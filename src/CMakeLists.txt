@@ -1,8 +1,10 @@
 find_package(fmt CONFIG)
 find_package(spdlog CONFIG)
 find_package(docopt CONFIG)
+find_package(tinyxml2 CONFIG)
 
-# Generic test that uses conan libs
+#TODO make a library
+#add_library(RetroDebugger SHARED)
 add_executable(RetroDebugger main.cpp)
 target_link_libraries(
     RetroDebugger
@@ -10,4 +12,14 @@ target_link_libraries(
             project_warnings
             docopt::docopt
             fmt::fmt
-            spdlog::spdlog)
+            spdlog::spdlog
+            tinyxml2::tinyxml2)
+
+#TODO
+#add_subdirectory(source)
+
+# Unit Tests
+if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
+    add_executable(RetroDebuggerTests)
+    add_subdirectory(tests)
+endif()

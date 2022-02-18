@@ -83,8 +83,8 @@ target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 add_subdirectory(src)
 
 # Adding the tests:
-option(ENABLE_TESTING "Enable the tests" ON)
-if(ENABLE_TESTING)
+option(ENABLE_RETRODEBUGGER_UNIT_TESTS "Enable the RetroDebugger unit tests" OFF) #Off while setting up everything
+if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
     enable_testing()
     message("Building Tests. Be sure to check out test/constexpr_tests for constexpr
 testing")

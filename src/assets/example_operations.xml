@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<operations opcodeLength=byte> <!--TODO: is the opcode length needed? -->
+    <operation opcode=0x00 command=nop/>    <!--operations with no args-->
+    <operation opcode=0x41 command=load> <arg type=reg value=B/> <arg type=reg value=C/> </operation> <!--operations with two reg args-->
+    <operation opcode=0x46 command=load> <arg type=reg value=B/> <arg type=indirect value=HL/> </operation> <!--operations with indirect arg-->
+    <operation opcode=0x87 command=add> <arg type=reg value=A/> <arg value=A/> </operation> <!--operations using default type of reg for 2nd arg-->
+    <operation opcode=0xE8 command=add> <arg type=reg value=SP/> <arg type=imm8bit/> </operation> <!--operations with 8bit immediate arg-->
+    <operation opcode=0xC2 command=jumpConditional> <arg type=condition value=NZ/> <arg type=immediate value=imm16bit/> </operation> <!--jump with conditional-->
+    <operation opcode=0xC3 command=jump> <arg type=imm16bit/> </operation> <!--jump with absolute address-->
+
+    <operation prefix=0xCB opcode=0xDE command=set> <arg type=const value=2/> <arg type=reg value=B/> </operation> <!--operations with prefix and a const arg-->
+</operations>

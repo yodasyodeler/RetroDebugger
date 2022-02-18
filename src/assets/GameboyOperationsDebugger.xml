@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--TODO: Gameboy is the target platform, some of the language is targeted to this platform. If I get to expanding this, I will need to update the language and redo probably everything. fun!-->
+<!--  auto type - description                           -->
+<!--  d8        - immediate 8 bit                       -->
+<!--  d16       - immediate 16 bit                      -->
+<!--  a8        - 8 bit unsigned address offset         -->
+<!--  a16       - 16 bit unsigned address absolute      -->
+<!--  r8        - 8 bit signed address offset           -->
+<!--'NUMERIC'   - constant integer value                -->
+<!--'0xNUMERIC' - constant integer value (HEX)          -->
+<!--'0bNUMERIC' - constant integer value (Binary)       -->
+<!--'(TYPE)'    - indirect value                        -->
+<!--TYPE+       - post increment, '-' for decrement     -->
+<!--+TYPE,      - pre increment,  '-' for decrement     -->
+<!--'ALPHA'     - Register name                         -->
+
+<!-- 'type'     - 'description'             -->
+<!--  auto      -  Will attempt to determine the type based on value. (Default type) -->
+<!--  reg       -  Value is used as a key to a map of registers. Will -->
+<!--  imm8      -  immediate 8bit number    -->
+<!--  imm16     -  immediate 16bit number   -->
+<!--  cond      -  conditional value-->
+<!--  -->
+
+
+<operations opcodeLength="8">
+    <operation opcode="0x00" command="NOP"/>
+    <operation opcode="0x01" command="LD">      <arg value="BC"/>             <arg value="d16"/>    </operation>
+    <operation opcode="0x02" command="LD">      <arg value="(BC)"/>           <arg value="A"/>      </operation>
+    <operation opcode="0x03" command="INC">     <arg value="BC"/>                                 </operation>
+    <operation opcode="0x04" command="INC">     <arg value="B"/>                                  </operation>
+    <operation opcode="0x05" command="DEC">     <arg value="B"/>                                  </operation>
+    <operation opcode="0x06" command="LD">      <arg value="B"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0x07" command="RLCA"/>
+    <operation opcode="0x08" command="LD">      <arg value="a16"/>            <arg value="SP"/>     </operation>
+    <operation opcode="0x09" command="ADD">     <arg value="HL"/>             <arg value="BC"/>     </operation>
+    <operation opcode="0x0A" command="LD">      <arg value="A"/>              <arg value="(BC)"/>   </operation>
+    <operation opcode="0x0B" command="DEC">     <arg value="BC"/>                                 </operation>
+    <operation opcode="0x0C" command="INC">     <arg value="C"/>                                  </operation>
+    <operation opcode="0x0D" command="DEC">     <arg value="C"/>                                  </operation>
+    <operation opcode="0x0E" command="LD">      <arg value="C"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0x0F" command="RRCA"/>
+    <operation opcode="0x10" command="STOP"/>
+    <operation opcode="0x11" command="LD">      <arg value="DE"/>             <arg value="d16"/>    </operation>
+    <operation opcode="0x12" command="LD">      <arg value="(DE)"/>           <arg value="A"/>      </operation>
+    <operation opcode="0x13" command="INC">     <arg value="DE"/>                                 </operation>
+    <operation opcode="0x14" command="INC">     <arg value="D"/>                                  </operation>
+    <operation opcode="0x15" command="DEC">     <arg value="D"/>                                  </operation>
+    <operation opcode="0x16" command="LD">      <arg value="D"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0x17" command="RLA"/>
+    <operation opcode="0x18" command="JR" isJump="true">      <arg value="r8"/>                                 </operation>
+    <operation opcode="0x19" command="ADD">     <arg value="HL"/>             <arg value="DE"/>     </operation>
+    <operation opcode="0x1A" command="LD">      <arg value="A"/>              <arg value="(DE)"/>   </operation>
+    <operation opcode="0x1B" command="DEC">     <arg value="DE"/>                                 </operation>
+    <operation opcode="0x1C" command="INC">     <arg value="E"/>                                  </operation>
+    <operation opcode="0x1D" command="DEC">     <arg value="E"/>                                  </operation>
+    <operation opcode="0x1E" command="LD">      <arg value="E"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0x1F" command="RRA"/>
+    <operation opcode="0x20" command="JR" isJump="true">      <arg type="cond" value="NZ"/>   <arg value="r8"/>     </operation>
+    <operation opcode="0x21" command="LD">      <arg value="HL"/>             <arg value="d16"/>    </operation>
+    <operation opcode="0x22" command="LD">      <arg value="(HL+)"/>          <arg value="A"/>      </operation>
+    <operation opcode="0x23" command="INC">     <arg value="HL"/>                                 </operation>
+    <operation opcode="0x24" command="INC">     <arg value="H"/>                                  </operation>
+    <operation opcode="0x25" command="DEC">     <arg value="H"/>                                  </operation>
+    <operation opcode="0x26" command="LD">      <arg value="H"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0x27" command="DAA"/>
+    <operation opcode="0x28" command="JR" isJump="true">      <arg type="cond" value="Z"/>   <arg value="r8"/>      </operation>
+    <operation opcode="0x29" command="ADD">     <arg value="HL"/>            <arg value="HL"/>     </operation>
+    <operation opcode="0x2A" command="LD">      <arg value="A"/>             <arg value="(HL+)"/>  </operation>
+    <operation opcode="0x2B" command="DEC">     <arg value="HL"/>                                </operation>
+    <operation opcode="0x2C" command="INC">     <arg value="L"/>                                 </operation>
+    <operation opcode="0x2D" command="DEC">     <arg value="L"/>                                 </operation>
+    <operation opcode="0x2E" command="LD">      <arg value="L"/>             <arg value="d8"/>     </operation>
+    <operation opcode="0x2F" command="CPL"/>
+    <operation opcode="0x30" command="JR" isJump="true">      <arg type="cond" value="NC"/>  <arg value="r8"/>     </operation>
+    <operation opcode="0x31" command="LD">      <arg value="SP"/>            <arg value="d16"/>    </operation>
+    <operation opcode="0x32" command="LD">      <arg value="(HL-)"/>         <arg value="A"/>      </operation>
+    <operation opcode="0x33" command="INC">     <arg value="SP"/>                                 </operation>
+    <operation opcode="0x34" command="INC">     <arg value="(HL)"/>                               </operation>
+    <operation opcode="0x35" command="DEC">     <arg value="(HL)"/>                               </operation>
+    <operation opcode="0x36" command="LD">      <arg value="(HL)"/>          <arg value="d8"/>     </operation>
+    <operation opcode="0x37" command="SCF"/>
+    <operation opcode="0x38" command="JR" isJump="true">      <arg type="cond" value="C"/>    <arg value="r8"/>     </operation>
+    <operation opcode="0x39" command="ADD">     <arg value="HL"/>             <arg value="SP"/>     </operation>
+    <operation opcode="0x3A" command="LD">      <arg value="A"/>              <arg value="(HL-)"/>  </operation>
+    <operation opcode="0x3B" command="DEC">     <arg value="SP"/>                                 </operation>
+    <operation opcode="0x3C" command="INC">     <arg value="A"/>                                  </operation>
+    <operation opcode="0x3D" command="DEC">     <arg value="A"/>                                  </operation>
+    <operation opcode="0x3E" command="LD">      <arg value="A"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0x3F" command="CCF"/>
+    <operation opcode="0x40" command="LD">      <arg value="B"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x41" command="LD">      <arg value="B"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x42" command="LD">      <arg value="B"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x43" command="LD">      <arg value="B"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x44" command="LD">      <arg value="B"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x45" command="LD">      <arg value="B"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x46" command="LD">      <arg value="B"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x47" command="LD">      <arg value="B"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x48" command="LD">      <arg value="C"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x49" command="LD">      <arg value="C"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x4A" command="LD">      <arg value="C"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x4B" command="LD">      <arg value="C"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x4C" command="LD">      <arg value="C"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x4D" command="LD">      <arg value="C"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x4E" command="LD">      <arg value="C"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x4F" command="LD">      <arg value="C"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x50" command="LD">      <arg value="D"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x51" command="LD">      <arg value="D"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x52" command="LD">      <arg value="D"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x53" command="LD">      <arg value="D"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x54" command="LD">      <arg value="D"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x55" command="LD">      <arg value="D"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x56" command="LD">      <arg value="D"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x57" command="LD">      <arg value="D"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x58" command="LD">      <arg value="E"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x59" command="LD">      <arg value="E"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x5A" command="LD">      <arg value="E"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x5B" command="LD">      <arg value="E"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x5C" command="LD">      <arg value="E"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x5D" command="LD">      <arg value="E"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x5E" command="LD">      <arg value="E"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x5F" command="LD">      <arg value="E"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x60" command="LD">      <arg value="H"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x61" command="LD">      <arg value="H"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x62" command="LD">      <arg value="H"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x63" command="LD">      <arg value="H"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x64" command="LD">      <arg value="H"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x65" command="LD">      <arg value="H"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x66" command="LD">      <arg value="H"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x67" command="LD">      <arg value="H"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x68" command="LD">      <arg value="L"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x69" command="LD">      <arg value="L"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x6A" command="LD">      <arg value="L"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x6B" command="LD">      <arg value="L"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x6C" command="LD">      <arg value="L"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x6D" command="LD">      <arg value="L"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x6E" command="LD">      <arg value="L"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x6F" command="LD">      <arg value="L"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x70" command="LD">      <arg value="(HL)"/>           <arg value="B"/>      </operation>
+    <operation opcode="0x71" command="LD">      <arg value="(HL)"/>           <arg value="C"/>      </operation>
+    <operation opcode="0x72" command="LD">      <arg value="(HL)"/>           <arg value="D"/>      </operation>
+    <operation opcode="0x73" command="LD">      <arg value="(HL)"/>           <arg value="E"/>      </operation>
+    <operation opcode="0x74" command="LD">      <arg value="(HL)"/>           <arg value="H"/>      </operation>
+    <operation opcode="0x75" command="LD">      <arg value="(HL)"/>           <arg value="L"/>      </operation>
+    <operation opcode="0x76" command="HALT"/>
+    <operation opcode="0x77" command="LD">      <arg value="(HL)"/>           <arg value="A"/>      </operation>
+    <operation opcode="0x78" command="LD">      <arg value="A"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x79" command="LD">      <arg value="A"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x7A" command="LD">      <arg value="A"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x7B" command="LD">      <arg value="A"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x7C" command="LD">      <arg value="A"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x7D" command="LD">      <arg value="A"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x7E" command="LD">      <arg value="A"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x7F" command="LD">      <arg value="A"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x80" command="ADD">     <arg value="A"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x81" command="ADD">     <arg value="A"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x82" command="ADD">     <arg value="A"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x83" command="ADD">     <arg value="A"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x84" command="ADD">     <arg value="A"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x85" command="ADD">     <arg value="A"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x86" command="ADD">     <arg value="A"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x87" command="ADD">     <arg value="A"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x88" command="ADC">     <arg value="A"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x89" command="ADC">     <arg value="A"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x8A" command="ADC">     <arg value="A"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x8B" command="ADC">     <arg value="A"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x8C" command="ADC">     <arg value="A"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x8D" command="ADC">     <arg value="A"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x8E" command="ADC">     <arg value="A"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x8F" command="ADC">     <arg value="A"/>              <arg value="A"/>      </operation>
+    <operation opcode="0x90" command="SUB">     <arg value="B"/>                                  </operation>
+    <operation opcode="0x91" command="SUB">     <arg value="C"/>                                  </operation>
+    <operation opcode="0x92" command="SUB">     <arg value="D"/>                                  </operation>
+    <operation opcode="0x93" command="SUB">     <arg value="E"/>                                  </operation>
+    <operation opcode="0x94" command="SUB">     <arg value="H"/>                                  </operation>
+    <operation opcode="0x95" command="SUB">     <arg value="L"/>                                  </operation>
+    <operation opcode="0x96" command="SUB">     <arg value="(HL)"/>                               </operation>
+    <operation opcode="0x97" command="SUB">     <arg value="A"/>                                  </operation>
+    <operation opcode="0x98" command="SBC">     <arg value="A"/>              <arg value="B"/>      </operation>
+    <operation opcode="0x99" command="SBC">     <arg value="A"/>              <arg value="C"/>      </operation>
+    <operation opcode="0x9A" command="SBC">     <arg value="A"/>              <arg value="D"/>      </operation>
+    <operation opcode="0x9B" command="SBC">     <arg value="A"/>              <arg value="E"/>      </operation>
+    <operation opcode="0x9C" command="SBC">     <arg value="A"/>              <arg value="H"/>      </operation>
+    <operation opcode="0x9D" command="SBC">     <arg value="A"/>              <arg value="L"/>      </operation>
+    <operation opcode="0x9E" command="SBC">     <arg value="A"/>              <arg value="(HL)"/>   </operation>
+    <operation opcode="0x9F" command="SBC">     <arg value="A"/>              <arg value="A"/>      </operation>
+    <operation opcode="0xA0" command="AND">     <arg value="B"/>                                  </operation>
+    <operation opcode="0xA1" command="AND">     <arg value="C"/>                                  </operation>
+    <operation opcode="0xA2" command="AND">     <arg value="D"/>                                  </operation>
+    <operation opcode="0xA3" command="AND">     <arg value="E"/>                                  </operation>
+    <operation opcode="0xA4" command="AND">     <arg value="H"/>                                  </operation>
+    <operation opcode="0xA5" command="AND">     <arg value="L"/>                                  </operation>
+    <operation opcode="0xA6" command="AND">     <arg value="(HL)"/>                               </operation>
+    <operation opcode="0xA7" command="AND">     <arg value="A"/>                                  </operation>
+    <operation opcode="0xA8" command="XOR">     <arg value="B"/>                                  </operation>
+    <operation opcode="0xA9" command="XOR">     <arg value="C"/>                                  </operation>
+    <operation opcode="0xAA" command="XOR">     <arg value="D"/>                                  </operation>
+    <operation opcode="0xAB" command="XOR">     <arg value="E"/>                                  </operation>
+    <operation opcode="0xAC" command="XOR">     <arg value="H"/>                                  </operation>
+    <operation opcode="0xAD" command="XOR">     <arg value="L"/>                                  </operation>
+    <operation opcode="0xAE" command="XOR">     <arg value="(HL)"/>                               </operation>
+    <operation opcode="0xAF" command="XOR">     <arg value="A"/>                                  </operation>
+    <operation opcode="0xB0" command="OR">      <arg value="B"/>                                  </operation>
+    <operation opcode="0xB1" command="OR">      <arg value="C"/>                                  </operation>
+    <operation opcode="0xB2" command="OR">      <arg value="D"/>                                  </operation>
+    <operation opcode="0xB3" command="OR">      <arg value="E"/>                                  </operation>
+    <operation opcode="0xB4" command="OR">      <arg value="H"/>                                  </operation>
+    <operation opcode="0xB5" command="OR">      <arg value="L"/>                                  </operation>
+    <operation opcode="0xB6" command="OR">      <arg value="(HL)"/>                               </operation>
+    <operation opcode="0xB7" command="OR">      <arg value="A"/>                                  </operation>
+    <operation opcode="0xB8" command="CP">      <arg value="B"/>                                  </operation>
+    <operation opcode="0xB9" command="CP">      <arg value="C"/>                                  </operation>
+    <operation opcode="0xBA" command="CP">      <arg value="D"/>                                  </operation>
+    <operation opcode="0xBB" command="CP">      <arg value="E"/>                                  </operation>
+    <operation opcode="0xBC" command="CP">      <arg value="H"/>                                  </operation>
+    <operation opcode="0xBD" command="CP">      <arg value="L"/>                                  </operation>
+    <operation opcode="0xBE" command="CP">      <arg value="(HL)"/>                               </operation>
+    <operation opcode="0xBF" command="CP">      <arg value="A"/>                                  </operation>
+    <operation opcode="0xC0" command="RET" isJump="true">     <arg type="cond" value="NZ"/>       </operation>
+    <operation opcode="0xC1" command="POP">     <arg value="BC"/>                                 </operation>
+    <operation opcode="0xC2" command="JP" isJump="true">      <arg type="cond" value="NZ"/>   <arg value="a16"/>    </operation>
+    <operation opcode="0xC3" command="JP" isJump="true">      <arg value="a16"/>                                </operation>
+    <operation opcode="0xC4" command="CALL" isJump="true">    <arg type="cond" value="NZ"/>   <arg value="a16"/>    </operation>
+    <operation opcode="0xC5" command="PUSH">    <arg value="BC"/>                                 </operation>
+    <operation opcode="0xC6" command="ADD">     <arg value="A"/>              <arg value="d8"/>   </operation>
+    <operation opcode="0xC7" command="RST" isJump="true">     <arg value="0x00"/>                               </operation>
+    <operation opcode="0xC8" command="RET" isJump="true">     <arg type="cond" value="Z"/>                        </operation>
+    <operation opcode="0xC9" command="RET" isJump="true"/>
+    <operation opcode="0xCA" command="JP" isJump="true">      <arg type="cond" value="Z"/>    <arg value="a16"/>    </operation>
+    <!-- <operation opcode="0xCB" command="PREFIX">                                                          </operation> -->
+    <operation opcode="0xCC" command="CALL" isJump="true">    <arg type="cond" value="Z"/>    <arg value="a16"/>    </operation>
+    <operation opcode="0xCD" command="CALL" isJump="true">    <arg value="a16"/>                                </operation>
+    <operation opcode="0xCE" command="ADC">     <arg value="A"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0xCF" command="RST" isJump="true">     <arg value="0x08"/>                               </operation>
+    <operation opcode="0xD0" command="RET" isJump="true">     <arg type="cond" value="NC"/>                       </operation>
+    <operation opcode="0xD1" command="POP">     <arg value="DE"/>                                 </operation>
+    <operation opcode="0xD2" command="JP" isJump="true">      <arg type="cond" value="NC"/>   <arg value="a16"/>    </operation>
+    <!-- 0xD3 NOP -->
+    <operation opcode="0xD4" command="CALL" isJump="true">    <arg type="cond" value="NC"/>   <arg value="a16"/>    </operation>
+    <operation opcode="0xD5" command="PUSH">    <arg value="DE"/>                                 </operation>
+    <operation opcode="0xD6" command="SUB">     <arg value="d8"/>                                 </operation>
+    <operation opcode="0xD7" command="RST" isJump="true">     <arg value="0x10"/>                               </operation>
+    <operation opcode="0xD8" command="RET" isJump="true">     <arg value="C"/>                                  </operation>
+    <operation opcode="0xD9" command="RETI" isJump="true"/>
+    <operation opcode="0xDA" command="JP" isJump="true">      <arg value="C"/>              <arg value="a16"/>    </operation>
+    <!-- 0xDB NOP -->
+    <operation opcode="0xDC" command="CALL" isJump="true">    <arg value="C"/>              <arg value="a16"/>    </operation>
+    <!-- 0xDD NOP -->
+    <operation opcode="0xDE" command="SBC">     <arg value="A"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0xDF" command="RST" isJump="true">     <arg value="0x18"/>                               </operation>
+    <operation opcode="0xE0" command="LDH">     <arg value="(a8)"/>           <arg value="A"/>      </operation>
+    <operation opcode="0xE1" command="POP">     <arg value="HL"/>                                 </operation>
+    <operation opcode="0xE2" command="LD">      <arg value="(C)"/>            <arg value="A"/>      </operation>
+    <!-- 0xE3 NOP -->
+    <!-- 0xE4 NOP -->
+    <operation opcode="0xE5" command="PUSH">    <arg value="HL"/>                                   </operation>
+    <operation opcode="0xE6" command="AND">     <arg value="d8"/>                                   </operation>
+    <operation opcode="0xE7" command="RST" isJump="true">     <arg value="0x20"/>                   </operation>
+    <operation opcode="0xE8" command="ADD">     <arg value="SP"/>             <arg value="r8"/>     </operation>
+    <operation opcode="0xE9" command="JP" isJump="true">      <arg value="(HL)"/>                   </operation>
+    <operation opcode="0xEA" command="LD">      <arg value="(a16)"/>          <arg value="A"/>      </operation>
+    <!-- 0xEB NOP -->
+    <!-- 0xEC NOP -->
+    <!-- 0xED NOP -->
+    <operation opcode="0xEE" command="XOR">     <arg value="d8"/>                                   </operation>
+    <operation opcode="0xEF" command="RST" isJump="true">     <arg value="0x28"/>                   </operation>
+    <operation opcode="0xF0" command="LDH">     <arg value="A"/>              <arg value="(a8)"/>   </operation>
+    <operation opcode="0xF1" command="POP">     <arg value="AF"/>                                   </operation>
+    <operation opcode="0xF2" command="LD">      <arg value="A"/>              <arg value="(C)"/>    </operation>
+    <operation opcode="0xF3" command="DI"/>
+    <operation opcode="0xF5" command="PUSH">    <arg value="AF"/>                                   </operation>
+    <operation opcode="0xF6" command="OR">      <arg value="d8"/>                                   </operation>
+    <operation opcode="0xF7" command="RST" isJump="true">     <arg value="0x30"/>                   </operation>
+    <operation opcode="0xF8" command="LD">      <arg value="HL"/>             <arg value="SP+r8"/>  </operation>
+    <operation opcode="0xF9" command="LD">      <arg value="SP"/>             <arg value="HL"/>     </operation>
+    <operation opcode="0xFA" command="LD">      <arg value="A"/>              <arg value="(a16)"/>  </operation>
+    <operation opcode="0xFB" command="EI"/>
+    <operation opcode="0xFE" command="CP">      <arg value="d8"/>                                   </operation>
+    <operation opcode="0xFF" command="RST" isJump="true">     <arg value="0x38"/>                   </operation>
+</operations>
+
+<!-- opcode length for extended refers to the length after an extended opcode is found -->
+<operations extended="0xCB" opcodeLength="8">
+    <operation opcode="0x00" command="RLC">    <arg value="B"/>    </operation>
+    <operation opcode="0x01" command="RLC">    <arg value="C"/>    </operation>
+    <operation opcode="0x02" command="RLC">    <arg value="D"/>    </operation>
+    <operation opcode="0x03" command="RLC">    <arg value="E"/>    </operation>
+    <operation opcode="0x04" command="RLC">    <arg value="H"/>    </operation>
+    <operation opcode="0x05" command="RLC">    <arg value="L"/>    </operation>
+    <operation opcode="0x06" command="RLC">    <arg value="(HL)"/> </operation>
+    <operation opcode="0x07" command="RLC">    <arg value="A"/>    </operation>
+    <operation opcode="0x08" command="RRC">    <arg value="B"/>    </operation>
+    <operation opcode="0x09" command="RRC">    <arg value="C"/>    </operation>
+    <operation opcode="0x0A" command="RRC">    <arg value="D"/>    </operation>
+    <operation opcode="0x0B" command="RRC">    <arg value="E"/>    </operation>
+    <operation opcode="0x0C" command="RRC">    <arg value="H"/>    </operation>
+    <operation opcode="0x0D" command="RRC">    <arg value="L"/>    </operation>
+    <operation opcode="0x0E" command="RRC">    <arg value="(HL)"/> </operation>
+    <operation opcode="0x0F" command="RRC">    <arg value="A"/>    </operation>
+    <operation opcode="0x10" command="RL">     <arg value="B"/>    </operation>
+    <operation opcode="0x11" command="RL">     <arg value="C"/>    </operation>
+    <operation opcode="0x12" command="RL">     <arg value="D"/>    </operation>
+    <operation opcode="0x13" command="RL">     <arg value="E"/>    </operation>
+    <operation opcode="0x14" command="RL">     <arg value="H"/>    </operation>
+    <operation opcode="0x15" command="RL">     <arg value="L"/>    </operation>
+    <operation opcode="0x16" command="RL">     <arg value="(HL)"/> </operation>
+    <operation opcode="0x17" command="RL">     <arg value="A"/>    </operation>
+    <operation opcode="0x18" command="RR">     <arg value="B"/>    </operation>
+    <operation opcode="0x19" command="RR">     <arg value="C"/>    </operation>
+    <operation opcode="0x1A" command="RR">     <arg value="D"/>    </operation>
+    <operation opcode="0x1B" command="RR">     <arg value="E"/>    </operation>
+    <operation opcode="0x1C" command="RR">     <arg value="H"/>    </operation>
+    <operation opcode="0x1D" command="RR">     <arg value="L"/>    </operation>
+    <operation opcode="0x1E" command="RR">     <arg value="(HL)"/> </operation>
+    <operation opcode="0x1F" command="RR">     <arg value="A"/>    </operation>
+    <operation opcode="0x20" command="SLA">    <arg value="B"/>    </operation>
+    <operation opcode="0x21" command="SLA">    <arg value="C"/>    </operation>
+    <operation opcode="0x22" command="SLA">    <arg value="D"/>    </operation>
+    <operation opcode="0x23" command="SLA">    <arg value="E"/>    </operation>
+    <operation opcode="0x24" command="SLA">    <arg value="H"/>    </operation>
+    <operation opcode="0x25" command="SLA">    <arg value="L"/>    </operation>
+    <operation opcode="0x26" command="SLA">    <arg value="(HL)"/> </operation>
+    <operation opcode="0x27" command="SLA">    <arg value="A"/>    </operation>
+    <operation opcode="0x28" command="SRA">    <arg value="B"/>    </operation>
+    <operation opcode="0x29" command="SRA">    <arg value="C"/>    </operation>
+    <operation opcode="0x2A" command="SRA">    <arg value="D"/>    </operation>
+    <operation opcode="0x2B" command="SRA">    <arg value="E"/>    </operation>
+    <operation opcode="0x2C" command="SRA">    <arg value="H"/>    </operation>
+    <operation opcode="0x2D" command="SRA">    <arg value="L"/>    </operation>
+    <operation opcode="0x2E" command="SRA">    <arg value="(HL)"/> </operation>
+    <operation opcode="0x2F" command="SRA">    <arg value="A"/>    </operation>
+    <operation opcode="0x30" command="SWAP">   <arg value="B"/>    </operation>
+    <operation opcode="0x31" command="SWAP">   <arg value="C"/>    </operation>
+    <operation opcode="0x32" command="SWAP">   <arg value="D"/>    </operation>
+    <operation opcode="0x33" command="SWAP">   <arg value="E"/>    </operation>
+    <operation opcode="0x34" command="SWAP">   <arg value="H"/>    </operation>
+    <operation opcode="0x35" command="SWAP">   <arg value="L"/>    </operation>
+    <operation opcode="0x36" command="SWAP">   <arg value="(HL)"/> </operation>
+    <operation opcode="0x37" command="SWAP">   <arg value="A"/>    </operation>
+    <operation opcode="0x38" command="SRL">    <arg value="B"/>    </operation>
+    <operation opcode="0x39" command="SRL">    <arg value="C"/>    </operation>
+    <operation opcode="0x3A" command="SRL">    <arg value="D"/>    </operation>
+    <operation opcode="0x3B" command="SRL">    <arg value="E"/>    </operation>
+    <operation opcode="0x3C" command="SRL">    <arg value="H"/>    </operation>
+    <operation opcode="0x3D" command="SRL">    <arg value="L"/>    </operation>
+    <operation opcode="0x3E" command="SRL">    <arg value="(HL)"/> </operation>
+    <operation opcode="0x3F" command="SRL">    <arg value="A"/>    </operation>
+    <operation opcode="0x40" command="BIT">    <arg value="0"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x41" command="BIT">    <arg value="0"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x42" command="BIT">    <arg value="0"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x43" command="BIT">    <arg value="0"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x44" command="BIT">    <arg value="0"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x45" command="BIT">    <arg value="0"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x46" command="BIT">    <arg value="0"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x47" command="BIT">    <arg value="0"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x48" command="BIT">    <arg value="1"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x49" command="BIT">    <arg value="1"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x4A" command="BIT">    <arg value="1"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x4B" command="BIT">    <arg value="1"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x4C" command="BIT">    <arg value="1"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x4D" command="BIT">    <arg value="1"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x4E" command="BIT">    <arg value="1"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x4F" command="BIT">    <arg value="1"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x50" command="BIT">    <arg value="2"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x51" command="BIT">    <arg value="2"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x52" command="BIT">    <arg value="2"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x53" command="BIT">    <arg value="2"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x54" command="BIT">    <arg value="2"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x55" command="BIT">    <arg value="2"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x56" command="BIT">    <arg value="2"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x57" command="BIT">    <arg value="2"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x58" command="BIT">    <arg value="3"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x59" command="BIT">    <arg value="3"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x5A" command="BIT">    <arg value="3"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x5B" command="BIT">    <arg value="3"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x5C" command="BIT">    <arg value="3"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x5D" command="BIT">    <arg value="3"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x5E" command="BIT">    <arg value="3"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x5F" command="BIT">    <arg value="3"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x60" command="BIT">    <arg value="4"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x61" command="BIT">    <arg value="4"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x62" command="BIT">    <arg value="4"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x63" command="BIT">    <arg value="4"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x64" command="BIT">    <arg value="4"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x65" command="BIT">    <arg value="4"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x66" command="BIT">    <arg value="4"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x67" command="BIT">    <arg value="4"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x68" command="BIT">    <arg value="5"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x69" command="BIT">    <arg value="5"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x6A" command="BIT">    <arg value="5"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x6B" command="BIT">    <arg value="5"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x6C" command="BIT">    <arg value="5"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x6D" command="BIT">    <arg value="5"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x6E" command="BIT">    <arg value="5"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x6F" command="BIT">    <arg value="5"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x70" command="BIT">    <arg value="6"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x71" command="BIT">    <arg value="6"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x72" command="BIT">    <arg value="6"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x73" command="BIT">    <arg value="6"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x74" command="BIT">    <arg value="6"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x75" command="BIT">    <arg value="6"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x76" command="BIT">    <arg value="6"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x77" command="BIT">    <arg value="6"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x78" command="BIT">    <arg value="7"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x79" command="BIT">    <arg value="7"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x7A" command="BIT">    <arg value="7"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x7B" command="BIT">    <arg value="7"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x7C" command="BIT">    <arg value="7"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x7D" command="BIT">    <arg value="7"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x7E" command="BIT">    <arg value="7"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x7F" command="BIT">    <arg value="7"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x80" command="RES">    <arg value="0"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x81" command="RES">    <arg value="0"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x82" command="RES">    <arg value="0"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x83" command="RES">    <arg value="0"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x84" command="RES">    <arg value="0"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x85" command="RES">    <arg value="0"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x86" command="RES">    <arg value="0"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x87" command="RES">    <arg value="0"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x88" command="RES">    <arg value="1"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x89" command="RES">    <arg value="1"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x8A" command="RES">    <arg value="1"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x8B" command="RES">    <arg value="1"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x8C" command="RES">    <arg value="1"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x8D" command="RES">    <arg value="1"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x8E" command="RES">    <arg value="1"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x8F" command="RES">    <arg value="1"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x90" command="RES">    <arg value="2"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x91" command="RES">    <arg value="2"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x92" command="RES">    <arg value="2"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x93" command="RES">    <arg value="2"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x94" command="RES">    <arg value="2"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x95" command="RES">    <arg value="2"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x96" command="RES">    <arg value="2"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x97" command="RES">    <arg value="2"/>    <arg value="A"/>     </operation>
+    <operation opcode="0x98" command="RES">    <arg value="3"/>    <arg value="B"/>     </operation>
+    <operation opcode="0x99" command="RES">    <arg value="3"/>    <arg value="C"/>     </operation>
+    <operation opcode="0x9A" command="RES">    <arg value="3"/>    <arg value="D"/>     </operation>
+    <operation opcode="0x9B" command="RES">    <arg value="3"/>    <arg value="E"/>     </operation>
+    <operation opcode="0x9C" command="RES">    <arg value="3"/>    <arg value="H"/>     </operation>
+    <operation opcode="0x9D" command="RES">    <arg value="3"/>    <arg value="L"/>     </operation>
+    <operation opcode="0x9E" command="RES">    <arg value="3"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0x9F" command="RES">    <arg value="3"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xA0" command="RES">    <arg value="4"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xA1" command="RES">    <arg value="4"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xA2" command="RES">    <arg value="4"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xA3" command="RES">    <arg value="4"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xA4" command="RES">    <arg value="4"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xA5" command="RES">    <arg value="4"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xA6" command="RES">    <arg value="4"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xA7" command="RES">    <arg value="4"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xA8" command="RES">    <arg value="5"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xA9" command="RES">    <arg value="5"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xAA" command="RES">    <arg value="5"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xAB" command="RES">    <arg value="5"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xAC" command="RES">    <arg value="5"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xAD" command="RES">    <arg value="5"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xAE" command="RES">    <arg value="5"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xAF" command="RES">    <arg value="5"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xB0" command="RES">    <arg value="6"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xB1" command="RES">    <arg value="6"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xB2" command="RES">    <arg value="6"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xB3" command="RES">    <arg value="6"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xB4" command="RES">    <arg value="6"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xB5" command="RES">    <arg value="6"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xB6" command="RES">    <arg value="6"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xB7" command="RES">    <arg value="6"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xB8" command="RES">    <arg value="7"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xB9" command="RES">    <arg value="7"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xBA" command="RES">    <arg value="7"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xBB" command="RES">    <arg value="7"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xBC" command="RES">    <arg value="7"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xBD" command="RES">    <arg value="7"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xBE" command="RES">    <arg value="7"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xBF" command="RES">    <arg value="7"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xC0" command="SET">    <arg value="0"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xC1" command="SET">    <arg value="0"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xC2" command="SET">    <arg value="0"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xC3" command="SET">    <arg value="0"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xC4" command="SET">    <arg value="0"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xC5" command="SET">    <arg value="0"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xC6" command="SET">    <arg value="0"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xC7" command="SET">    <arg value="0"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xC8" command="SET">    <arg value="1"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xC9" command="SET">    <arg value="1"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xCA" command="SET">    <arg value="1"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xCB" command="SET">    <arg value="1"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xCC" command="SET">    <arg value="1"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xCD" command="SET">    <arg value="1"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xCE" command="SET">    <arg value="1"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xCF" command="SET">    <arg value="1"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xD0" command="SET">    <arg value="2"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xD1" command="SET">    <arg value="2"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xD2" command="SET">    <arg value="2"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xD3" command="SET">    <arg value="2"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xD4" command="SET">    <arg value="2"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xD5" command="SET">    <arg value="2"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xD6" command="SET">    <arg value="2"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xD7" command="SET">    <arg value="2"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xD8" command="SET">    <arg value="3"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xD9" command="SET">    <arg value="3"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xDA" command="SET">    <arg value="3"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xDB" command="SET">    <arg value="3"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xDC" command="SET">    <arg value="3"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xDD" command="SET">    <arg value="3"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xDE" command="SET">    <arg value="3"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xDF" command="SET">    <arg value="3"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xE0" command="SET">    <arg value="4"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xE1" command="SET">    <arg value="4"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xE2" command="SET">    <arg value="4"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xE3" command="SET">    <arg value="4"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xE4" command="SET">    <arg value="4"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xE5" command="SET">    <arg value="4"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xE6" command="SET">    <arg value="4"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xE7" command="SET">    <arg value="4"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xE8" command="SET">    <arg value="5"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xE9" command="SET">    <arg value="5"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xEA" command="SET">    <arg value="5"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xEB" command="SET">    <arg value="5"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xEC" command="SET">    <arg value="5"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xED" command="SET">    <arg value="5"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xEE" command="SET">    <arg value="5"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xEF" command="SET">    <arg value="5"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xF0" command="SET">    <arg value="6"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xF1" command="SET">    <arg value="6"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xF2" command="SET">    <arg value="6"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xF3" command="SET">    <arg value="6"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xF4" command="SET">    <arg value="6"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xF5" command="SET">    <arg value="6"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xF6" command="SET">    <arg value="6"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xF7" command="SET">    <arg value="6"/>    <arg value="A"/>     </operation>
+    <operation opcode="0xF8" command="SET">    <arg value="7"/>    <arg value="B"/>     </operation>
+    <operation opcode="0xF9" command="SET">    <arg value="7"/>    <arg value="C"/>     </operation>
+    <operation opcode="0xFA" command="SET">    <arg value="7"/>    <arg value="D"/>     </operation>
+    <operation opcode="0xFB" command="SET">    <arg value="7"/>    <arg value="E"/>     </operation>
+    <operation opcode="0xFC" command="SET">    <arg value="7"/>    <arg value="H"/>     </operation>
+    <operation opcode="0xFD" command="SET">    <arg value="7"/>    <arg value="L"/>     </operation>
+    <operation opcode="0xFE" command="SET">    <arg value="7"/>    <arg value="(HL)"/>  </operation>
+    <operation opcode="0xFF" command="SET">    <arg value="7"/>    <arg value="A"/>     </operation>
+</operations>
+
+
+
+
+
+
+
+

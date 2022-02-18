@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<commands>
+    <command>
+        <name>example</name>
+        <mnemonic>example</mnemonic>
+        <opcodes>
+            <opcode>0x0</opcode> 
+        </opcodes>
+    </command>
+</commands>
