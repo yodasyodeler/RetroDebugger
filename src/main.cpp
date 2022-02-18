@@ -5,7 +5,7 @@
 #include <spdlog/spdlog.h>
 
 static constexpr auto USAGE =
-  R"(Naval Fate.
+    R"(Naval Fate.
 
     Usage:
           naval_fate ship new <name>...
@@ -22,22 +22,22 @@ static constexpr auto USAGE =
           --drifting    Drifting mine.
 )";
 
-int main(int argc, const char **argv)
-{
-  try {
-    std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
-      { std::next(argv), std::next(argv, argc) },
-      true,// show help if requested
-      "Naval Fate 2.0");// version string
+int main(int argc, const char** argv) {
+    try {
+        std::map<std::string, docopt::value> args = docopt::docopt(USAGE,
+            { std::next(argv), std::next(argv, argc) },
+            true, // show help if requested
+            "Naval Fate 2.0"); // version string
 
-    for (auto const &arg : args) { std::cout << arg.first << "=" << arg.second << '\n'; }
+        for (auto const& arg : args) { std::cout << arg.first << "=" << arg.second << '\n'; }
 
 
-    // Use the default logger (stdout, multi-threaded, colored)
-    spdlog::info("Hello, {}!", "World");
+        // Use the default logger (stdout, multi-threaded, colored)
+        spdlog::info("Hello, {}!", "World");
 
-    fmt::print("Hello, from {}\n", "{fmt}");
-  } catch (const std::exception &e) {
-    fmt::print("Unhandled exception in main: {}", e.what());
-  }
+        fmt::print("Hello, from {}\n", "{fmt}");
+    }
+    catch (const std::exception& e) {
+        fmt::print("Unhandled exception in main: {}", e.what());
+    }
 }
