@@ -79,6 +79,21 @@ dynamic_project_options(
 
 target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
+if(MSVC)
+    # Collect binaries under a stage subdirectory
+    set(stageDir ${CMAKE_CURRENT_BINARY_DIR}/stage)
+    include(GNUInstallDirs)
+    if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
+    endif()
+    if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
+    endif()
+    if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
+    endif()
+endif()
+
 # Adding the src:
 add_subdirectory(src)
 
@@ -91,6 +106,7 @@ endif()
 option(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS "Enable the RetroDebugger unit tests" OFF
 )#Off while setting up everything
 if(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS)
+    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT RetroDebuggerIntegrationTests)
     add_subdirectory(tests)
     enable_testing()
 endif()
@@ -105,11 +121,12 @@ endif()
 # so that it behaves well with MSVC's debugger, and we can run the target from visual studio
 if(MSVC)
     get_all_targets(all_targets)
-    set_target_properties(${all_targets} PROPERTIES VS_DEBUGGER_ENVIRONMENT "PATH=$(VC_ExecutablePath_x64);%PATH%")
+    set_target_properties(
+        ${all_targets} PROPERTIES VS_DEBUGGER_ENVIRONMENT
+                                  "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY};$(VC_ExecutablePath_x64);%PATH%")
 endif()
 
 # set the startup project for the "play" button in MSVC
-set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT RetroDebugger)
 
 # Enable folders for IDEs
 set_property(GLOBAL PROPERTY USE_FOLDERS YES)
