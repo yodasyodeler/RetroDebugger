@@ -17,11 +17,11 @@ public:
     Operations GetJumpOpertions();
     std::vector<RegisterInfoPtr> GetRegisters();
 
-    size_t GetOperation(unsigned int opcode, Operation& operation);
+    size_t GetOperation(size_t opcode, Operation& operation);
     bool ParseFile(const std::string& filename);
 
 private:
-    void ConvertOperation(OpcodeToOperation& operationMap, const  XmlDebuggerOperation& xmlOperation);
+    void ConvertOperation(OpcodeToOperation& operationMap, const XmlDebuggerOperation& xmlOperation);
 
     bool m_isValid = false;
     Operations m_operations = {};

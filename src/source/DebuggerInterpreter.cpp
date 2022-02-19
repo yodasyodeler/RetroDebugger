@@ -3,12 +3,13 @@
 
 #include "DebuggerInterpreter.h"
 
-#include "DebuggerStringParser.h"
 #include "DebuggerPrintFormat.h"
+#include "DebuggerStringParser.h"
 
 #include "DebuggerCallbacks.h"
 
-DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger) : m_debugger(debugger) {}
+DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger) :
+    m_debugger(debugger) {}
 
 std::string DebuggerInterpreter::GetCommandResponse() {
     return m_commandResponse;
@@ -26,9 +27,12 @@ bool DebuggerInterpreter::Help(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
 
-    if (cmdCount == 1) SetCommandResponse(DebuggerPrintFormat::PrintGeneralHelp());
-    else if (cmdCount == 2) SetCommandResponse(DebuggerPrintFormat::PrintCommandHelp(words[1]));
-    else SetCommandResponse(DebuggerPrintFormat::PrintHelpHelp());
+    if (cmdCount == 1)
+        SetCommandResponse(DebuggerPrintFormat::PrintGeneralHelp());
+    else if (cmdCount == 2)
+        SetCommandResponse(DebuggerPrintFormat::PrintCommandHelp(words[1]));
+    else
+        SetCommandResponse(DebuggerPrintFormat::PrintHelpHelp());
     return true;
 }
 
@@ -191,16 +195,16 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
             SetCommandResponse(DebuggerPrintFormat::PrintRegister(reg->first, reg->second) + "\n");
             return true;
         }
-        //TODO: case insensitive
+        // TODO: case insensitive
         else if ((words[1] == "registers") || (words[1] == "reg")) {
             SetCommandResponse(DebuggerPrintFormat::PrintAllRegisters(regSet));
             return true;
         }
-        //else if (false) {
-        //    const auto info = m_debugger->GetRegInfo(0); //TODO: not implemented
-        //    SetCommandResponse(DebuggerPrintFormat::PrintMemoryMappedRegInfo(info));
-        //    return true;
-        //}
+        // else if (false) {
+        //     const auto info = m_debugger->GetRegInfo(0); //TODO: not implemented
+        //     SetCommandResponse(DebuggerPrintFormat::PrintMemoryMappedRegInfo(info));
+        //     return true;
+        // }
         else if (DebuggerStringParser::ParseNumber(words[1], number)) {
             const auto info = m_debugger->GetRomInfo(number);
             SetCommandResponse(DebuggerPrintFormat::PrintAddressInfo(info));
@@ -210,7 +214,7 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
     return false;
 }
 
-//TODO: Make more accurate to gdb, only supports starting address, not what is expected of list.
+// TODO: Make more accurate to gdb, only supports starting address, not what is expected of list.
 bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
@@ -218,12 +222,12 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     unsigned int number = DebuggerCallback::GetPcReg();
 
     if ((cmdCount == 1) || (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number))) {
-        if (cmdCount == 1 && m_listNext) number = m_listAddress;
+        if (cmdCount == 1 && m_listNext) number = static_cast<unsigned int>(m_listAddress);
 
-        auto commands = m_debugger->GetCommandInfoList(number, m_listsize);
+        auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), m_listsize);
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
         if (!commands.empty()) {
-            unsigned int lastAddress = m_listAddress;//TODO: I hate this, but I'm lazy right now. Find a better way to get last address
+            auto lastAddress = m_listAddress; // TODO: I hate this, but I'm lazy right now. Find a better way to get last address
             if (!commands.empty()) {
                 const auto command = (--commands.end());
                 lastAddress = command->first;
@@ -244,7 +248,7 @@ bool DebuggerInterpreter::Set(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     unsigned int number;
 
-    if (words.size() != 3) return false; //TODO: look for more uses of set to verfiy if this check is valid.
+    if (words.size() != 3) return false; // TODO: look for more uses of set to verfiy if this check is valid.
 
     if (words[1] == "listsize" && DebuggerStringParser::ParseNumber(words[2], number))
         return SetListsize(number);
@@ -260,7 +264,7 @@ bool DebuggerInterpreter::Show(const std::vector<std::string>& words) {
     return false;
 }
 
-//Debug variable Setters
+// Debug variable Setters
 bool DebuggerInterpreter::SetListsize(const int listsize) {
     m_commandResponse.clear();
     m_listsize = listsize;

@@ -86,9 +86,13 @@ add_subdirectory(src)
 option(ENABLE_RETRODEBUGGER_UNIT_TESTS "Enable the RetroDebugger unit tests" OFF) #Off while setting up everything
 if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
     enable_testing()
-    message("Building Tests. Be sure to check out test/constexpr_tests for constexpr
-testing")
-    add_subdirectory(test)
+endif()
+
+option(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS "Enable the RetroDebugger unit tests" OFF
+)#Off while setting up everything
+if(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS)
+    add_subdirectory(tests)
+    enable_testing()
 endif()
 
 option(ENABLE_FUZZING "Enable the fuzz tests" OFF)

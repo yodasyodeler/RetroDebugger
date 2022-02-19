@@ -38,12 +38,12 @@ bool Debugger::RunTillJump() {
 }
 
 BreakNum Debugger::SetBreakpoint(const unsigned int address) {
-    //TODO: should the address be checked?
+    // TODO: should the address be checked?
     return m_breakManager.SetBreakpoint(address);
 }
 
 BreakNum Debugger::SetBreakpoint(const BankNum bank, const unsigned int address) {
-    //TODO: should the address be checked?
+    // TODO: should the address be checked?
     return m_breakManager.SetBreakpoint(bank, address);
 }
 
@@ -51,9 +51,9 @@ BreakNum Debugger::SetWatchpoint(const unsigned int addressStart, const unsigned
     return m_breakManager.SetWatchpoint(addressStart, addressEnd);
 }
 
-//BreakNum Debugger::SetWatchpoint(const BankNum bank, const unsigned int addressStart, const unsigned int addressEnd) {
-//    return m_breakManager.SetWatchpoint(bank, addressStart, addressEnd);
-//}
+// BreakNum Debugger::SetWatchpoint(const BankNum bank, const unsigned int addressStart, const unsigned int addressEnd) {
+//     return m_breakManager.SetWatchpoint(bank, addressStart, addressEnd);
+// }
 
 bool Debugger::EnableBreakpoints(const std::vector<BreakNum>& list) {
     return m_breakManager.EnableBreakpoints(list);
@@ -67,7 +67,7 @@ bool Debugger::DeleteBreakpoints(const std::vector<BreakNum>& list) {
     return m_breakManager.DeleteBreakpoints(list);
 }
 
-std::map<unsigned int, BreakInfo> Debugger::GetBreakpointInfoList(const std::vector<unsigned int>& list) {
+BreakList Debugger::GetBreakpointInfoList(const std::vector<unsigned int>& list) {
     return m_breakManager.GetBreakpointInfoList(list);
 }
 
@@ -75,17 +75,16 @@ bool Debugger::ParseXmlFile(const std::string& filename) {
     return m_operations->ParseFile(filename);
 }
 
-RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } //TODO: need to redo RegInfo
+RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } // TODO: need to redo RegInfo
 
-AddrInfo Debugger::GetRomInfo(const unsigned int address) { return {address, DebuggerCallback::ReadMemory(address)}; }
+AddrInfo Debugger::GetRomInfo(const unsigned int address) { return { address, DebuggerCallback::ReadMemory(address) }; }
 
 std::vector<RegisterInfoPtr> Debugger::GetRegisterInfoList() {
     return m_operations->GetRegisters();
 }
 
-
-std::map<unsigned int, Operation> Debugger::GetCommandInfoList(size_t address, const unsigned int numInstructions) {
-    std::map<unsigned int, Operation> operations;
+CommandList Debugger::GetCommandInfoList(size_t address, const unsigned int numInstructions) {
+    CommandList operations;
     for (auto i = 0u; i < numInstructions; ++i) {
         Operation operation;
         auto operationAddress = address;
@@ -96,6 +95,4 @@ std::map<unsigned int, Operation> Debugger::GetCommandInfoList(size_t address, c
 }
 
 void Debugger::SetupBreakpointManagerSettings() {
-
 }
-

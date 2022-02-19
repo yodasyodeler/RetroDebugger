@@ -18,7 +18,7 @@ public:
     BreakNum SetBreakpoint(BankNum bank, unsigned int address);
 
     BreakNum SetWatchpoint(unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max());
-    //BreakNum SetWatchpoint(BankNum bank, unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max());
+    // BreakNum SetWatchpoint(BankNum bank, unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max());
 
     bool EnableBreakpoints(const std::vector<BreakNum>& list);
     bool DisableBreakpoints(const std::vector<BreakNum>& list);
@@ -27,11 +27,12 @@ public:
     RegInfo GetRegInfo(int reg);
     AddrInfo GetRomInfo(unsigned int address);
 
-    std::map<unsigned int, Operation> GetCommandInfoList(size_t address, unsigned int numInstructions);
-    std::map<BreakNum, BreakInfo> GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
+    CommandList GetCommandInfoList(size_t address, unsigned int numInstructions);
+    BreakList GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
     std::vector<RegisterInfoPtr> GetRegisterInfoList();
 
     bool ParseXmlFile(const std::string& filename);
+
 private:
     void SetupBreakpointManagerSettings();
 
