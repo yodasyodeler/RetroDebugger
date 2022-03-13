@@ -15,12 +15,11 @@ target_link_libraries(
             tinyxml2::tinyxml2)
 target_compile_definitions(RetroDebugger PRIVATE DEBUGGER_EXPORTS)
 
+# Unit Tests
+if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
+    add_subdirectory(tests)
+endif()
+
 #TODO
 add_subdirectory(include)
 add_subdirectory(source)
-
-# Unit Tests
-if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
-    add_executable(RetroDebuggerTests)
-    add_subdirectory(tests)
-endif()

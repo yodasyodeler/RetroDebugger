@@ -1,9 +1,12 @@
 find_package(GTest REQUIRED)
+find_package(tinyxml2 CONFIG)
 
 include(CTest)
 include(GoogleTest)
 
-target_link_libraries(RetroDebuggerTests PUBLIC GTest::gtest GTest::gtest_main)
+add_executable(RetroDebuggerTests)
+
+target_link_libraries(RetroDebuggerTests PUBLIC GTest::gtest GTest::gtest_main tinyxml2::tinyxml2)
 set_target_properties(RetroDebuggerTests PROPERTIES FOLDER "Unit Tests")
 # target_link_libraries(catch_main PRIVATE project_options)
 

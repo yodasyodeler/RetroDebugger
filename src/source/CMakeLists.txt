@@ -33,7 +33,6 @@ if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
                 Debugger.cpp
                 Debugger.h
                 DebuggerApi.cpp
-                DebuggerApi.h
                 DebuggerCallbacks.cpp
                 DebuggerCallbacks.h
                 DebuggerConsole.cpp
