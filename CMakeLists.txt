@@ -98,13 +98,12 @@ endif()
 add_subdirectory(src)
 
 # Adding the tests:
-option(ENABLE_RETRODEBUGGER_UNIT_TESTS "Enable the RetroDebugger unit tests" OFF) #Off while setting up everything
+option(ENABLE_RETRODEBUGGER_UNIT_TESTS "Enable the RetroDebugger unit tests" ON)
 if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
     enable_testing()
 endif()
 
-option(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS "Enable the RetroDebugger unit tests" OFF
-)#Off while setting up everything
+option(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS "Enable the RetroDebugger unit tests" ON)
 if(ENABLE_RETRODEBUGGER_INTEGRATION_TESTS)
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT RetroDebuggerIntegrationTests)
     add_subdirectory(tests)

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <numeric>
 
-static const char* GdbPrompt = "(gdb)";
+static const char* GdbPrompt = "(rdb)";
 static std::vector<std::string> m_prevWords;
 
 // static BreakpointManager g_interpreter;

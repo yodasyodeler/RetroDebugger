@@ -8,9 +8,9 @@
 #include <array>
 
 /******************************************************************************
-* TODOs
-*
-******************************************************************************/
+ * TODOs
+ *
+ ******************************************************************************/
 
 namespace DebuggerXmlParserTests {
 
@@ -58,10 +58,10 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ParseFile) {
 }
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_NormalOperationArgumentsMatchExpected) {
-    const std::array<unsigned int, 2> expectedNop_OpcodeNumArgs = {0x00,0};
-    const std::array<unsigned int, 2> expectedIncBC_OpcodeNumArgs = {0x03,1};
-    const std::array<unsigned int, 2> expectedld16_OpcodeNumArgs = {0x56,2};
-    const std::array<unsigned int, 2> expectedCallFlags_OpcodeNumArgs = {0xC4,2};
+    const std::array<unsigned int, 2> expectedNop_OpcodeNumArgs = { 0x00, 0 };
+    const std::array<unsigned int, 2> expectedIncBC_OpcodeNumArgs = { 0x03, 1 };
+    const std::array<unsigned int, 2> expectedld16_OpcodeNumArgs = { 0x56, 2 };
+    const std::array<unsigned int, 2> expectedCallFlags_OpcodeNumArgs = { 0xC4, 2 };
 
     ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
 
@@ -75,9 +75,9 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_NormalOperationArgumentsMatchE
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_ExtendedOperationArgumentsMatchExpected) {
     const auto gbExtOpcode = 0xCBu;
-    const std::array<unsigned int, 2> expectedRlcB_OpcodeNumArgs = {0x00,1};
-    const std::array<unsigned int, 2> expectedIncSwapHlInder_OpcodeNumArgs = {0x36,1};
-    const std::array<unsigned int, 2> expectedSet7A_OpcodeNumArgs = {0xFF,2};
+    const std::array<unsigned int, 2> expectedRlcB_OpcodeNumArgs = { 0x00, 1 };
+    const std::array<unsigned int, 2> expectedIncSwapHlInder_OpcodeNumArgs = { 0x36, 1 };
+    const std::array<unsigned int, 2> expectedSet7A_OpcodeNumArgs = { 0xFF, 2 };
 
     ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
 
