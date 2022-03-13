@@ -21,5 +21,6 @@ if(ENABLE_RETRODEBUGGER_UNIT_TESTS)
 endif()
 
 #TODO
+add_subdirectory(assets)
 add_subdirectory(include)
 add_subdirectory(source)

@@ -31,4 +31,11 @@ gtest_discover_tests(
         OUTPUT_SUFFIX
         .xml)
 
-target_sources(RetroDebuggerTests PRIVATE BreakpointManagerTests.cpp)
+target_sources(
+    RetroDebuggerTests
+    PRIVATE BreakpointManagerTests.cpp
+            DebuggerApiTests.cpp
+            DebuggerOperationsTests.cpp
+            DebuggerStringParserTests.cpp
+            DebuggerXmlParserTests.cpp
+            XmlElementParserTests.cpp)
