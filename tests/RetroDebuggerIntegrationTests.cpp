@@ -26,8 +26,7 @@ protected:
 TEST_F(RetroDebuggerIntergrationTests, GetCommandPrompt_ValidValue) {
     std::string cmdPrompt;
     GetCommandPrompt(&cmdPrompt);
-    ASSERT_EQ(cmdPrompt, "(rdb)");
+    ASSERT_EQ(cmdPrompt, std::string("(rdb)"));
 }
-
 
 }

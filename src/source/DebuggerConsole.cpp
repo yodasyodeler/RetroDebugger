@@ -1,16 +1,17 @@
 #include "DebuggerConsole.h"
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 #include <windows.h>
 
 #include "DebuggerStringParser.h"
 
-static const std::string GdbPrompt = "(gdb)";
+static const std::string DebuggerPrompt = "(rdb)";
 
 
-DebuggerConsole::DebuggerConsole(DebuggerInterpreter* interpreter) : m_interpreter(interpreter) {}
+DebuggerConsole::DebuggerConsole(DebuggerInterpreter* interpreter) :
+    m_interpreter(interpreter) {}
 
 bool DebuggerConsole::AdvanceDebugger(const std::string& command) {
     auto words = DebuggerStringParser::ParseBuffer(command);
@@ -20,7 +21,7 @@ bool DebuggerConsole::AdvanceDebugger(const std::string& command) {
 }
 
 std::string DebuggerConsole::GetPrompt() {
-    return GdbPrompt;
+    return DebuggerPrompt;
 }
 
 std::string DebuggerConsole::GetResponse() {
@@ -31,8 +32,8 @@ size_t DebuggerConsole::GetResponseLength() {
     return m_interpreter->GetCommandResponseLength();
 }
 
-//TODO: look at using a map, may be easier to maintain, add alias etc.
-//fall through if invalid argument
+// TODO: look at using a map, may be easier to maintain, add alias etc.
+// fall through if invalid argument
 bool DebuggerConsole::ParseCommand(std::vector<std::string>& words) {
     std::stringstream stream;
 

@@ -214,7 +214,7 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
     return false;
 }
 
-// TODO: Make more accurate to gdb, only supports starting address, not what is expected of list.
+// TODO: Make it closer to Linux GDB, only supports starting address, not what is expected of list.
 bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();

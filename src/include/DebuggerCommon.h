@@ -7,7 +7,7 @@
 
 // TODO: should there be a common namespace here?
 
-// TODO: should this be unsigned? actual gdb has uses for internal breakpoints(signed). I don't believe this will though.
+// TODO: should this be unsigned? Linux GDB has uses for internal breakpoints(signed). I don't believe this will though.
 typedef unsigned int BreakNum;
 typedef unsigned int BankNum;
 

@@ -1,8 +1,8 @@
 find_package(GTest REQUIRED)
 find_package(fmt CONFIG)
 
-include(CTest)
-include(GoogleTest)
+#include(CTest)
+#include(GoogleTest)
 
 add_executable(RetroDebuggerIntegrationTests)
 
