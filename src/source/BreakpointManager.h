@@ -1,10 +1,10 @@
 #pragma once
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "DebuggerCommon.h"
 #include "DebuggerCallbacks.h"
+#include "DebuggerCommon.h"
 
 static const BreakNum MAX_BREAKPOINT_NUM = UINT_MAX;
 static const unsigned int MAX_ADDRESS = UINT_MAX;

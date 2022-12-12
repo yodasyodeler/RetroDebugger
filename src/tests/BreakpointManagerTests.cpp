@@ -1,5 +1,5 @@
-#include "gtest/gtest.h"
 #include "BreakpointManager.h"
+#include "gtest/gtest.h"
 
 namespace DebuggerTests {
 unsigned int g_pc = 0;
@@ -32,12 +32,12 @@ TEST_F(BreakpointManagerTests, Debugger_AddBreakCheckInfoDelete) {
     auto breakInfo = m_breakpointManager.GetBreakpointInfoList();
     EXPECT_EQ(breakInfo.size(), 0u);
 
-    const auto breakNum = m_breakpointManager.SetBreakpoint({ExpectedAddress});
+    const auto breakNum = m_breakpointManager.SetBreakpoint({ ExpectedAddress });
     breakInfo = m_breakpointManager.GetBreakpointInfoList();
     EXPECT_TRUE(breakInfo.find(breakNum) != breakInfo.end());
     EXPECT_EQ(breakInfo.at(breakNum).address, ExpectedAddress);
 
-    m_breakpointManager.DeleteBreakpoints({breakNum});
+    m_breakpointManager.DeleteBreakpoints({ breakNum });
     breakInfo = m_breakpointManager.GetBreakpointInfoList();
     EXPECT_TRUE(breakInfo.find(breakNum) == breakInfo.end());
 }
@@ -54,7 +54,7 @@ TEST_F(BreakpointManagerTests, Debugger_AddDefaultBreakCheckInfoDelete) {
     EXPECT_TRUE(breakInfo.find(breakNum) != breakInfo.end());
     EXPECT_EQ(breakInfo.at(breakNum).address, g_pc);
 
-    m_breakpointManager.DeleteBreakpoints({breakNum});
+    m_breakpointManager.DeleteBreakpoints({ breakNum });
     breakInfo = m_breakpointManager.GetBreakpointInfoList();
     EXPECT_TRUE(breakInfo.find(breakNum) == breakInfo.end());
 }
@@ -74,13 +74,13 @@ TEST_F(BreakpointManagerTests, Debugger_DisableReEnableBreakpoint) {
     g_pc = 0x100;
     const auto breakNum = m_breakpointManager.SetBreakpoint(0x100);
 
-    m_breakpointManager.EnableBreakpoints({breakNum});
+    m_breakpointManager.EnableBreakpoints({ breakNum });
     EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
 
-    m_breakpointManager.DisableBreakpoints({breakNum});
+    m_breakpointManager.DisableBreakpoints({ breakNum });
     EXPECT_TRUE(!m_breakpointManager.CheckBreakpoints(breakInfo));
 
-    m_breakpointManager.EnableBreakpoints({breakNum});
+    m_breakpointManager.EnableBreakpoints({ breakNum });
     EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
 }
 
@@ -88,7 +88,7 @@ TEST_F(BreakpointManagerTests, Debugger_DisableReEnableBreakpointList) {
     BreakInfo breakInfo;
     g_pc = 0x100;
     const auto breakNum1 = m_breakpointManager.SetBreakpoint(0x100);
-    std::vector<BreakNum> breakList = {breakNum1, breakNum1 + 1, breakNum1 + 2, breakNum1 + 3};
+    std::vector<BreakNum> breakList = { breakNum1, breakNum1 + 1, breakNum1 + 2, breakNum1 + 3 };
 
     //Doesn't break when between 2 breakpoints
     EXPECT_TRUE(m_breakpointManager.EnableBreakpoints(breakList)); //Range of breakpoints works if at least one point is a breakpoint
@@ -117,10 +117,10 @@ TEST_F(BreakpointManagerTests, Debugger_DisableReEnableBreakpointMix) {
     const auto breakNum2 = m_breakpointManager.SetBreakpoint(0x102);
     const auto breakNum3 = m_breakpointManager.SetBreakpoint(0x103);
 
-    std::vector<BreakNum> breakList = {breakNum1, breakNum2, breakNum3};
+    std::vector<BreakNum> breakList = { breakNum1, breakNum2, breakNum3 };
 
     EXPECT_TRUE(m_breakpointManager.DisableBreakpoints(breakList));
-    EXPECT_TRUE(m_breakpointManager.EnableBreakpoints({breakNum2}));
+    EXPECT_TRUE(m_breakpointManager.EnableBreakpoints({ breakNum2 }));
 
     g_pc = 0x101;
     EXPECT_TRUE(!m_breakpointManager.CheckBreakpoints(breakInfo));
@@ -130,7 +130,7 @@ TEST_F(BreakpointManagerTests, Debugger_DisableReEnableBreakpointMix) {
     EXPECT_TRUE(!m_breakpointManager.CheckBreakpoints(breakInfo));
 
     EXPECT_TRUE(m_breakpointManager.EnableBreakpoints(breakList));
-    EXPECT_TRUE(m_breakpointManager.DisableBreakpoints({breakNum2}));
+    EXPECT_TRUE(m_breakpointManager.DisableBreakpoints({ breakNum2 }));
     g_pc = 0x101;
     EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
     g_pc = 0x102;
