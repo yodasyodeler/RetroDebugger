@@ -66,7 +66,9 @@ bool DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocumen
             }
         }
 
-        else { return SetLastError(element, "Unknown element"); }
+        else {
+            return SetLastError(element, "Unknown element");
+        }
         element = element->NextSiblingElement();
     }
     return true;
@@ -93,7 +95,9 @@ bool DebuggerXmlParser::ParseOperations(const tinyxml2::XMLElement* operationsEl
             }
         }
 
-        else { return SetLastError(element, "Unknown element"); }
+        else {
+            return SetLastError(element, "Unknown element");
+        }
         element = element->NextSiblingElement();
     }
 
@@ -119,7 +123,9 @@ bool DebuggerXmlParser::ParseOperation(const tinyxml2::XMLElement* operationElem
             }
         }
 
-        else { return SetLastError(element, "Unknown element"); }
+        else {
+            return SetLastError(element, "Unknown element");
+        }
         element = element->NextSiblingElement();
     }
     return true;
