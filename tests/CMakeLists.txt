@@ -44,4 +44,8 @@ gtest_discover_tests(
         OUTPUT_SUFFIX
         .xml)
 
-target_sources(RetroDebuggerIntegrationTests PRIVATE RetroDebuggerIntegrationTests.cpp)
+# Source files: add configured_files and tests
+target_include_directories(RetroDebuggerIntegrationTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
+target_sources(
+    RetroDebuggerIntegrationTests PRIVATE RetroDebuggerIntegrationTests.cpp
+                                          "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h")

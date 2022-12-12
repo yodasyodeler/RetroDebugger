@@ -8,9 +8,7 @@ static constexpr std::string_view ProjectName = "@PROJECT_NAME@";
 static constexpr std::string_view ProjectVersion = "@PROJECT_VERSION@";
 static constexpr int ProjectVersionMajor { @PROJECT_VERSION_MAJOR@ };
 static constexpr int ProjectVersionMinor { @PROJECT_VERSION_MINOR@ };
-static constexpr int ProjectVersionMinor { @PROJECT_VERSION_PATCH@ };
+static constexpr int ProjectVersionPatch { @PROJECT_VERSION_PATCH@ };
 static constexpr std::string_view GitSha = "@GIT_SHA@";
 }
 // clang-format on
-
-#endif

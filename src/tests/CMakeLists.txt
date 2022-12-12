@@ -9,11 +9,11 @@ add_executable(RetroDebuggerTests)
 target_link_libraries(RetroDebuggerTests PUBLIC GTest::gtest GTest::gtest_main tinyxml2::tinyxml2)
 set_target_properties(RetroDebuggerTests PROPERTIES FOLDER "Unit Tests")
 
-# Provide a simple smoke test to make sure that the CLI works and can display a --help message
-add_test(NAME cli.has_help COMMAND RetroDebugger --help)
+# Add configured_files
+target_include_directories(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
+target_sources(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h")
 
-# automatically discover tests that are defined test files you can modify the unittests. Set TEST_PREFIX
-# to whatever you want, or use different for different binaries
+# automatically discover tests that are defined test files you can modify the unittests.
 gtest_discover_tests(
     RetroDebuggerTests
     TEST_PREFIX
