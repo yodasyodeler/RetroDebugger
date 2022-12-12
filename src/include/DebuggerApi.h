@@ -17,7 +17,7 @@ typedef std::function<bool(BankNum bank, unsigned int address)> CheckBankableMem
 
 typedef std::function<RegSet()> GetRegSetFunc;
 
-// TODO: If using C style API ad prefix. Otherwise add namespace to avoid name collisions
+// TODO: If using C style API add prefix. Otherwise add namespace to avoid name collisions
 #ifdef __cplusplus
 extern "C" {
 #endif
