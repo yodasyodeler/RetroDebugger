@@ -18,7 +18,6 @@ target_link_system_libraries(
 # TODO: figure out impact of not including 'project_options' or the bug of including project_options.
 # 'NCREMENTAL:NO' appears to be failed attempt of adding '/INCREMENTAL:NO'. -I is header include in gcc.
 target_link_libraries(RetroDebugger PRIVATE project_warnings) # project_options
-target_compile_definitions(RetroDebugger PRIVATE DEBUGGER_EXPORTS)
 #target_include_directories(RetroDebugger PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include") # TODO: Uncomment when ready
 
 # Unit Tests

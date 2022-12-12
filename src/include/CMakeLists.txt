@@ -1,16 +1,19 @@
 include(GenerateExportHeader)
-generate_export_header(RetroDebugger)
+generate_export_header(
+    RetroDebugger
+    BASE_NAME
+    RDB
+    EXPORT_FILE_NAME
+    "${PROJECT_NAME}_export.h")
 
-target_sources(RetroDebugger PRIVATE # FILE_SET # HEADERS # FILES
-                                     DebuggerApi.h DebuggerCommon.h ${CMAKE_CURRENT_BINARY_DIR}/retrodebugger_export.h)
+target_sources(RetroDebugger PRIVATE DebuggerApi.h DebuggerCommon.h ${CMAKE_CURRENT_BINARY_DIR}/RetroDebugger_export.h)
 
 source_group(include REGULAR_EXPRESSION *.h)
-target_include_directories(RetroDebugger PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>"
-                                                "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-# message("Directory install:" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-#         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+target_include_directories(
+    RetroDebugger PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
+                         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 if(ENABLE_TESTING)
     target_sources(RetroDebuggerTests PRIVATE DebuggerApi.h DebuggerCommon.h)
-    target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+    target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif()

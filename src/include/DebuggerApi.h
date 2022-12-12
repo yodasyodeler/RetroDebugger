@@ -1,11 +1,8 @@
 #pragma once
 
-#ifdef DEBUGGER_EXPORTS
-#define DBG_API __declspec(dllexport)
-#else
-#define DBG_API __declspec(dllimport)
-#endif
+#include "RetroDebugger_export.h"
 
+// TODO: Should these APIs support C language. Remove C++ types? Otherwise look at adding nodiscard and noexcept where makes sense.
 // TODO: Research dll best practice, not sure if this should be exposed.
 #include "DebuggerCommon.h"
 #include <functional>
@@ -20,54 +17,57 @@ typedef std::function<bool(BankNum bank, unsigned int address)> CheckBankableMem
 
 typedef std::function<RegSet()> GetRegSetFunc;
 
+// TODO: If using C style API ad prefix. Otherwise add namespace to avoid name collisions
 #ifdef __cplusplus
 extern "C" {
 #endif
-DBG_API size_t GetCommandPrompt(std::string* message);
+RDB_EXPORT size_t GetRdbVersion(std::string* version);
 
-DBG_API size_t GetCommandResponse(std::string* message);
+RDB_EXPORT size_t GetCommandPrompt(std::string* message);
 
-DBG_API size_t GetCommandResponseSize();
+RDB_EXPORT size_t GetCommandResponse(std::string* message);
 
-DBG_API int ProcessCommandString(std::string* message);
+RDB_EXPORT size_t GetCommandResponseSize();
+
+RDB_EXPORT int ProcessCommandString(std::string* message);
 
 // Direct calls
-DBG_API bool CheckBreakpoints(BreakInfo* breakInfo);
+RDB_EXPORT bool CheckBreakpoints(BreakInfo* breakInfo);
 
-DBG_API bool Run(const unsigned int numBreakpointsToSkip);
+RDB_EXPORT bool Run(const unsigned int numBreakpointsToSkip);
 
-DBG_API bool RunInstructions(const int numBreakToPass);
+RDB_EXPORT bool RunInstructions(const int numBreakToPass);
 
-DBG_API bool RunTillJump();
+RDB_EXPORT bool RunTillJump();
 
-DBG_API bool SetBreakpoint(const int address);
+RDB_EXPORT bool SetBreakpoint(const int address);
 
-DBG_API bool EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
+RDB_EXPORT bool EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
 
-DBG_API bool DisableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
+RDB_EXPORT bool DisableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
 
-DBG_API bool DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
+RDB_EXPORT bool DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
 
-// DBG_API RegInfo GetRegInfo(const int register);
+// RDB_EXPORT RegInfo GetRegInfo(const int register);
 
-DBG_API BreakInfo GetBreakpointInfo(const unsigned int breakPointNum);
+RDB_EXPORT BreakInfo GetBreakpointInfo(const unsigned int breakPointNum);
 
-// DBG_API CommandInfo GetCommandInfo(const unsigned int location, unsigned int& instruction);
+// RDB_EXPORT CommandInfo GetCommandInfo(const unsigned int location, unsigned int& instruction);
 
-DBG_API bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo);
+RDB_EXPORT bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo);
 
-DBG_API bool ParseXmlFile(const std::string& filename);
+RDB_EXPORT bool ParseXmlFile(const std::string& filename);
 
 // Callbacks
-DBG_API void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);
+RDB_EXPORT void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);
 
-DBG_API void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb);
+RDB_EXPORT void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb);
 
-DBG_API void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
+RDB_EXPORT void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
 
-DBG_API void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readMemory_cb);
+RDB_EXPORT void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readMemory_cb);
 
-DBG_API void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
+RDB_EXPORT void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
 #ifdef __cplusplus
 }
 #endif
