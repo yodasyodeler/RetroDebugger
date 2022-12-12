@@ -1,17 +1,19 @@
 name: ci
 on:
   pull_request:
+  release:
+    types: [published]
   push:
+    tags:
     branches:
       - main
-      - master
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   # Conan cache environment variables
   CONAN_SYSREQUIRES_MODE: enabled
   CONAN_USER_HOME: "${{ github.workspace }}/conan-cache"
   CONAN_USER_HOME_SHORT: "${{ github.workspace }}/conan-cache/short"
+  CLANG_TIDY_VERSION: "13.0.0"
 
 jobs:
   Test:
@@ -29,12 +31,11 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-10.15
-          - windows-2019
+          - macos-11
         compiler:
           # you can specify the version after `-` like "llvm-13.0.0".
-          - llvm
-          - gcc
+          - llvm-13.0.0
+          - gcc-11
         generator:
           - "Ninja Multi-Config"
         build_type:
@@ -46,68 +47,67 @@ jobs:
 
         exclude:
           # mingw is determined by this author to be too buggy to support
-          - os: windows-2019
-            compiler: gcc
+          - os: macos-11
+            compiler: gcc-11
+          - os: ubuntu-20.04
+            compiler: llvm-13.0.0
 
         include:
           # Add appropriate variables for gcov version required. This will intentionally break
           # if you try to use a compiler that does not have gcov set
-          - compiler: gcc
+          - compiler: gcc-11
             gcov_executable: gcov
-          - compiler: llvm
+          - compiler: llvm-13.0.0
             gcov_executable: "llvm-cov gcov"
 
-          # This exists solely to make sure a non-multiconfig build works
-          - os: ubuntu-20.04
-            compiler: gcc
-            generator: "Unix Makefiles"
-            build_type: Debug
-            gcov_executable: gcov
-            developer_mode: On
+          # Set up preferred package generators, for given build configurations
+          - build_type: Release
+            developer_mode: OFF
+            package_generator: TBZ2
 
           - os: windows-2022
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Debug
             developer_mode: On
+
           - os: windows-2022
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Release
             developer_mode: On
+
           - os: windows-2022
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Debug
-            developer_mode: Off
+            developer_mode: OFF
+
           - os: windows-2022
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Release
-            developer_mode: Off
-
-
-
+            developer_mode: OFF
+            package_generator: ZIP
 
 
     steps:
+      - name: Check for llvm version mismatches
+        if: ${{ contains(matrix.compiler, 'llvm') && !contains(matrix.compiler, env.CLANG_TIDY_VERSION) }}
+        uses: actions/github-script@v3
+        with:
+          script: |
+            core.setFailed('There is a mismatch between configured llvm compiler and clang-tidy version chosen')
+
       - uses: actions/checkout@v2
 
-      - name: Cache
-        uses: actions/cache@v2
+      - name: Setup Cache
+        uses: ./.github/actions/setup_cache
         with:
-          path: |
-            ~/vcpkg
-            ./build/vcpkg_installed
-            ${{ env.CONAN_USER_HOME }}
-            ~/.cache/pip
-            ${{ env.HOME }}/.cache/vcpkg/archives
-            ${{ env.XDG_CACHE_HOME }}/vcpkg/archives
-            ${{ env.LOCALAPPDATA }}\vcpkg\archives
-            ${{ env.APPDATA }}\vcpkg\archives
-          key: ${{ runner.os }}-${{ matrix.compiler }}-${{matrix.build_type}}-${{matrix.generator}}-${{matrix.developer_mode}}-${{ hashFiles('**/CMakeLists.txt') }}-${{ hashFiles('./conanfile.txt')}}-${{ hashFiles('./vcpkg.json')}}
-          restore-keys: |
-            ${{ runner.os }}-${{ matrix.compiler }}-${{matrix.build_type}}-${{matrix.generator}}-${{matrix.developer_mode}}
+          compiler: ${{ matrix.compiler }}
+          build_type: ${{ matrix.build_type }}
+          developer_mode: ${{ matrix.developer_mode }}
+          generator: ${{ matrix.generator }}
 
       - name: Setup Cpp
         uses: aminya/setup-cpp@v1
@@ -120,18 +120,23 @@ jobs:
           conan: true
           vcpkg: false
           ccache: true
-          clangtidy: true
+          clangtidy: ${{ env.CLANG_TIDY_VERSION }}
+
 
           cppcheck: true
 
           gcovr: true
           opencppcoverage: true
 
+      - name: Cleanup Conan system packages (they are not properly cached)
+        run: |
+          conan remove -f '*/system'
+
         # make sure coverage is only enabled for Debug builds, since it sets -O0 to make sure coverage
         # has meaningful results
       - name: Configure CMake
         run: |
-          cmake -S . -B ./build -G "${{matrix.generator}}" -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -DENABLE_DEVELOPER_MODE:BOOL=${{matrix.developer_mode}} -DOPT_ENABLE_COVERAGE:BOOL=${{ matrix.build_type == 'Debug' }}
+          cmake -S . -B ./build -G "${{matrix.generator}}" -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -DENABLE_DEVELOPER_MODE:BOOL=${{matrix.developer_mode}} -DOPT_ENABLE_COVERAGE:BOOL=${{ matrix.build_type == 'Debug' && matrix.developer_mode == 'OFF' }} -DGIT_SHA:STRING=${{ github.sha }}
 
       - name: Build
         # Execute the build.  You can specify a specific target with "--target <NAME>"
@@ -152,6 +157,20 @@ jobs:
         working-directory: ./build
         run: |
           OpenCppCoverage.exe --export_type cobertura:coverage.xml --cover_children -- ctest -C ${{matrix.build_type}}
+
+      - name: CPack
+        if: matrix.package_generator != ''
+        working-directory: ./build
+        run: |
+          cpack -C ${{matrix.build_type}} -G ${{matrix.package_generator}}
+
+      - name: Publish Tagged Release
+        uses: softprops/action-gh-release@v1
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.package_generator != '' }}
+        with:
+          files: |
+            build/*-*${{ matrix.build_type }}*-*.*
+
 
       - name: Publish to codecov
         uses: codecov/codecov-action@v2

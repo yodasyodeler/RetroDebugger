@@ -1,5 +1,7 @@
 #include "gtest/gtest.h"
 
+#include "RetroDebugger_config.h"
+
 #include <DebuggerApi.h>
 
 #include <fmt/core.h>
@@ -9,24 +11,31 @@
  *
  ******************************************************************************/
 
-namespace IntergrationTests {
+namespace IntegrationTests {
 
-class RetroDebuggerIntergrationTests : public ::testing::Test {
+class RetroDebuggerIntegrationTests : public ::testing::Test {
 protected:
-    RetroDebuggerIntergrationTests() {
+    RetroDebuggerIntegrationTests() {
     }
 
-    ~RetroDebuggerIntergrationTests() override {}
+    ~RetroDebuggerIntegrationTests() override {}
 
     void SetUp() override {}
 
     void TearDown() override {}
 };
 
-TEST_F(RetroDebuggerIntergrationTests, GetCommandPrompt_ValidValue) {
+TEST_F(RetroDebuggerIntegrationTests, GetCommandPrompt_ValidValue) {
     std::string cmdPrompt;
     GetCommandPrompt(&cmdPrompt);
     ASSERT_EQ(cmdPrompt, std::string("(rdb)"));
+}
+
+TEST_F(RetroDebuggerIntegrationTests, GetRdbVersion_ValidValue) {
+    std::string version;
+    GetRdbVersion(&version);
+
+    ASSERT_EQ(version, RetroDebugger::Config::ProjectVersion);
 }
 
 }

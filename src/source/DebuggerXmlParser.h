@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include "tinyxml2.h"
+#include <string>
 
 #include "DebuggerCommon.h"
 

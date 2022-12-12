@@ -4,6 +4,8 @@
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
 
+#include "RetroDebugger_config.h"
+
 #include <iostream>
 #include <numeric>
 
@@ -13,6 +15,13 @@ static std::vector<std::string> m_prevWords;
 static Debugger g_debugger;
 static DebuggerInterpreter g_interpreter(&g_debugger);
 static DebuggerConsole g_console(&g_interpreter);
+
+size_t GetRdbVersion(std::string* version) {
+    if (version == nullptr) return std::numeric_limits<size_t>::max(); // TODO: move to enum
+    *version = RetroDebugger::Config::ProjectVersion;
+
+    return version->length();
+}
 
 // Command interpreter calls
 size_t GetCommandPrompt(std::string* message) {

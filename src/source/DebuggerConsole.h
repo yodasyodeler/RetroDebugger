@@ -18,5 +18,5 @@ private:
     bool ParseCommand(std::vector<std::string>& words);
 
     DebuggerInterpreter* m_interpreter;
-    std::vector<std::string> m_prevWords = {""};
+    std::vector<std::string> m_prevWords = { "" };
 };
