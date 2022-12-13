@@ -40,9 +40,9 @@ jobs:
           - "Ninja Multi-Config"
         build_type:
           - Release
-          - Debug
+          # - Debug # Commented out for now to reduce github billable time, hopefully find a way to re-enable later.
         developer_mode:
-          - ON
+          #- ON   # Commented out for now to reduce github billable time, hopefully find a way to re-enable later.
           - OFF
 
         exclude:
@@ -65,17 +65,17 @@ jobs:
             developer_mode: OFF
             package_generator: TBZ2
 
-          - os: windows-2022
-            compiler: msvc
-            generator: "Visual Studio 17 2022"
-            build_type: Debug
-            developer_mode: On
+          # - os: windows-2022 # Commented out for now to reduce github billable time, hopefully find a way to re-enable later.
+          #   compiler: msvc
+          #   generator: "Visual Studio 17 2022"
+          #   build_type: Debug
+          #   developer_mode: On
 
-          - os: windows-2022
-            compiler: msvc
-            generator: "Visual Studio 17 2022"
-            build_type: Release
-            developer_mode: On
+          # - os: windows-2022 # Commented out for now to reduce github billable time, hopefully find a way to re-enable later.
+          #   compiler: msvc
+          #   generator: "Visual Studio 17 2022"
+          #   build_type: Release
+          #   developer_mode: On
 
           - os: windows-2022
             compiler: msvc
