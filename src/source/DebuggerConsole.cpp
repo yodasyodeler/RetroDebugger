@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <windows.h>
 
 #include "DebuggerStringParser.h"
 

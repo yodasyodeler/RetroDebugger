@@ -30,5 +30,5 @@ private:
     std::vector<ArgumentPtr> m_argumentList;
     std::vector<RegisterInfoPtr> m_registerList;
 
-    std::vector<OpertionInfoPtr> m_operationList;
+    std::vector<OperationInfoPtr> m_operationList;
 };

@@ -92,7 +92,7 @@ struct CommandInfo
 struct comp
 {
     bool operator()(const std::string& lhs, const std::string& rhs) const {
-        return _stricmp(lhs.c_str(), rhs.c_str()) < 0;
+        return lhs.compare(rhs.c_str()) < 0;
     }
 };
 
@@ -242,11 +242,11 @@ struct OperationInfo
     std::string name;
     bool isJump;
 };
-using OpertionInfoPtr = std::shared_ptr<OperationInfo>;
+using OperationInfoPtr = std::shared_ptr<OperationInfo>;
 
 struct Operation
 {
-    OpertionInfoPtr info;
+    OperationInfoPtr info;
     std::vector<ArgumentPtr> arguments;
 };
 

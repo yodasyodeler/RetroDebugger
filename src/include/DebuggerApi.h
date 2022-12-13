@@ -36,7 +36,7 @@ RDB_EXPORT bool CheckBreakpoints(BreakInfo* breakInfo);
 
 RDB_EXPORT bool Run(const unsigned int numBreakpointsToSkip);
 
-RDB_EXPORT bool RunInstructions(const int numBreakToPass);
+RDB_EXPORT bool RunInstructions(const unsigned int numBreakToPass);
 
 RDB_EXPORT bool RunTillJump();
 

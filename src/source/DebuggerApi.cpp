@@ -68,7 +68,7 @@ bool Run(const unsigned int numBreakpointsToSkip) {
     return g_debugger.Run(numBreakpointsToSkip);
 }
 
-bool RunInstructions(const int numBreakToPass) {
+bool RunInstructions(const unsigned int numBreakToPass) {
     return g_debugger.RunInstructions(numBreakToPass);
 }
 

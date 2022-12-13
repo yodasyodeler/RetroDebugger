@@ -139,7 +139,7 @@ void DebuggerOperations::ConvertOperation(OpcodeToOperation& operationMap, const
     const auto findMatchingOperationName = [xmlOperation](const std::shared_ptr<OperationInfo>& operation) -> bool { return operation->name == xmlOperation.command; };
 
 
-    OpertionInfoPtr operationInfoPtr;
+    OperationInfoPtr operationInfoPtr;
     const auto findResult = std::find_if(m_operationList.begin(), m_operationList.end(), findMatchingOperationName);
     if (findResult == m_operationList.end()) {
         auto operationInfo = std::make_shared<OperationInfo>(xmlOperation.command, xmlOperation.isJump);
