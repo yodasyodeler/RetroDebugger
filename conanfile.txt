@@ -3,7 +3,6 @@
 [requires]
 gtest/1.11.0
 fmt/8.1.1
-spdlog/1.9.2
 tinyxml2/9.0.0
 
 [generators]

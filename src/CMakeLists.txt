@@ -1,5 +1,4 @@
 find_package(fmt CONFIG)
-find_package(spdlog CONFIG)
 find_package(tinyxml2 CONFIG)
 
 add_library(RetroDebugger SHARED)
@@ -9,7 +8,6 @@ target_link_system_libraries(
     RetroDebugger
     PRIVATE
     fmt::fmt
-    spdlog::spdlog
     tinyxml2::tinyxml2)
 
 # project_options: includes 'NCREMENTAL:NO', from what I can tell it is a bug also present in the CMake template this is using.
