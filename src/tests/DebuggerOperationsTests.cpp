@@ -2,6 +2,7 @@
 
 #include "DebuggerOperations.h"
 #include "DebuggerXmlParser.h"
+#include "RetroDebuggerTests_assets.h"
 
 #include "DebuggerCallbacks.h"
 
@@ -14,14 +15,11 @@
 
 namespace DebuggerXmlParserTests {
 
-const auto GameboyTestFile = "../GameboyOperationsDebugger.xml";
-const auto InvalidEmptyTestFile = "../invalid_empty.xml";
-
 class DebuggerOperationsTests : public ::testing::Test {
 protected:
     DebuggerOperationsTests() {
         m_parser = std::make_shared<DebuggerXmlParser>();
-        m_operations = std::make_unique<DebuggerOperations>(m_parser, GameboyTestFile);
+        m_operations = std::make_unique<DebuggerOperations>(m_parser, std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
     }
 
     ~DebuggerOperationsTests() override {}

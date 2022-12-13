@@ -11,7 +11,7 @@ set_target_properties(RetroDebuggerTests PROPERTIES FOLDER "Unit Tests")
 
 # Add configured_files
 target_include_directories(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
-target_sources(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h")
+target_sources(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h" "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h")
 
 # automatically discover tests that are defined test files you can modify the unittests.
 gtest_discover_tests(
@@ -30,7 +30,6 @@ gtest_discover_tests(
 target_sources(
     RetroDebuggerTests
     PRIVATE BreakpointManagerTests.cpp
-            DebuggerApiTests.cpp
             DebuggerOperationsTests.cpp
             DebuggerStringParserTests.cpp
             DebuggerXmlParserTests.cpp

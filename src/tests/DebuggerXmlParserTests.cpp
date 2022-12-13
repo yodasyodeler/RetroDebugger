@@ -1,24 +1,21 @@
 #include "gtest/gtest.h"
 
-#include <regex>
+#include "RetroDebuggerTests_assets.h"
 
 #include "DebuggerXmlParser.h"
 
-/******************************************************************************
-* TODOs
-*   Z80Operations_ParseFileTest         -   more than one extended operations
-*   GameboyCommandInfo_ParseFileTest    -   coverage of any other types of xml elment archetypes.
-*   EmptyFile_ParseFileTest             -   fails gracefully
-*
-******************************************************************************/
+#include <regex>
 
+
+/******************************************************************************
+ * TODOs
+ *   Z80Operations_ParseFileTest         -   more than one extended operations
+ *   GameboyCommandInfo_ParseFileTest    -   coverage of any other types of xml element archetypes.
+ *   EmptyFile_ParseFileTest             -   fails gracefully
+ *
+ ******************************************************************************/
 
 namespace DebuggerXmlParserTests {
-
-const auto GameboyTestFile = "../GameboyOperationsDebugger.xml";
-const auto InvalidEmptyTestFile = "../invalid_empty.xml";
-const auto ValidBareTestFile = "../valid_bare_min.xml";
-
 
 class DebuggerXmlParserTests : public ::testing::Test {
 protected:
@@ -41,7 +38,7 @@ TEST_F(DebuggerXmlParserTests, GameboyOperations_ParseFileTest) {
     const auto expectedNormalOperationsSize = 244u;
     const auto expectedExtendedOperationsSize = 256u;
 
-    const auto parseFileReturn = m_xmlParser.ParseFile(GameboyTestFile);
+    const auto parseFileReturn = m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
     ASSERT_TRUE(parseFileReturn) << m_xmlParser.GetLastError();
 
     auto operations = m_xmlParser.GetOperations();
@@ -63,7 +60,7 @@ TEST_F(DebuggerXmlParserTests, GameboyOperations_ParseFileTest) {
 TEST_F(DebuggerXmlParserTests, Invalid_ParseFileTest) {
     const std::regex expectedErrorString(".*couldn't find the first XML element in the file");
 
-    const auto parseFileReturn = m_xmlParser.ParseFile(InvalidEmptyTestFile);
+    const auto parseFileReturn = m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::InvalidEmptyXml));
     ASSERT_FALSE(parseFileReturn);
 
     const auto actualErrorMessage = m_xmlParser.GetLastError();
