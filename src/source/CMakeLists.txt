@@ -51,6 +51,3 @@ if(ENABLE_TESTING)
                 XmlElementParser.h)
     target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 endif()
-
-install(TARGETS RetroDebugger DESTINATION RetroDebugger-bin)
-install(FILES DebuggerApi.h DESTINATION RetroDebugger-include)
