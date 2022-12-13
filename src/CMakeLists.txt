@@ -1,6 +1,5 @@
 find_package(fmt CONFIG)
 find_package(spdlog CONFIG)
-find_package(docopt CONFIG)
 find_package(tinyxml2 CONFIG)
 
 add_library(RetroDebugger SHARED)
@@ -9,7 +8,6 @@ add_library(RetroDebugger SHARED)
 target_link_system_libraries(
     RetroDebugger
     PRIVATE
-    docopt::docopt
     fmt::fmt
     spdlog::spdlog
     tinyxml2::tinyxml2)
