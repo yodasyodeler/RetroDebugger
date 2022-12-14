@@ -2,6 +2,8 @@
 
 #include "DebuggerCallbacks.h"
 
+#include <fmt/core.h>
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -127,45 +129,27 @@ std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
     const char* Address = "Address";
     const char* What = "What";
 
-    std::string re;
-    char buffer[512] = {};
-
-    sprintf_s(buffer,
-        "%-8s"
-        "%-15s"
-        "%-5s"
-        "%-4s"
-        "%-19s"
-        "%s"
-        "\n",
+    std::string re = fmt::format(
+        "{:-<8s}{:-<15s}{:-<5s}{:-<4s}{:-<19s}{}\n",
         Num,
         Type,
         Disp,
         Enb,
         Address,
         What);
-    re += buffer;
     for (const auto& info : breakInfo) {
         const auto what = (info.second.type == BreakType::BankBreakpoint) ? "Bank: "s + std::to_string(info.second.bankNumber) : ""s;
-        sprintf_s(buffer,
-            "%-8u"
-            "%-15s"
-            "%-5s"
-            "%-4s"
-            "0x%016X "
-            "%s"
-            "\n",
+        re += fmt::format(
+            "{:-<8d}{:-<15s}{:-<5s}{:-<4s}0x{:016X}{}\n",
             info.first,
-            BreakTypeToString.at(info.second.type).c_str(),
-            BreakDispToString.at(info.second.disp).c_str(),
+            BreakTypeToString.at(info.second.type),
+            BreakDispToString.at(info.second.disp),
             (info.second.isEnabled ? "y" : "n"),
             info.second.address,
-            what.c_str());
-        re += buffer;
+            what);
 
         if (info.second.timesHit) {
-            sprintf_s(buffer, "%s already hit %u times\n", BreakTypeToString.at(info.second.type).c_str(), info.second.timesHit);
-            re += buffer;
+            re += fmt::format("{} already hit {} times\n", BreakTypeToString.at(info.second.type), info.second.timesHit);
         }
     }
     return re;

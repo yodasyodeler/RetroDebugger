@@ -2,9 +2,7 @@
 
 #include "RetroDebugger_config.h"
 
-#include <DebuggerApi.h>
-
-#include <fmt/core.h>
+#include <RetroDebuggerApi.h>
 
 /******************************************************************************
  * TODOs

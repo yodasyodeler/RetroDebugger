@@ -6,7 +6,7 @@ generate_export_header(
     EXPORT_FILE_NAME
     "${PROJECT_NAME}_export.h")
 
-target_sources(RetroDebugger PRIVATE DebuggerApi.h DebuggerCommon.h ${CMAKE_CURRENT_BINARY_DIR}/RetroDebugger_export.h)
+target_sources(RetroDebugger PRIVATE RetroDebuggerApi.h RetroDebuggerCommon.h ${CMAKE_CURRENT_BINARY_DIR}/RetroDebugger_export.h)
 
 source_group(include REGULAR_EXPRESSION *.h)
 target_include_directories(
@@ -14,6 +14,6 @@ target_include_directories(
                          "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 if(ENABLE_TESTING)
-    target_sources(RetroDebuggerTests PRIVATE DebuggerApi.h DebuggerCommon.h)
+    target_sources(RetroDebuggerTests PRIVATE RetroDebuggerApi.h RetroDebuggerCommon.h)
     target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif()

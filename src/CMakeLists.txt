@@ -13,7 +13,7 @@ target_link_system_libraries(
 # project_options: includes 'NCREMENTAL:NO', from what I can tell it is a bug also present in the CMake template this is using.
 # TODO: figure out impact of not including 'project_options' or the bug of including project_options.
 # 'NCREMENTAL:NO' appears to be failed attempt of adding '/INCREMENTAL:NO'. -I is header include in gcc.
-target_link_libraries(RetroDebugger PRIVATE project_warnings) # project_options
+target_link_libraries(RetroDebugger PUBLIC project_warnings) # project_options
 
 # Add configured_files
 target_include_directories(RetroDebugger PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")

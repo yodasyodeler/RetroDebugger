@@ -1,8 +1,8 @@
-#include "DebuggerApi.h"
 #include "DebuggerConsole.h"
 #include "DebuggerInterpreter.h"
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
+#include "RetroDebuggerApi.h"
 
 #include "RetroDebugger_config.h"
 

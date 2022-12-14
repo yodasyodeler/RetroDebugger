@@ -14,19 +14,13 @@ if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
 endif()
 
 find_package(GTest REQUIRED)
-find_package(fmt CONFIG)
 
 #include(CTest)
 #include(GoogleTest)
 
 add_executable(RetroDebuggerIntegrationTests)
 
-target_link_libraries(
-    RetroDebuggerIntegrationTests
-    PRIVATE RetroDebugger
-            fmt::fmt
-            GTest::gtest
-            GTest::gtest_main)
+target_link_libraries(RetroDebuggerIntegrationTests PRIVATE RetroDebugger GTest::gtest GTest::gtest_main)
 set_target_properties(RetroDebuggerIntegrationTests PROPERTIES FOLDER "Integration Tests")
 
 # automatically discover tests that are defined test files you can modify the unittests. Set TEST_PREFIX

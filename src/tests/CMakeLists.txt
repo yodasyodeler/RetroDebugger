@@ -6,12 +6,18 @@ include(GoogleTest)
 
 add_executable(RetroDebuggerTests)
 
-target_link_libraries(RetroDebuggerTests PUBLIC GTest::gtest GTest::gtest_main tinyxml2::tinyxml2)
+target_link_libraries(
+    RetroDebuggerTests
+    PRIVATE GTest::gtest
+            GTest::gtest_main
+            tinyxml2::tinyxml2
+            fmt::fmt)
 set_target_properties(RetroDebuggerTests PROPERTIES FOLDER "Unit Tests")
 
 # Add configured_files
 target_include_directories(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
-target_sources(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h" "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h")
+target_sources(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h"
+                                          "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h")
 
 # automatically discover tests that are defined test files you can modify the unittests.
 gtest_discover_tests(

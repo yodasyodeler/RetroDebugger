@@ -4,9 +4,9 @@ target_sources(
             BreakpointManager.h
             Debugger.cpp
             Debugger.h
-            DebuggerApi.cpp
             DebuggerCallbacks.cpp
             DebuggerCallbacks.h
+            DebuggerCommon.h
             DebuggerConsole.cpp
             DebuggerConsole.h
             DebuggerInterpreter.cpp
@@ -19,6 +19,7 @@ target_sources(
             DebuggerStringParser.h
             DebuggerXmlParser.cpp
             DebuggerXmlParser.h
+            RetroDebuggerApi.cpp
             XmlElementParser.cpp
             XmlElementParser.h)
 target_include_directories(RetroDebugger PRIVATE ${CMAKE_CURRENT_LIST_DIR})
@@ -32,9 +33,9 @@ if(ENABLE_TESTING)
                 BreakpointManager.h
                 Debugger.cpp
                 Debugger.h
-                DebuggerApi.cpp
                 DebuggerCallbacks.cpp
                 DebuggerCallbacks.h
+                DebuggerCommon.h
                 DebuggerConsole.cpp
                 DebuggerConsole.h
                 DebuggerInterpreter.cpp
@@ -47,6 +48,7 @@ if(ENABLE_TESTING)
                 DebuggerStringParser.h
                 DebuggerXmlParser.cpp
                 DebuggerXmlParser.h
+                RetroDebuggerApi.cpp
                 XmlElementParser.cpp
                 XmlElementParser.h)
     target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR})

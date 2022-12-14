@@ -1,28 +1,13 @@
 #pragma once
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
-#include <vector>
 
-// TODO: should there be a common namespace here?
+#include "RetroDebuggerCommon.h"
 
-// TODO: should this be unsigned? Linux GDB has uses for internal breakpoints(signed). I don't believe this will though.
-typedef unsigned int BreakNum;
-typedef unsigned int BankNum;
+enum DbgRegName {};
 
-enum class BreakType : unsigned int {
-    Invalid = static_cast<unsigned int>(-1),
-    Watchpoint = 0,
-    Breakpoint,
-    BankBreakpoint,
-    Catchpoint,
-};
-
-enum class BreakDisposition {
-    Keep = 0,
-    Delete,
-    Disable,
+struct RegInfo
+{
+    DbgRegName reg;
+    unsigned int value;
 };
 
 // TODO: Look into inline case statement and performance
@@ -50,29 +35,6 @@ enum OpcodeImmediateType {
     SignedOffset8Bit,
 };
 
-enum DbgRegName {};
-
-struct BreakInfo
-{
-    unsigned int address;
-    BreakNum breakpointNumber;
-    BankNum bankNumber;
-    // unsigned int ignoreCount; //TODO: unimplemented
-    // unsigned int enableCount; //TODO: unimplemented
-    unsigned int timesHit;
-    unsigned int oldWatchValue;
-    unsigned int newWatchValue;
-    BreakType type = BreakType::Invalid;
-    BreakDisposition disp; // TODO: no way to use, is implemented though
-    bool isEnabled;
-};
-
-struct RegInfo
-{
-    DbgRegName reg;
-    unsigned int value;
-};
-
 struct AddrInfo
 {
     unsigned int address;
@@ -96,15 +58,11 @@ struct comp
     }
 };
 
-static const char* InstructionToString[0x100] = {};
-
-static const char* ExtendedInstructionToString[0x100] = {};
-
-
 // TODO: clean this up
 // TODO: there is overlap with other structs here, need to clean up xml and then merge the ideas
 // TODO: remove AUTO, its not needed and should never be the end type
-enum class ArgumentType : int { UNKOWN = 0,
+enum class ArgumentType : int {
+    UNKOWN = 0,
     AUTO,
     CONSTANT,
     REG,
@@ -114,9 +72,11 @@ enum class ArgumentType : int { UNKOWN = 0,
     S32BIT,
     U8BIT,
     U16BIT,
-    U32BIT };
+    U32BIT
+};
 
-enum class RegOperationType : int { NONE = 0,
+enum class RegOperationType : int {
+    NONE = 0,
     POSTINC,
     POSTDEC,
     PREINC,
@@ -126,7 +86,8 @@ enum class RegOperationType : int { NONE = 0,
     REG_OFFSET_U8BIT,
     REG_OFFSET_U16BIT,
     REG_OFFSET_S8BIT,
-    REG_OFFSET_S16BIT };
+    REG_OFFSET_S16BIT
+};
 
 typedef unsigned int OpcodeLength;
 
@@ -192,19 +153,25 @@ typedef std::map<unsigned int, XmlDebuggerOperations> XmlOperationsMap;
 
 
 // TODO: clean this up, there is overlap and stale
-enum class ImmediateType : int { UNKOWN = -1,
-    NONE = 0 }; // TODO: think about naming for this enum
-enum class FlagType : int { UNKOWN = -1,
+enum class ImmediateType : int {
+    UNKOWN = -1,
+    NONE = 0
+}; // TODO: think about naming for this enum
+enum class FlagType : int {
+    UNKOWN = -1,
     NONE = 0,
     ZERO,
     SUBTRACT,
     HALF_CARRY,
-    CARRY };
-enum class OperationType : int { UNKOWN = -1,
+    CARRY
+};
+enum class OperationType : int {
+    UNKOWN = -1,
     NONE = 0,
     NOP,
     LOAD,
-    ADD };
+    ADD
+};
 
 struct DebuggerCommand
 {
@@ -280,15 +247,6 @@ inline unsigned int GetArgTypeLength(const ArgumentType& argType) {
         return 0u;
     } // TODO: should this make it fail?
 }
-
-
-struct RegisterInfo
-{
-    std::string name;
-};
-using RegisterInfoPtr = std::shared_ptr<RegisterInfo>;
-
-using RegSet = std::map<std::string, unsigned int>;
 
 using CommandList = std::map<size_t, Operation>;
 using BreakList = std::map<BreakNum, BreakInfo>;

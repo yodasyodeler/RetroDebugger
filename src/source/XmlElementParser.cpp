@@ -1,14 +1,15 @@
-
 #include "XmlElementParser.h"
 
-const auto ErrorNullptr = std::string("encountered unexpected nullptr");
-const auto ErrorUnexpectedElement = std::string("Found an unexpected element. Looking for ");
-const auto ErrorObtainingUnsignedInt = std::string("Failed to obtain a valid unsigned int for ");
-const auto ErrorObtainingOpcodeLength = std::string("Failed to obtain a valid OperationLength for ");
-const auto ErrorObtainingString = std::string("Failed to obtain a valid string for ");
-const auto ErrorObtainingBool = std::string("Failed to obtain a valid bool for ");
-const auto ErrorObtainingOperation = std::string("Failed to obtain a valid reg operation for ");
-const auto ErrorDeterminingArgumentType = std::string("Failed to determine argument type for ");
+#include <algorithm>
+
+static const auto ErrorNullptr = std::string("encountered unexpected nullptr");
+static const auto ErrorUnexpectedElement = std::string("Found an unexpected element. Looking for ");
+static const auto ErrorObtainingUnsignedInt = std::string("Failed to obtain a valid unsigned int for ");
+static const auto ErrorObtainingOpcodeLength = std::string("Failed to obtain a valid OperationLength for ");
+static const auto ErrorObtainingString = std::string("Failed to obtain a valid string for ");
+static const auto ErrorObtainingBool = std::string("Failed to obtain a valid bool for ");
+static const auto ErrorObtainingOperation = std::string("Failed to obtain a valid reg operation for ");
+static const auto ErrorDeterminingArgumentType = std::string("Failed to determine argument type for ");
 
 bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg);
 
@@ -17,7 +18,12 @@ bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg);
 static bool StringNCompare(const std::string_view& string1, const std::string_view& string2) {
     if (string1.size() != string2.size()) return false;
 
-    return !_stricmp(string1.data(), string2.data());
+    auto toUpperString = [](std::string_view str) {
+        std::string re(str);
+        std::ranges::transform(re, re.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+        return re;
+    };
+    return !toUpperString(string1).compare(toUpperString(string2));
 }
 
 // TODO: I wonder if I should look into a method that doesn't use an exception.
@@ -32,11 +38,11 @@ static bool StringToUnsigned(const std::string& str, unsigned int& value) {
 }
 
 static bool StringToBool(const std::string_view& str, bool& value) {
-    if (StringNCompare(str, "true")) {
+    if (StringNCompare(str, "TRUE")) {
         value = true;
         return true;
     }
-    if (StringNCompare(str, "false")) {
+    if (StringNCompare(str, "FALSE")) {
         value = false;
         return true;
     }
@@ -380,7 +386,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     constexpr auto trueStr = "true";
     str = element->Attribute(isJumpStr);
     if (str) {
-        operation.isJump = (_stricmp(str, trueStr) == 0);
+        operation.isJump = (_stricmp(str, trueStr) == 0); // TODO: cross platform issue
     }
 
     return true;
