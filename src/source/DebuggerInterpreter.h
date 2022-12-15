@@ -9,7 +9,7 @@ class DebuggerInterpreter {
 public:
     DebuggerInterpreter(Debugger* debugger);
 
-    std::string GetCommandResponse();
+    [[nodiscard]] std::string GetCommandResponse();
     void SetCommandResponse(std::string response);
     size_t GetCommandResponseLength();
 

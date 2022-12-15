@@ -1,12 +1,11 @@
 #include "DebuggerCallbacks.h"
 
 // Callback functions
-static GetProgramCounterFunc g_getPcReg_cb = nullptr;
-static ReadMemoryFunc g_readMemory_cb = nullptr;
-static CheckBankableMemoryLocationFunc g_CheckBankableMemoryLocation_cb = nullptr;
-static ReadBankableMemoryFunc g_readBankableMemory_cb = nullptr;
-static GetRegSetFunc g_getRegSet_cb = nullptr;
-
+static Rdb::GetProgramCounterFunc g_getPcReg_cb = nullptr;
+static Rdb::ReadMemoryFunc g_readMemory_cb = nullptr;
+static Rdb::CheckBankableMemoryLocationFunc g_CheckBankableMemoryLocation_cb = nullptr;
+static Rdb::ReadBankableMemoryFunc g_readBankableMemory_cb = nullptr;
+static Rdb::GetRegSetFunc g_getRegSet_cb = nullptr;
 
 // Callback wrappers
 namespace DebuggerCallback {
@@ -47,25 +46,25 @@ RegSet GetRegSet() {
 }
 
 // Callback Setter APIs
-void SetGetPcRegCallback(GetProgramCounterFunc getPcReg_cb) {
+void SetGetPcRegCallback(Rdb::GetProgramCounterFunc getPcReg_cb) {
     g_getPcReg_cb = getPcReg_cb;
 }
 
 
-void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb) {
+void SetReadMemoryCallback(Rdb::ReadMemoryFunc readMemory_cb) {
     g_readMemory_cb = readMemory_cb;
 }
 
-void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb) {
+void SetCheckBankableMemoryLocationCallback(Rdb::CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb) {
     g_CheckBankableMemoryLocation_cb = CheckBankableMemoryLocation_cb;
 }
 
-void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankableMemory_cb) {
+void SetReadBankableMemoryCallback(Rdb::ReadBankableMemoryFunc readBankableMemory_cb) {
     g_readBankableMemory_cb = readBankableMemory_cb;
 }
 
-void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
+void SetGetRegSetCallback(Rdb::GetRegSetFunc getRegSet_cb) {
     g_getRegSet_cb = getRegSet_cb;
 }
 
-} // namespace DebuggerCallback
+}

@@ -30,7 +30,7 @@ protected:
 
 
     std::vector<unsigned int> m_mockMemory;
-    ReadMemoryFunc MockReadMemory = [&](unsigned int address) -> unsigned int {
+    Rdb::ReadMemoryFunc MockReadMemory = [&](unsigned int address) -> unsigned int {
         if (address >= m_mockMemory.size()) { return 0u; }
         return m_mockMemory[address];
     };

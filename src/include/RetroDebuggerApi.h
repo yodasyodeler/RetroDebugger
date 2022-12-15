@@ -5,31 +5,24 @@
 // TODO: Should these APIs support C language. Remove C++ types? Otherwise look at adding nodiscard and noexcept where makes sense.
 // TODO: Research dll best practice, not sure if this should be exposed.
 #include "RetroDebuggerCommon.h"
-#include <functional>
 
-typedef std::function<unsigned int()> GetProgramCounterFunc;
+namespace Rdb {
 
-typedef std::function<unsigned int(unsigned int)> ReadMemoryFunc;
+/// @brief Gets the RetroDebugger version
+/// Gets the RetroDebugger version.
+/// Version is formatted as following "<MAJOR>.<MINOR>.<PATCH>".
+/// @return RetroDebugger version string.
+RDB_EXPORT [[nodiscard]] std::string GetRdbVersion() noexcept;
 
-typedef std::function<unsigned int(BankNum bank, unsigned int)> ReadBankableMemoryFunc;
+/// @brief Returns a string for RetroDebugger that can be used as a prompt.
+/// @return A string of RetroDebugger command prompt.
+RDB_EXPORT [[nodiscard]] std::string GetCommandPrompt() noexcept;
 
-typedef std::function<bool(BankNum bank, unsigned int address)> CheckBankableMemoryLocationFunc;
+RDB_EXPORT [[nodiscard]] std::string GetCommandResponse();
 
-typedef std::function<RegSet()> GetRegSetFunc;
+// RDB_EXPORT size_t GetCommandResponseSize(); //TODO: when using string is this needed?
 
-// TODO: If using C style API add prefix. Otherwise add namespace to avoid name collisions
-#ifdef __cplusplus
-extern "C" {
-#endif
-RDB_EXPORT size_t GetRdbVersion(std::string* version);
-
-RDB_EXPORT size_t GetCommandPrompt(std::string* message);
-
-RDB_EXPORT size_t GetCommandResponse(std::string* message);
-
-RDB_EXPORT size_t GetCommandResponseSize();
-
-RDB_EXPORT int ProcessCommandString(std::string* message);
+RDB_EXPORT int ProcessCommandString(const std::string& message);
 
 // Direct calls
 RDB_EXPORT bool CheckBreakpoints(BreakInfo* breakInfo);
@@ -50,13 +43,13 @@ RDB_EXPORT bool DeleteBreakpoints(const unsigned int breakRange0, const unsigned
 
 // RDB_EXPORT RegInfo GetRegInfo(const int register);
 
-RDB_EXPORT BreakInfo GetBreakpointInfo(const unsigned int breakPointNum);
+RDB_EXPORT [[nodiscard]] BreakInfo GetBreakpointInfo(const unsigned int breakPointNum);
 
 // RDB_EXPORT CommandInfo GetCommandInfo(const unsigned int location, unsigned int& instruction);
 
 RDB_EXPORT bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo);
 
-RDB_EXPORT bool ParseXmlFile(const std::string& filename);
+RDB_EXPORT bool ParseXmlFile(const std::string& filename); // TODO: Should this API be restructured to use exceptions.
 
 // Callbacks
 RDB_EXPORT void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);
@@ -68,6 +61,4 @@ RDB_EXPORT void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocati
 RDB_EXPORT void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readMemory_cb);
 
 RDB_EXPORT void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
-#ifdef __cplusplus
 }
-#endif

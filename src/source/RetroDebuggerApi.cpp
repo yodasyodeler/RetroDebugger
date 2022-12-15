@@ -1,13 +1,15 @@
+#include "RetroDebuggerApi.h"
 #include "DebuggerConsole.h"
 #include "DebuggerInterpreter.h"
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
-#include "RetroDebuggerApi.h"
 
 #include "RetroDebugger_config.h"
 
 #include <iostream>
 #include <numeric>
+
+namespace Rdb {
 
 static std::vector<std::string> m_prevWords;
 
@@ -16,41 +18,31 @@ static Debugger g_debugger;
 static DebuggerInterpreter g_interpreter(&g_debugger);
 static DebuggerConsole g_console(&g_interpreter);
 
-size_t GetRdbVersion(std::string* version) {
-    if (version == nullptr) return std::numeric_limits<size_t>::max(); // TODO: move to enum
-    *version = RetroDebugger::Config::ProjectVersion;
-
-    return version->length();
+std::string GetRdbVersion() noexcept {
+    return std::string(RetroDebugger::Config::ProjectVersion);
 }
 
 // Command interpreter calls
-size_t GetCommandPrompt(std::string* message) {
-    if (message == nullptr) return std::numeric_limits<size_t>::max(); // TODO: move to enum
-    *message = g_console.GetPrompt();
-
-    return message->length();
+std::string GetCommandPrompt() noexcept {
+    return g_console.GetPrompt();
 }
 
-size_t GetCommandResponse(std::string* message) {
-    if (message == nullptr) return std::numeric_limits<size_t>::max(); // TODO: move to enum
-    *message = g_console.GetResponse();
-
-    return message->length();
+std::string GetCommandResponse() {
+    return g_console.GetResponse();
 }
 
-size_t GetCommandResponseSize() {
-    return g_console.GetResponseLength();
-}
+// size_t GetCommandResponseSize() {
+//     return g_console.GetResponseLength();
+// }
 
-int ProcessCommandString(std::string* message) {
-    if (message == nullptr) return -1; // TODO: move to enum
-    return (g_console.AdvanceDebugger(*message)) ? 1 : 0; // TODO: move to enum
+int ProcessCommandString(const std::string& message) {
+    return (g_console.AdvanceDebugger(message)) ? 1 : 0; // TODO: move to enum
 }
 
 // Direct debugger calls
 bool CheckBreakpoints(BreakInfo* breakInfo) {
     BreakInfo info = {};
-    BreakInfo& infoRef = (!breakInfo) ? info : *breakInfo;
+    BreakInfo& infoRef = !breakInfo ? info : *breakInfo;
 
     const auto re = g_debugger.CheckBreakpoints(infoRef);
     if (re) {
@@ -148,4 +140,6 @@ void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb) {
 
 void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
     DebuggerCallback::SetGetRegSetCallback(getRegSet_cb);
+}
+
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -47,3 +48,17 @@ struct RegisterInfo
 using RegisterInfoPtr = std::shared_ptr<RegisterInfo>;
 
 using RegSet = std::map<std::string, unsigned int>;
+
+
+namespace Rdb {
+typedef std::function<unsigned int()> GetProgramCounterFunc;
+
+typedef std::function<unsigned int(unsigned int)> ReadMemoryFunc;
+
+typedef std::function<unsigned int(BankNum bank, unsigned int)> ReadBankableMemoryFunc;
+
+typedef std::function<bool(BankNum bank, unsigned int address)> CheckBankableMemoryLocationFunc;
+
+typedef std::function<RegSet()> GetRegSetFunc;
+
+}

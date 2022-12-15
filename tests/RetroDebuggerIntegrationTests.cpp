@@ -24,16 +24,11 @@ protected:
 };
 
 TEST_F(RetroDebuggerIntegrationTests, GetCommandPrompt_ValidValue) {
-    std::string cmdPrompt;
-    GetCommandPrompt(&cmdPrompt);
-    ASSERT_EQ(cmdPrompt, std::string("(rdb)"));
+    ASSERT_EQ(Rdb::GetCommandPrompt(), std::string("(rdb)"));
 }
 
 TEST_F(RetroDebuggerIntegrationTests, GetRdbVersion_ValidValue) {
-    std::string version;
-    GetRdbVersion(&version);
-
-    ASSERT_EQ(version, RetroDebugger::Config::ProjectVersion);
+    ASSERT_EQ(Rdb::GetRdbVersion(), RetroDebugger::Config::ProjectVersion);
 }
 
 }
