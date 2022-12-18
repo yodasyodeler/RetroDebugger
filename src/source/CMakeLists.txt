@@ -48,7 +48,6 @@ if(ENABLE_TESTING)
                 DebuggerStringParser.h
                 DebuggerXmlParser.cpp
                 DebuggerXmlParser.h
-                RetroDebuggerApi.cpp
                 XmlElementParser.cpp
                 XmlElementParser.h)
     target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR})

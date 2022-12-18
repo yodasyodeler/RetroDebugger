@@ -19,7 +19,7 @@ target_include_directories(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/confi
 target_sources(RetroDebuggerTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h"
                                           "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h")
 
-# automatically discover tests that are defined test files you can modify the unittests.
+# automatically discover tests that are defined test files you can modify the unit tests.
 gtest_discover_tests(
     RetroDebuggerTests
     TEST_PREFIX

@@ -41,5 +41,6 @@ gtest_discover_tests(
 # Source files: add configured_files and tests
 target_include_directories(RetroDebuggerIntegrationTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
 target_sources(
-    RetroDebuggerIntegrationTests PRIVATE RetroDebuggerIntegrationTests.cpp
-                                          "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h")
+    RetroDebuggerIntegrationTests
+    PRIVATE RetroDebuggerIntegrationTests.cpp "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h"
+            "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h")

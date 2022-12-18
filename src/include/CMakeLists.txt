@@ -14,6 +14,6 @@ target_include_directories(
                          "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
 if(ENABLE_TESTING)
-    target_sources(RetroDebuggerTests PRIVATE RetroDebuggerApi.h RetroDebuggerCommon.h)
+    target_sources(RetroDebuggerTests PRIVATE RetroDebuggerCommon.h)
     target_include_directories(RetroDebuggerTests PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 endif()
