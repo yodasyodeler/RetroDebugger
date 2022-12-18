@@ -5,10 +5,10 @@
 #include "XmlElementParser.h"
 
 /******************************************************************************
-* TODOs
-*   ParseXmlElement_UnkownName      -   make sure element with unknown name sets the last error appropriately
-*
-******************************************************************************/
+ * TODOs
+ *   ParseXmlElement_UnkownName      -   make sure element with unknown name sets the last error appropriately
+ *
+ ******************************************************************************/
 
 
 namespace XmlElementParserTests {
@@ -49,7 +49,7 @@ TEST_F(XmlElementParserTests, Operations_ParseOperations) {
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
     ASSERT_TRUE(parseSuccess) << m_xmlParser.GetLastError();
-    EXPECT_EQ(operations.extendedOpcode, NORMAL_OPERATIONS_KEY);
+    EXPECT_EQ(operations.extendedOpcode, NormalOperationsKey);
     EXPECT_EQ(operations.opcodeLength, expectedOcodeLength);
     EXPECT_EQ(operations.operations.size(), expectedOperationsSize);
 }
@@ -81,7 +81,7 @@ TEST_F(XmlElementParserTests, Operations_InvalidOpcodeLength) {
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
     ASSERT_FALSE(parseSuccess);
-    EXPECT_EQ(operations.extendedOpcode, NORMAL_OPERATIONS_KEY);
+    EXPECT_EQ(operations.extendedOpcode, NormalOperationsKey);
     EXPECT_EQ(operations.opcodeLength, expectedDefaultOpcodeLength);
     EXPECT_EQ(operations.operations.size(), expectedOperationsSize);
     const auto actualLastError = m_xmlParser.GetLastError();

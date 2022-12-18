@@ -6,7 +6,7 @@ class DebuggerXmlParser;
 
 class DebuggerOperations {
 public:
-    DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser);
+    explicit DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser);
     DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser, const std::string& filename);
 
     void Reset();

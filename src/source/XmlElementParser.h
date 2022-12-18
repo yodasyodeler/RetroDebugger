@@ -11,9 +11,9 @@ public:
     bool ParseXmlElement(const tinyxml2::XMLElement* element, XmlDebuggerOperations& operations);
     bool ParseXmlElement(const tinyxml2::XMLElement* element, XmlDebuggerOperation& operation);
     bool ParseXmlElement(const tinyxml2::XMLElement* element, XmlDebuggerArgument& argument);
-    //bool ParseXmlElement(const tinyxml2::XMLElement* element, std::string& outValue, bool allowDefault = false);
-    //bool ParseXmlElement(const tinyxml2::XMLElement* element, unsigned int& outValue, bool allowDefault = false);
-    //bool ParseXmlElement(const tinyxml2::XMLElement* element, FlagType& outValue, bool allowDefault = false);
+    // bool ParseXmlElement(const tinyxml2::XMLElement* element, std::string& outValue, bool allowDefault = false);
+    // bool ParseXmlElement(const tinyxml2::XMLElement* element, unsigned int& outValue, bool allowDefault = false);
+    // bool ParseXmlElement(const tinyxml2::XMLElement* element, FlagType& outValue, bool allowDefault = false);
 
     /*template <class T>
     bool ParseXmlElement(const tinyxml2::XMLElement* element, std::set<T>& outValue, bool allowDefault = false) {

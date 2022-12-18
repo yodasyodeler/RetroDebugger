@@ -1,13 +1,14 @@
 #pragma once
+#include "DebuggerCallbacks.h"
+#include "DebuggerCommon.h"
+
+#include <limits>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "DebuggerCallbacks.h"
-#include "DebuggerCommon.h"
-
-static const BreakNum MAX_BREAKPOINT_NUM = UINT_MAX;
-static const unsigned int MAX_ADDRESS = UINT_MAX;
+static constexpr BreakNum MaxBreakpointNumber = std::numeric_limits<unsigned int>::max();
+static constexpr unsigned int MaxAddress = std::numeric_limits<unsigned int>::max();
 
 class DebuggerOperations;
 
@@ -21,9 +22,9 @@ class BreakpointManager {
 
 public:
     BreakpointManager() = default;
-    BreakpointManager(std::shared_ptr<DebuggerOperations> operations);
+    explicit BreakpointManager(std::shared_ptr<DebuggerOperations> operations);
 
-    bool CheckBreakpoints(BreakInfo& breakpointNum); //TODO: what args are needed
+    bool CheckBreakpoints(BreakInfo& breakpointNum); // TODO: what args are needed
 
     bool Run(unsigned int numBreakpointsToSkip = 0);
     bool RunInstructions(unsigned int numInstructions = 0);
@@ -38,6 +39,8 @@ public:
     std::map<BreakNum, BreakInfo> GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
 
 private:
+    void CheckBreakInfo(BreakInfo& info);
+    bool HandleBreakInfo(BreakInfo& info);
     bool ModifyBreak(std::vector<BreakNum> list, bool isEnabled);
 
     std::map<BreakNum, BreakInfo> m_breakpoints = {};

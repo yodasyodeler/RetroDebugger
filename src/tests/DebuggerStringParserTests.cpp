@@ -1,8 +1,8 @@
 #include "DebuggerStringParser.h"
 #include "gtest/gtest.h"
 
-TEST(DebuggerStringParser, DebugStringParser_ParseBuffersOfDiffrentSizes) {
-    const std::string EmptyString(""); //empty
+TEST(DebuggerStringParser, ParseBuffer_BuffersOfDiffrentSizes) {
+    const std::string EmptyString(""); // empty
     const std::string OneWord("OneWord");
     const std::string TwoWord("Two Words");
 
@@ -11,7 +11,7 @@ TEST(DebuggerStringParser, DebugStringParser_ParseBuffersOfDiffrentSizes) {
     EXPECT_EQ(DebuggerStringParser::ParseBuffer(TwoWord).size(), 2);
 }
 
-TEST(DebuggerStringParser, DebugStringParser_ParseBuffersWithExtraWhiteSpace) {
+TEST(DebuggerStringParser, ParseBuffer_BuffersWithExtraWhiteSpace) {
     const std::string LeadingSpaces("    4LeadingSpaces");
     const std::string TrailingSpaces("4TrailingSpaces    ");
     const std::string ExtraSpaces("Four  Word   Extra    Space");
@@ -32,10 +32,10 @@ TEST(DebuggerStringParser, DebugStringParser_ParseBuffersWithExtraWhiteSpace) {
     EXPECT_EQ(ParsedExtraSpacesOut[3], std::string("Space"));
 }
 
-TEST(DebuggerStringParser, DebugStringParser_ParseNumberSingle) {
+TEST(DebuggerStringParser, ParseNumber_) {
     const std::string number_1("1");
     const std::string number_9567("9567");
-    unsigned int numberOut;
+    unsigned int numberOut{};
 
     EXPECT_TRUE(DebuggerStringParser::ParseNumber(number_1, numberOut));
     EXPECT_EQ(numberOut, 1);
@@ -45,23 +45,28 @@ TEST(DebuggerStringParser, DebugStringParser_ParseNumberSingle) {
 }
 
 TEST(DebuggerStringParser, DebugStringParser_ParseNumberSingleInvalidNum) {
+    unsigned int numberOut{};
+
     const std::string number_float("1.0");
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_float, numberOut));
+
     const std::string number_negative("-5");
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_negative, numberOut));
+
     const std::string number_notNum("abc");
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_notNum, numberOut));
+
     const std::string number_startAsNum("1abc");
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_startAsNum, numberOut));
+
     const std::string number_endAsNum("abc1");
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_endAsNum, numberOut));
+
     const std::string number_empty("");
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_empty, numberOut));
+
     const std::string number_numSpaceNum("1 2");
-
-    unsigned int numberOut;
-
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_float, numberOut));
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_negative, numberOut));
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_notNum, numberOut));
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_startAsNum, numberOut));
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_endAsNum, numberOut));
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_empty, numberOut));
-    EXPECT_TRUE(!DebuggerStringParser::ParseNumber(number_numSpaceNum, numberOut));
+    EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_numSpaceNum, numberOut));
 }
 
 TEST(DebuggerStringParser, DebugStringParser_ParseNumberRange) {
@@ -111,7 +116,7 @@ TEST(DebuggerStringParser, DebugStringParser_ParseNumberDifferentNotations) {
     const std::string number_binary("0b1010");
     const std::string number_rangeMismatch("0x5-0b111");
 
-    unsigned int number;
+    unsigned int number{};
     std::vector<unsigned int> numbers;
 
     EXPECT_TRUE(DebuggerStringParser::ParseNumber(number_hex, number));
@@ -119,7 +124,7 @@ TEST(DebuggerStringParser, DebugStringParser_ParseNumberDifferentNotations) {
     EXPECT_TRUE(DebuggerStringParser::ParseNumber(number_binary, number));
     EXPECT_EQ(number, 10);
     EXPECT_TRUE(DebuggerStringParser::ParseList(number_rangeMismatch, numbers));
-    EXPECT_EQ(numbers.size(), 3);
+    ASSERT_EQ(numbers.size(), 3);
     EXPECT_EQ(numbers[0], 5);
     EXPECT_EQ(numbers[1], 6);
     EXPECT_EQ(numbers[2], 7);
@@ -154,7 +159,7 @@ TEST(DebuggerStringParser, DebugStringParser_ParseComplexLists) {
     EXPECT_EQ(numbers[4], 2);
 }
 
-TEST(DebuggerStringParser, DISABLED_DebugStringParser_ParseComplexSubLists) { //TODO: enable if negative numbers to remove items from lists becomes supported
+TEST(DebuggerStringParser, DISABLED_DebugStringParser_ParseComplexSubLists) { // TODO: enable if negative numbers to remove items from lists becomes supported
     const std::string number_list0("1,2,-2");
     const std::string number_list1("0-3,-2");
     const std::string number_list2("0-4,-1-3");
@@ -175,4 +180,64 @@ TEST(DebuggerStringParser, DISABLED_DebugStringParser_ParseComplexSubLists) { //
     EXPECT_EQ(numbers.size(), 2);
     EXPECT_EQ(numbers[0], 0);
     EXPECT_EQ(numbers[0], 4);
+}
+
+TEST(DebuggerStringParser, ParseNumberPair_happyPath) {
+    unsigned int num1{};
+    unsigned int num2{};
+
+    static constexpr auto intergerValues = "123:456";
+    ASSERT_TRUE(DebuggerStringParser::ParseNumberPair(intergerValues, num1, num2, ":"));
+    EXPECT_EQ(num1, 123);
+    EXPECT_EQ(num2, 456);
+
+    static constexpr auto hexAndBinaryValues = "0xFF:0b10100101";
+    ASSERT_TRUE(DebuggerStringParser::ParseNumberPair(hexAndBinaryValues, num1, num2, ":"));
+    EXPECT_EQ(num1, 0xFF);
+    EXPECT_EQ(num2, 0b10100101);
+
+    static constexpr auto valuesWithlongSeparator = "505I'm A Separator1234";
+    ASSERT_TRUE(DebuggerStringParser::ParseNumberPair(valuesWithlongSeparator, num1, num2, "I'm A Separator"));
+    EXPECT_EQ(num1, 505);
+    EXPECT_EQ(num2, 1234);
+}
+
+TEST(DebuggerStringParser, ParseNumberPair_invalidNumbers) {
+    unsigned int num1{};
+    unsigned int num2{};
+
+    static constexpr auto invalidPair_noNumbers = ":";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_noNumbers, num1, num2, ":"));
+
+    static constexpr auto invalidPair_noSecondNumber = "123:";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_noSecondNumber, num1, num2, ":"));
+
+    static constexpr auto invalidPair_noFirstNumber = ":456";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_noFirstNumber, num1, num2, ":"));
+
+    static constexpr auto invalidPair_invalidFirstNumber = "abc:456";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_invalidFirstNumber, num1, num2, ":"));
+
+    static constexpr auto invalidPair_invalidSecondNumber = "123:def";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_invalidSecondNumber, num1, num2, ":"));
+}
+
+TEST(DebuggerStringParser, ParseNumberPair_invalidSeperator) {
+    unsigned int num1{};
+    unsigned int num2{};
+
+    static constexpr auto invalidPair_missingSeperator = "123456";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_missingSeperator, num1, num2, ":"));
+
+    static constexpr auto invalidPair_differentSeperator = ":456";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_differentSeperator, num1, num2, ":"));
+
+    static constexpr auto invalidPair_twoSeperators = "0xabc::456";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_twoSeperators, num1, num2, ":"));
+
+    static constexpr auto invalidPair_multipleSeperators_seperatorAtMiddle = "123:0xd:0xef";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_multipleSeperators_seperatorAtMiddle, num1, num2, ":"));
+
+    static constexpr auto invalidPair_multipleSeperators_seperatorAtEnd = "123:0xdef:";
+    EXPECT_FALSE(DebuggerStringParser::ParseNumberPair(invalidPair_multipleSeperators_seperatorAtEnd, num1, num2, ":"));
 }

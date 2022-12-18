@@ -43,11 +43,11 @@ TEST_F(DebuggerXmlParserTests, GameboyOperations_ParseFileTest) {
 
     auto operations = m_xmlParser.GetOperations();
     EXPECT_EQ(operations.size(), expectedNumOfOperations);
-    EXPECT_NE(operations.find(NORMAL_OPERATIONS_KEY), operations.end());
+    EXPECT_NE(operations.find(NormalOperationsKey), operations.end());
     EXPECT_NE(operations.find(GAMEBOY_EXTENDED_OPCODE_KEY), operations.end());
 
-    const auto actualNormalOperations = operations[NORMAL_OPERATIONS_KEY];
-    EXPECT_EQ(actualNormalOperations.extendedOpcode, NORMAL_OPERATIONS_KEY);
+    const auto actualNormalOperations = operations[NormalOperationsKey];
+    EXPECT_EQ(actualNormalOperations.extendedOpcode, NormalOperationsKey);
     EXPECT_EQ(actualNormalOperations.opcodeLength, expectedGameboyOpcodeSize);
     EXPECT_EQ(actualNormalOperations.operations.size(), expectedNormalOperationsSize);
 

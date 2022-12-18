@@ -10,7 +10,7 @@
 class DebuggerXmlParser {
 public:
     DebuggerXmlParser() = default;
-    DebuggerXmlParser(const std::string& filename);
+    explicit DebuggerXmlParser(const std::string& filename);
 
     void Reset();
 
@@ -18,7 +18,7 @@ public:
     bool ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocument);
 
     XmlOperationsMap GetOperations();
-    //DebuggerCommandMap GetCommands();
+    // DebuggerCommandMap GetCommands();
 
     std::string GetLastError();
 
@@ -30,8 +30,8 @@ private:
     bool SetLastError(const std::string& elementName, const std::string& error);
     bool SetLastError(const tinyxml2::XMLElement* element, const std::string& error);
 
-    //bool ParseCommands();
-    //bool ParseCommand(const tinyxml2::XMLElement& command);
+    // bool ParseCommands();
+    // bool ParseCommand(const tinyxml2::XMLElement& command);
 
     tinyxml2::XMLDocument m_xmlDocument;
     XmlOperationsMap m_operationMap = {};

@@ -7,8 +7,8 @@ bool Debugger::CheckBreakpoints(BreakInfo& breakInfo) {
     return m_breakManager.CheckBreakpoints(breakInfo);
 }
 
-bool Debugger::Run(const unsigned int numBreakToPass) {
-    return m_breakManager.Run(numBreakToPass);
+bool Debugger::Run(const unsigned int numBreakpointsToSkip) {
+    return m_breakManager.Run(numBreakpointsToSkip);
 }
 
 bool Debugger::RunInstructions(const unsigned int numInstructions) {
@@ -57,7 +57,7 @@ bool Debugger::ParseXmlFile(const std::string& filename) {
     return m_operations->ParseFile(filename);
 }
 
-RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } // TODO: need to redo RegInfo
+// RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } // TODO: need to redo RegInfo
 
 AddrInfo Debugger::GetRomInfo(const unsigned int address) { return { address, DebuggerCallback::ReadMemory(address) }; }
 
@@ -67,14 +67,11 @@ std::vector<RegisterInfoPtr> Debugger::GetRegisterInfoList() {
 
 CommandList Debugger::GetCommandInfoList(size_t address, const unsigned int numInstructions) {
     CommandList operations;
-    for (auto i = 0u; i < numInstructions; ++i) {
+    for (auto i = 0U; i < numInstructions; ++i) {
         Operation operation;
         auto operationAddress = address;
         address += m_operations->GetOperation(address, operation);
         operations.emplace(operationAddress, operation);
     }
     return operations;
-}
-
-void Debugger::SetupBreakpointManagerSettings() {
 }

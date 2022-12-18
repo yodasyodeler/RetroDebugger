@@ -1,35 +1,47 @@
 #include "XmlElementParser.h"
 
 #include <algorithm>
+#include <string_view>
 
-static const auto ErrorNullptr = std::string("encountered unexpected nullptr");
-static const auto ErrorUnexpectedElement = std::string("Found an unexpected element. Looking for ");
-static const auto ErrorObtainingUnsignedInt = std::string("Failed to obtain a valid unsigned int for ");
-static const auto ErrorObtainingOpcodeLength = std::string("Failed to obtain a valid OperationLength for ");
-static const auto ErrorObtainingString = std::string("Failed to obtain a valid string for ");
-static const auto ErrorObtainingBool = std::string("Failed to obtain a valid bool for ");
-static const auto ErrorObtainingOperation = std::string("Failed to obtain a valid reg operation for ");
-static const auto ErrorDeterminingArgumentType = std::string("Failed to determine argument type for ");
+static constexpr std::string_view ErrorNullptr = "encountered unexpected nullptr";
+static constexpr std::string_view ErrorUnexpectedElement = "Found an unexpected element. Looking for ";
+static constexpr std::string_view ErrorObtainingUnsignedInt = "Failed to obtain a valid unsigned int for ";
+static constexpr std::string_view ErrorObtainingOpcodeLength = "Failed to obtain a valid OperationLength for ";
+static constexpr std::string_view ErrorObtainingString = "Failed to obtain a valid string for ";
+static constexpr std::string_view ErrorObtainingBool = "Failed to obtain a valid bool for ";
+static constexpr std::string_view ErrorObtainingOperation = "Failed to obtain a valid reg operation for ";
+static constexpr std::string_view ErrorDeterminingArgumentType = "Failed to determine argument type for ";
+
+static constexpr auto ByteOpcodeLength = 8;
+static constexpr auto WordOpcodeLength = 16;
+static constexpr auto DoubleWordOpcodeLength = 32;
 
 bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg);
+
+/// @brief Checks the name string is a valid Register offset operation.
+/// @param name         String containing the register offset operation.
+/// @param operationPos Position of the operation character in the 'name' string.
+/// @return  Was reg offset valid. False: (Error, True: Success)
+bool CheckRegOffset(std::string& name, XmlDebuggerArgument& arg, size_t operationPos);
+
+std::string ToUpperString(std::string_view str) {
+    std::string upperString(str);
+    std::ranges::transform(upperString, upperString.begin(), [](unsigned char character) { return static_cast<char>(std::toupper(character)); });
+    return upperString;
+};
 
 // local helper methods
 // TODO: could move to a common file, probably keep here unless code is needed else where. Should check the text formatting code
 static bool StringNCompare(const std::string_view& string1, const std::string_view& string2) {
-    if (string1.size() != string2.size()) return false;
+    if (string1.size() != string2.size()) { return false; }
 
-    auto toUpperString = [](std::string_view str) {
-        std::string re(str);
-        std::ranges::transform(re, re.begin(), [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
-        return re;
-    };
-    return !toUpperString(string1).compare(toUpperString(string2));
+    return ToUpperString(string1) == ToUpperString(string2);
 }
 
 // TODO: I wonder if I should look into a method that doesn't use an exception.
 static bool StringToUnsigned(const std::string& str, unsigned int& value) {
     try {
-        value = std::stoul(str, nullptr, 0);
+        value = static_cast<unsigned int>(std::stoul(str, nullptr, 0));
     }
     catch (...) {
         return false;
@@ -98,10 +110,7 @@ static bool StringToRegOperation(const std::string_view& str, RegOperationType& 
 }
 
 static bool IsAlphaString(const std::string_view& string) {
-    for (const auto& c : string) {
-        if (!std::isalpha(c)) { return false; }
-    }
-    return true;
+    return std::ranges::all_of(string, [](char character) { return std::isalpha(character); });
 }
 
 static bool StringToImmediateArgType(const std::string_view& str, ArgumentType& type) {
@@ -185,25 +194,21 @@ static bool StringToArgType(const std::string_view& str, ArgumentType& type) {
         type = ArgumentType::CONDITIONAL;
         return true;
     }
-    if (StringToImmediateArgType(str, type)) { return true; }
-    return false;
+
+    return StringToImmediateArgType(str, type);
 }
 
 static bool StringToOpcodeLength(const std::string_view& str, OpcodeLength& opcodeLength) {
-    if (StringNCompare("8", str)) {
-        opcodeLength = 8;
-        return true;
-    }
-    if (StringNCompare("BYTE", str)) {
-        opcodeLength = 8;
+    if (StringNCompare("8", str) || StringNCompare("BYTE", str)) {
+        opcodeLength = ByteOpcodeLength;
         return true;
     }
     if (StringNCompare("16", str)) {
-        opcodeLength = 16;
+        opcodeLength = WordOpcodeLength;
         return true;
     }
     if (StringNCompare("32", str)) {
-        opcodeLength = 32;
+        opcodeLength = DoubleWordOpcodeLength;
         return true;
     }
     return false;
@@ -253,16 +258,16 @@ static bool ParseAutoArgType(XmlDebuggerArgument& argument) {
 
 bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
     const auto& value = name; // TODO: what am I doing here
-    constexpr auto operationChars = "+-";
-    auto operationFind = value.find_first_of(operationChars);
-    if (operationFind == std::string::npos) {
+    static constexpr std::string_view operationChars = "+-";
+    auto operationPos = value.find_first_of(operationChars);
+    if (operationPos == std::string::npos) {
         arg.operation = RegOperationType::NONE;
         return false;
     }
 
-    if (operationFind == 0) { // PreOp
-        if (value[operationFind] == '+' && IsAlphaString(value.substr(1))) { arg.operation = RegOperationType::PREINC; }
-        else if (value[operationFind] == '-') {
+    if (operationPos == 0) { // PreOp
+        if (value[operationPos] == '+' && IsAlphaString(value.substr(1))) { arg.operation = RegOperationType::PREINC; }
+        else if (value[operationPos] == '-') {
             arg.operation = RegOperationType::PREDEC;
         }
         else {
@@ -271,9 +276,9 @@ bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
         }
         name.erase(0, 1);
     }
-    else if (operationFind == value.size() - 1) { // PostOp
-        if (value[operationFind] == '+') { arg.operation = RegOperationType::POSTINC; }
-        else if (value[operationFind] == '-') {
+    else if (operationPos == value.size() - 1) { // PostOp
+        if (value[operationPos] == '+') { arg.operation = RegOperationType::POSTINC; }
+        else if (value[operationPos] == '-') {
             arg.operation = RegOperationType::POSTDEC;
         }
         else {
@@ -283,34 +288,7 @@ bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
         name.erase(name.size() - 1);
     }
     else { // Check if regoffset
-        const auto firstParam = value.substr(0, operationFind);
-        const auto secondParam = value.substr(operationFind + 1);
-        if (IsAlphaString(firstParam) && StringToUnsigned(secondParam, arg.value.offset)) { // TODO: is there a unit test for this?
-            name = firstParam;
-            arg.operation = (value[operationFind] == '+') ? RegOperationType::REG_OFFSET_ADD : RegOperationType::REG_OFFSET_SUB;
-        }
-        else if (auto immediateType = ArgumentType::UNKOWN; IsAlphaString(firstParam) && StringToImmediateArgType(secondParam, immediateType)) { // TODO: Look at adding support for REG+REG, REG+S8BIT, REG+S16BIT,
-            if (immediateType == ArgumentType::U8BIT) { arg.operation = RegOperationType::REG_OFFSET_U8BIT; }
-            else if (immediateType == ArgumentType::U16BIT) {
-                arg.operation = RegOperationType::REG_OFFSET_U16BIT;
-            }
-            else if (immediateType == ArgumentType::S8BIT) {
-                arg.operation = RegOperationType::REG_OFFSET_S8BIT;
-            }
-            else if (immediateType == ArgumentType::S16BIT) {
-                arg.operation = RegOperationType::REG_OFFSET_S16BIT;
-            }
-            else {
-                return false;
-            }
-            name = firstParam;
-        }
-        // else if (StringToUnsigned(firstParam, arg.value.offset) && IsAlphaString(secondParam)) {
-        //     //arg.value.name = secondParam;
-        //     arg.operation = (value[operationFind] == '+') ? RegOperationType::REG_OFFSET_ADD : RegOperationType::REG_OFFSET_SUB;
-        // }
-        else {
-            arg.operation = RegOperationType::NONE;
+        if (!CheckRegOffset(name, arg, operationPos)) {
             return false;
         }
     }
@@ -324,9 +302,43 @@ bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
     return true;
 }
 
+bool CheckRegOffset(std::string& name, XmlDebuggerArgument& arg, size_t operationPos) {
+    const auto firstParam = name.substr(0, operationPos);
+    const auto secondParam = name.substr(operationPos + 1);
+    if (IsAlphaString(firstParam) && StringToUnsigned(secondParam, arg.value.offset)) { // TODO: is there a unit test for this?
+        name = firstParam;
+        arg.operation = (name[operationPos] == '+') ? RegOperationType::REG_OFFSET_ADD : RegOperationType::REG_OFFSET_SUB;
+    }
+    else if (auto immediateType = ArgumentType::UNKOWN; IsAlphaString(firstParam) && StringToImmediateArgType(secondParam, immediateType)) { // TODO: Look at adding support for REG+REG, REG+S8BIT, REG+S16BIT,
+        if (immediateType == ArgumentType::U8BIT) { arg.operation = RegOperationType::REG_OFFSET_U8BIT; }
+        else if (immediateType == ArgumentType::U16BIT) {
+            arg.operation = RegOperationType::REG_OFFSET_U16BIT;
+        }
+        else if (immediateType == ArgumentType::S8BIT) {
+            arg.operation = RegOperationType::REG_OFFSET_S8BIT;
+        }
+        else if (immediateType == ArgumentType::S16BIT) {
+            arg.operation = RegOperationType::REG_OFFSET_S16BIT;
+        }
+        else {
+            return false;
+        }
+        name = firstParam;
+    }
+    // else if (StringToUnsigned(firstParam, arg.value.offset) && IsAlphaString(secondParam)) {
+    //     //arg.value.name = secondParam;
+    //     arg.operation = (value[operationFind] == '+') ? RegOperationType::REG_OFFSET_ADD : RegOperationType::REG_OFFSET_SUB;
+    // }
+    else {
+        arg.operation = RegOperationType::NONE;
+        return false;
+    }
+    return true;
+}
+
 std::string GetTextAsString(const tinyxml2::XMLAttribute* attribute) {
-    auto textPtr = attribute->Value();
-    return (!textPtr) ? "" : std::string(textPtr);
+    const auto* textPtr = attribute->Value();
+    return (textPtr == nullptr) ? "" : std::string(textPtr);
 }
 
 // FlagType StringToFlagType(const std::string_view& flagType) {
@@ -348,19 +360,19 @@ std::string XmlElementParser::GetLastError() {
 bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlDebuggerOperations& operations) {
     operations.Reset();
 
-    auto OperationsStr = "operations";
-    if (!element) { return SetLastError(OperationsStr, ErrorNullptr); }
-    if (!StringNCompare(element->Name(), "operations")) { return SetLastError(element, ErrorUnexpectedElement + OperationsStr); }
+    static constexpr auto OperationsStr = "operations";
+    if (element == nullptr) { return SetLastError(std::string(OperationsStr), std::string(ErrorNullptr)); }
+    if (!StringNCompare(element->Name(), "operations")) { return SetLastError(element, std::string(ErrorUnexpectedElement) + OperationsStr); }
 
     const char* opcodeLengthStr = "opcodeLength";
     const char* str = element->Attribute(opcodeLengthStr);
-    if ((!str) || !StringToOpcodeLength(str, operations.opcodeLength)) { return SetLastError(element, ErrorObtainingOpcodeLength + opcodeLengthStr); }
+    if ((str == nullptr) || !StringToOpcodeLength(str, operations.opcodeLength)) { return SetLastError(element, std::string(ErrorObtainingOpcodeLength) + opcodeLengthStr); }
 
     const char* extenededOpcodeStr = "extended";
     str = element->Attribute(extenededOpcodeStr);
-    if (!str) { operations.extendedOpcode = NORMAL_OPERATIONS_KEY; }
+    if (str == nullptr) { operations.extendedOpcode = NormalOperationsKey; }
     else if (!StringToUnsigned(str, operations.extendedOpcode)) {
-        return SetLastError(element, ErrorObtainingUnsignedInt + extenededOpcodeStr);
+        return SetLastError(element, std::string(ErrorObtainingUnsignedInt) + extenededOpcodeStr);
     }
 
     return true;
@@ -370,23 +382,23 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     operation.Reset();
 
     constexpr auto OperationStr = "operation";
-    if (!element) { return SetLastError(OperationStr, ErrorNullptr); }
-    if (!StringNCompare(element->Name(), OperationStr)) { return SetLastError(element, ErrorUnexpectedElement + OperationStr); }
+    if (!element) { return SetLastError(std::string(OperationStr), std::string(ErrorNullptr)); }
+    if (!StringNCompare(element->Name(), OperationStr)) { return SetLastError(element, std::string(ErrorUnexpectedElement) + OperationStr); }
 
     constexpr auto opcodeStr = "opcode";
     const char* str = element->Attribute(opcodeStr);
-    if (!str || !StringToUnsigned(str, operation.opcode)) { return SetLastError(element, ErrorObtainingUnsignedInt + opcodeStr); }
+    if (!str || !StringToUnsigned(str, operation.opcode)) { return SetLastError(element, std::string(ErrorObtainingUnsignedInt) + opcodeStr); }
 
     constexpr auto commandStr = "command";
     str = element->Attribute(commandStr);
-    if (!str) { return SetLastError(element, ErrorObtainingString + commandStr); }
+    if (!str) { return SetLastError(element, std::string(ErrorObtainingString) + commandStr); }
     operation.command = str;
 
     constexpr auto isJumpStr = "isJump";
     constexpr auto trueStr = "true";
     str = element->Attribute(isJumpStr);
     if (str) {
-        operation.isJump = (_stricmp(str, trueStr) == 0); // TODO: cross platform issue
+        operation.isJump = ToUpperString(str) == ToUpperString(trueStr); // TODO: cross platform issue
     }
 
     return true;
@@ -397,13 +409,13 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     bool isCandidateForAuto = true;
     argument.Reset();
     constexpr auto argStr = "arg";
-    if (!element) { return SetLastError(argStr, ErrorNullptr); }
-    if (!StringNCompare(element->Name(), argStr)) { return SetLastError(element, ErrorUnexpectedElement + argStr); }
+    if (!element) { return SetLastError(std::string(argStr), std::string(ErrorNullptr)); }
+    if (!StringNCompare(element->Name(), argStr)) { return SetLastError(element, std::string(ErrorUnexpectedElement) + argStr); }
 
     constexpr auto typeStr = "type";
     const char* str = element->Attribute(typeStr);
     if (str) {
-        if (!StringToArgType(str, argument.type)) { return SetLastError(element, ErrorObtainingString + typeStr); }
+        if (!StringToArgType(str, argument.type)) { return SetLastError(element, std::string(ErrorObtainingString) + typeStr); }
         else {
             isCandidateForAuto = false;
         }
@@ -412,7 +424,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     constexpr auto indirectStr = "indirect";
     str = element->Attribute(indirectStr);
     if (str) {
-        if (!StringToBool(str, argument.indirectArg)) { return SetLastError(element, ErrorObtainingBool + indirectStr); }
+        if (!StringToBool(str, argument.indirectArg)) { return SetLastError(element, std::string(ErrorObtainingBool) + indirectStr); }
         else {
             isCandidateForAuto = false;
         }
@@ -421,7 +433,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     constexpr auto operationStr = "operation";
     str = element->Attribute(operationStr);
     if (str) {
-        if (!StringToRegOperation(str, argument.operation)) { return SetLastError(element, ErrorObtainingOperation + operationStr); }
+        if (!StringToRegOperation(str, argument.operation)) { return SetLastError(element, std::string(ErrorObtainingOperation) + operationStr); }
         else {
             isCandidateForAuto = false;
         }
@@ -430,7 +442,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     constexpr auto offsetStr = "offset";
     str = element->Attribute(offsetStr);
     if (str) {
-        if (!StringToUnsigned(str, argument.value.offset)) { return SetLastError(element, ErrorObtainingUnsignedInt + offsetStr); }
+        if (!StringToUnsigned(str, argument.value.offset)) { return SetLastError(element, std::string(ErrorObtainingUnsignedInt) + offsetStr); }
         else {
             isCandidateForAuto = false;
         }
@@ -446,7 +458,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
 
     constexpr auto valueStr = "value";
     str = element->Attribute(valueStr);
-    if (!str) { return SetLastError(element, ErrorObtainingString + valueStr); }
+    if (!str) { return SetLastError(element, std::string(ErrorObtainingString) + valueStr); }
     else {
         argument.value.name = str;
     }
@@ -454,7 +466,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     // Parse Auto last
     if (isCandidateForAuto) {
         if (!ParseAutoArgType(argument)) {
-            return SetLastError(element, ErrorDeterminingArgumentType + argument.value.name);
+            return SetLastError(element, std::string(ErrorDeterminingArgumentType) + argument.value.name);
         }
     }
 

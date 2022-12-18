@@ -28,17 +28,17 @@ enum class BreakDisposition {
 
 struct BreakInfo
 {
-    unsigned int address;
-    BreakNum breakpointNumber;
-    BankNum bankNumber;
-    // unsigned int ignoreCount; //TODO: unimplemented
+    unsigned int address{};
+    BreakNum breakpointNumber{};
+    BankNum bankNumber{};
+    // unsigned int ignoreCount{}; //TODO: unimplemented
     // unsigned int enableCount; //TODO: unimplemented
-    unsigned int timesHit;
-    unsigned int oldWatchValue;
-    unsigned int newWatchValue;
+    unsigned int timesHit{};
+    unsigned int oldWatchValue{};
+    unsigned int newWatchValue{};
     BreakType type = BreakType::Invalid;
-    BreakDisposition disp; // TODO: no way to use, is implemented though
-    bool isEnabled;
+    BreakDisposition disp = BreakDisposition::Disable; // TODO: no way to use, is implemented though
+    bool isEnabled = false;
 };
 
 struct RegisterInfo
@@ -60,5 +60,4 @@ typedef std::function<unsigned int(BankNum bank, unsigned int)> ReadBankableMemo
 typedef std::function<bool(BankNum bank, unsigned int address)> CheckBankableMemoryLocationFunc;
 
 typedef std::function<RegSet()> GetRegSetFunc;
-
 }

@@ -100,10 +100,10 @@ struct XmlArgValue
         reg.clear();
         offset = 0;
     }
-    bool nameFirst; // REG+NUM or NUM+REG, TODO: may remove this, allows the ability to say which value was first, but isn't really that useful for most opcodes.
+    bool nameFirst = true; // REG+NUM or NUM+REG, TODO: may remove this, allows the ability to say which value was first, but isn't really that useful for most opcodes.
     std::string name;
     std::string reg;
-    unsigned int offset;
+    unsigned int offset{};
 };
 
 struct XmlDebuggerArgument
@@ -114,13 +114,13 @@ struct XmlDebuggerArgument
         operation = RegOperationType::NONE;
         value.Reset();
     }
-    ArgumentType type;
-    bool indirectArg;
-    RegOperationType operation;
-    XmlArgValue value; // used in register lookup
+    ArgumentType type = ArgumentType::UNKOWN;
+    bool indirectArg = false;
+    RegOperationType operation = RegOperationType::NONE;
+    XmlArgValue value{}; // used in register lookup
 };
 
-static const unsigned int NORMAL_OPERATIONS_KEY = UINT_MAX;
+static constexpr auto NormalOperationsKey = std::numeric_limits<unsigned int>::max();
 
 struct XmlDebuggerOperation
 {
@@ -130,7 +130,7 @@ struct XmlDebuggerOperation
         arguments.clear();
         isJump = false;
     }
-    unsigned int opcode;
+    unsigned int opcode{};
     std::string command;
     std::vector<XmlDebuggerArgument> arguments;
     bool isJump = false;
@@ -141,11 +141,11 @@ struct XmlDebuggerOperations
 {
     void Reset() {
         opcodeLength = 0;
-        extendedOpcode = NORMAL_OPERATIONS_KEY;
+        extendedOpcode = NormalOperationsKey;
         operations.clear();
     }
-    OpcodeLength opcodeLength;
-    unsigned int extendedOpcode;
+    OpcodeLength opcodeLength{};
+    unsigned int extendedOpcode = NormalOperationsKey;
     XmlOpcodeToOperation operations;
 };
 

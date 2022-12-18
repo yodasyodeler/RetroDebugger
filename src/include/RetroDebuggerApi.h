@@ -27,25 +27,25 @@ RDB_EXPORT int ProcessCommandString(const std::string& message);
 // Direct calls
 RDB_EXPORT bool CheckBreakpoints(BreakInfo* breakInfo);
 
-RDB_EXPORT bool Run(const unsigned int numBreakpointsToSkip);
+RDB_EXPORT bool Run(unsigned int numBreakpointsToSkip);
 
-RDB_EXPORT bool RunInstructions(const unsigned int numBreakToPass);
+RDB_EXPORT bool RunInstructions(unsigned int numBreakToPass);
 
 RDB_EXPORT bool RunTillJump();
 
-RDB_EXPORT bool SetBreakpoint(const int address);
+RDB_EXPORT bool SetBreakpoint(unsigned int address);
 
-RDB_EXPORT bool EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
+RDB_EXPORT bool EnableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
-RDB_EXPORT bool DisableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
+RDB_EXPORT bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
-RDB_EXPORT bool DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1);
+RDB_EXPORT bool DeleteBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
-// RDB_EXPORT RegInfo GetRegInfo(const int register);
+// RDB_EXPORT RegInfo GetRegInfo(int register);
 
-RDB_EXPORT [[nodiscard]] BreakInfo GetBreakpointInfo(const unsigned int breakPointNum);
+RDB_EXPORT [[nodiscard]] BreakInfo GetBreakpointInfo(unsigned int breakPointNum);
 
-// RDB_EXPORT CommandInfo GetCommandInfo(const unsigned int location, unsigned int& instruction);
+// RDB_EXPORT CommandInfo GetCommandInfo(unsigned int location, unsigned int& instruction);
 
 RDB_EXPORT bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo);
 

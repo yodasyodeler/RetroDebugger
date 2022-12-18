@@ -101,7 +101,7 @@ bool DebuggerOperations::ParseFile(const std::string& filename) {
 
     const auto xmlOperations = m_debuggerParser->GetOperations();
     for (const auto& operations : xmlOperations) {
-        if (operations.first == NORMAL_OPERATIONS_KEY) {
+        if (operations.first == NormalOperationsKey) {
             for (const auto& operation : operations.second.operations) {
                 ConvertOperation(m_operations.operations, operation.second);
             }

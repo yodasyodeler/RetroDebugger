@@ -10,9 +10,6 @@
 #include <numeric>
 
 namespace Rdb {
-
-static std::vector<std::string> m_prevWords;
-
 // static BreakpointManager g_interpreter;
 static Debugger g_debugger;
 static DebuggerInterpreter g_interpreter(&g_debugger);
@@ -42,10 +39,10 @@ int ProcessCommandString(const std::string& message) {
 // Direct debugger calls
 bool CheckBreakpoints(BreakInfo* breakInfo) {
     BreakInfo info = {};
-    BreakInfo& infoRef = !breakInfo ? info : *breakInfo;
+    BreakInfo& infoRef = (breakInfo == nullptr) ? info : *breakInfo;
 
-    const auto re = g_debugger.CheckBreakpoints(infoRef);
-    if (re) {
+    const auto hitBreakpoint = g_debugger.CheckBreakpoints(infoRef);
+    if (hitBreakpoint) {
         if (infoRef.type == BreakType::Breakpoint || infoRef.type == BreakType::BankBreakpoint) {
             g_interpreter.SetCommandResponse(DebuggerPrintFormat::PrintBreakpointHit(infoRef));
         }
@@ -53,7 +50,7 @@ bool CheckBreakpoints(BreakInfo* breakInfo) {
             g_interpreter.SetCommandResponse(DebuggerPrintFormat::PrintWatchpointHit(infoRef));
         }
     }
-    return re;
+    return hitBreakpoint;
 }
 
 bool Run(const unsigned int numBreakpointsToSkip) {
@@ -68,32 +65,32 @@ bool RunTillJump() {
     return g_debugger.RunTillJump();
 }
 
-bool SetBreakpoint(const int address) {
-    return g_debugger.SetBreakpoint(address);
+bool SetBreakpoint(unsigned int address) {
+    g_debugger.SetBreakpoint(address);
+    return true; // TODO: this doesn't mean anything
 }
 
 bool EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
-    if (breakRange0 > breakRange1)
-        return false;
-    std::vector<unsigned int> breakRange(breakRange1 - breakRange0 + 1);
+    if (breakRange0 > breakRange1) { return false; }
+
+    std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
     std::iota(breakRange.begin(), breakRange.end(), breakRange0);
 
     return g_debugger.EnableBreakpoints(breakRange);
 }
 
 bool DisableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
-    if (breakRange0 > breakRange1)
-        return false;
-    std::vector<unsigned int> breakRange(breakRange1 - breakRange0 + 1);
+    if (breakRange0 > breakRange1) { return false; }
+
+    std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
     std::iota(breakRange.begin(), breakRange.end(), breakRange0);
 
     return g_debugger.DisableBreakpoints(breakRange);
 }
 
 bool DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
-    if (breakRange0 > breakRange1)
-        return false;
-    std::vector<unsigned int> breakRange(breakRange1 - breakRange0 + 1);
+    if (breakRange0 > breakRange1) { return false; }
+    std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
     std::iota(breakRange.begin(), breakRange.end(), breakRange0);
 
     return g_debugger.DeleteBreakpoints(breakRange);
@@ -107,7 +104,7 @@ BreakInfo GetBreakpointInfo(const unsigned int breakPointNum) {
 }
 
 bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo) {
-    if (registerInfo) {
+    if (registerInfo != nullptr) {
         *registerInfo = g_debugger.GetRegisterInfoList();
         return true;
     }
@@ -121,25 +118,25 @@ bool ParseXmlFile(const std::string& filename) {
 
 // Set Callbacks
 void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb) {
-    DebuggerCallback::SetGetPcRegCallback(getPc_cb);
+    DebuggerCallback::SetGetPcRegCallback(std::move(getPc_cb));
 }
 
 void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb) {
-    DebuggerCallback::SetReadMemoryCallback(readMemory_cb);
+    DebuggerCallback::SetReadMemoryCallback(std::move(readMemory_cb));
 }
 
 // TODO: I need to think about this callback more. The idea is to add the bank to a break/watch such as Bank 3 address 0x40C0 -> "3:0x40C0"
 void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb) {
-    return DebuggerCallback::SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocation_cb);
+    return DebuggerCallback::SetCheckBankableMemoryLocationCallback(std::move(CheckBankableMemoryLocation_cb));
 }
 
 void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb) {
-    DebuggerCallback::SetReadBankableMemoryCallback(readBankMemory_cb);
+    DebuggerCallback::SetReadBankableMemoryCallback(std::move(readBankMemory_cb));
 }
 
 
 void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
-    DebuggerCallback::SetGetRegSetCallback(getRegSet_cb);
+    DebuggerCallback::SetGetRegSetCallback(std::move(getRegSet_cb));
 }
 
 }

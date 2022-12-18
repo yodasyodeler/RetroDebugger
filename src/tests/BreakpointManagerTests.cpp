@@ -172,7 +172,7 @@ TEST_F(BreakpointManagerTests, Debugger_StepBreaksOnBreakpoint) {
 }
 
 TEST_F(BreakpointManagerTests, Debugger_ContinueBreaksOnBreakpoint) {
-    BreakInfo breakInfo;
+    BreakInfo breakInfo{};
     const auto breakNum1 = m_breakpointManager.SetBreakpoint(0x101);
     g_pc = 0x100;
 

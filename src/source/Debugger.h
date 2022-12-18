@@ -8,7 +8,7 @@
 class Debugger {
 public:
     Debugger();
-    bool CheckBreakpoints(BreakInfo& breakpointNum);
+    bool CheckBreakpoints(BreakInfo& breakInfo);
 
     bool Run(unsigned int numBreakpointsToSkip = 0);
     bool RunInstructions(unsigned int numInstructions = 0);
@@ -24,8 +24,8 @@ public:
     bool DisableBreakpoints(const std::vector<BreakNum>& list);
     bool DeleteBreakpoints(const std::vector<BreakNum>& list = {});
 
-    RegInfo GetRegInfo(int reg);
-    AddrInfo GetRomInfo(unsigned int address);
+    // RegInfo GetRegInfo(int reg);
+    static AddrInfo GetRomInfo(unsigned int address);
 
     CommandList GetCommandInfoList(size_t address, unsigned int numInstructions);
     BreakList GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
@@ -34,8 +34,6 @@ public:
     bool ParseXmlFile(const std::string& filename);
 
 private:
-    void SetupBreakpointManagerSettings();
-
     std::shared_ptr<DebuggerXmlParser> m_xmlParser;
     std::shared_ptr<DebuggerOperations> m_operations;
     BreakpointManager m_breakManager;
