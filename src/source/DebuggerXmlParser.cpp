@@ -6,6 +6,7 @@ static constexpr std::string_view ErrorNullptr = "Encountered unexpected nullptr
 static constexpr std::string_view ErrorEmptyFile = "couldn't find the first XML element in the file";
 static constexpr std::string_view ErrorPreMsg = "Error XmlParser: ";
 
+static constexpr std::string_view RetroDebuggerStr = "RetroDebugger";
 static constexpr std::string_view OperationsStr = "operations";
 static constexpr std::string_view OperationStr = "operation";
 static constexpr std::string_view ArgStr = "arg";
@@ -50,6 +51,17 @@ bool DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocumen
     const auto* element = xmlDocument.FirstChildElement();
     if (element == nullptr) { return SetLastError("XML file", ErrorEmptyFile); } // if file is empty report an error
 
+    if (const auto* unexpectedSibling = element->NextSiblingElement();
+        unexpectedSibling != nullptr) {
+        return SetLastError("XML file", fmt::format("'RetroDebugger' must be the only root element. Found sibling element: '{}'", (unexpectedSibling->Name() == nullptr ? "" : unexpectedSibling->Name())));
+    }
+
+    if (const auto* name = element->Name();
+        name == nullptr || name != RetroDebuggerStr) {
+        return SetLastError("XML file", fmt::format("Root XML element must be 'RetroDebugger'. Root element found: '{}'", (name == nullptr ? "" : name)));
+    }
+
+    element = element->FirstChildElement(); // Go to first element within the 'RetroDebugger' element
     while (element != nullptr) {
         const std::string_view name = (element->Name() != nullptr) ? element->Name() : "";
 
@@ -61,7 +73,6 @@ bool DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocumen
                 m_operationMap.emplace(operations.extendedOpcode, operations);
             }
         }
-
         else {
             return SetLastError(element, "Unknown element");
         }

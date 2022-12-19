@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "RetroDebuggerTests_assets.h"
 #include "RetroDebugger_config.h"

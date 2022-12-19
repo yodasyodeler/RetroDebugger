@@ -1,4 +1,4 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "DebuggerOperations.h"
 #include "DebuggerXmlParser.h"

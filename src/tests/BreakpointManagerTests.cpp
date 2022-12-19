@@ -1,5 +1,5 @@
 #include "BreakpointManager.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 namespace DebuggerTests {
 unsigned int g_pc = 0; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables) - ignoring test code for now. TODO: make a gmock interface

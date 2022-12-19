@@ -1,5 +1,5 @@
 #include "DebuggerStringParser.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 TEST(DebuggerStringParser, ParseBuffer_BuffersOfDiffrentSizes) {
     const std::string EmptyString;

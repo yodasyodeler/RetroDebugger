@@ -1,6 +1,5 @@
-#include "gtest/gtest.h"
-
-#include <regex>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "XmlElementParser.h"
 
@@ -12,16 +11,16 @@
 
 namespace XmlElementParserTests {
 
-const auto XmlOperations = R"(<operations opcodeLength="8"></operations>)";
-const auto XmlOperationsExtended = R"(<operations extended="0xCB" opcodeLength="8"></operations>)";
-const auto XmlOperationsInvalidOpcodeLength = R"(<operations extended="0xCB" opcodeLength="9"></operations>)";
-const auto XmlOperationsInvalidNoOpcodeLength = R"(<operations></operations>)";
-const auto XmlOperationsInvalidExtendedOpcode = R"(<operations extended="0xGG" opcodeLength="8"></operations>)";
+static constexpr auto* XmlOperations = R"(<operations opcodeLength="8"></operations>)";
+static constexpr auto* XmlOperationsExtended = R"(<operations extended="0xCB" opcodeLength="8"></operations>)";
+static constexpr auto* XmlOperationsInvalidOpcodeLength = R"(<operations extended="0xCB" opcodeLength="9"></operations>)";
+static constexpr auto* XmlOperationsInvalidNoOpcodeLength = R"(<operations></operations>)";
+static constexpr auto* XmlOperationsInvalidExtendedOpcode = R"(<operations extended="0xGG" opcodeLength="8"></operations>)";
 
-const auto XmlOperation = R"(<operation opcode="0x40" command="BIT">    <arg value="0"/>    <arg value="B"/>     </operation>)";
-const auto XmlOperationMinimal = R"(<operation opcode="0x40" command="BIT"/>)";
-const auto XmlOperationInvalidNoOpcode = R"(<operation command="BIT"/>)";
-const auto XmlOperationInvalidNoCommand = R"(<operation opcode="0x40"/>)";
+static constexpr auto* XmlOperation = R"(<operation opcode="0x40" command="BIT">    <arg value="0"/>    <arg value="B"/>     </operation>)";
+static constexpr auto* XmlOperationMinimal = R"(<operation opcode="0x40" command="BIT"/>)";
+static constexpr auto* XmlOperationInvalidNoOpcode = R"(<operation command="BIT"/>)";
+static constexpr auto* XmlOperationInvalidNoCommand = R"(<operation opcode="0x40"/>)";
 
 class XmlElementParserTests : public ::testing::Test {
 public:
@@ -41,8 +40,7 @@ TEST_F(XmlElementParserTests, Operations_ParseOperations) {
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
-    ASSERT_TRUE(parseSuccess) << m_xmlParser.GetLastError();
+    ASSERT_TRUE(m_xmlParser.ParseXmlElement(element, operations)) << m_xmlParser.GetLastError();
     EXPECT_EQ(operations.extendedOpcode, NormalOperationsKey);
     EXPECT_EQ(operations.opcodeLength, expectedOcodeLength);
     EXPECT_EQ(operations.operations.size(), expectedOperationsSize);
@@ -57,8 +55,7 @@ TEST_F(XmlElementParserTests, Operations_ParseExtendedOperations) {
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
-    ASSERT_TRUE(parseSuccess) << m_xmlParser.GetLastError();
+    ASSERT_TRUE(m_xmlParser.ParseXmlElement(element, operations)) << m_xmlParser.GetLastError();
     EXPECT_EQ(operations.extendedOpcode, expectedExtendedOpcode);
     EXPECT_EQ(operations.opcodeLength, expectedOcodeLength);
     EXPECT_EQ(operations.operations.size(), expectedOperationsSize);
@@ -67,51 +64,41 @@ TEST_F(XmlElementParserTests, Operations_ParseExtendedOperations) {
 TEST_F(XmlElementParserTests, Operations_InvalidOpcodeLength) {
     const auto expectedDefaultOpcodeLength = 0U;
     const auto expectedOperationsSize = 0U;
-    const std::regex expectedLastError(".*Failed to obtain a valid OperationLength for .*");
 
     m_xmlDocument.Parse(XmlOperationsInvalidOpcodeLength);
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
-    ASSERT_FALSE(parseSuccess);
+    ASSERT_FALSE(m_xmlParser.ParseXmlElement(element, operations));
     EXPECT_EQ(operations.extendedOpcode, NormalOperationsKey);
     EXPECT_EQ(operations.opcodeLength, expectedDefaultOpcodeLength);
     EXPECT_EQ(operations.operations.size(), expectedOperationsSize);
-    const auto actualLastError = m_xmlParser.GetLastError();
-    EXPECT_TRUE(std::regex_match(actualLastError, expectedLastError));
+
+    EXPECT_THAT(m_xmlParser.GetLastError(), testing::HasSubstr("Failed to obtain a valid OperationLength for"));
 }
 
 TEST_F(XmlElementParserTests, Operations_InvalidNoOpcodeLength) {
     const auto expectedDefaultOpcodeLength = 0U;
     const auto expectedOperationsSize = 0U;
-    const std::regex expectedLastError(".*Failed to obtain a valid OperationLength for .*");
 
     m_xmlDocument.Parse(XmlOperationsInvalidNoOpcodeLength);
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
-    ASSERT_FALSE(parseSuccess);
-
-    const auto actualLastError = m_xmlParser.GetLastError();
-    EXPECT_TRUE(std::regex_match(actualLastError, expectedLastError));
+    ASSERT_FALSE(m_xmlParser.ParseXmlElement(element, operations));
+    EXPECT_THAT(m_xmlParser.GetLastError(), testing::HasSubstr("Failed to obtain a valid OperationLength for "));
 }
 
 TEST_F(XmlElementParserTests, Operations_InvalidExtendedOpcode) {
     const auto expectedDefaultOpcodeLength = 0U;
     const auto expectedOperationsSize = 0U;
-    const std::regex expectedLastError(".*Failed to obtain a valid unsigned int for .*");
 
     m_xmlDocument.Parse(XmlOperationsInvalidExtendedOpcode);
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
-    ASSERT_FALSE(parseSuccess);
-
-    const auto actualLastError = m_xmlParser.GetLastError();
-    EXPECT_TRUE(std::regex_match(actualLastError, expectedLastError));
+    ASSERT_FALSE(m_xmlParser.ParseXmlElement(element, operations));
+    EXPECT_THAT(m_xmlParser.GetLastError(), testing::HasSubstr("Failed to obtain a valid unsigned int for "));
 }
 
 TEST_F(XmlElementParserTests, Operation_ParseOperation) {
@@ -121,8 +108,7 @@ TEST_F(XmlElementParserTests, Operation_ParseOperation) {
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
-    ASSERT_TRUE(parseSuccess) << m_xmlParser.GetLastError();
+    ASSERT_TRUE(m_xmlParser.ParseXmlElement(element, operation)) << m_xmlParser.GetLastError();
 
     EXPECT_EQ(operation.opcode, expectedOpcode);
     EXPECT_EQ(operation.command, expectedCommand);
@@ -135,39 +121,31 @@ TEST_F(XmlElementParserTests, Operation_ParseOperationMinimal) {
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
-    ASSERT_TRUE(parseSuccess) << m_xmlParser.GetLastError();
+    ASSERT_TRUE(m_xmlParser.ParseXmlElement(element, operation)) << m_xmlParser.GetLastError();
 
     EXPECT_EQ(operation.opcode, expectedOpcode);
     EXPECT_EQ(operation.command, expectedCommand);
 }
 
 TEST_F(XmlElementParserTests, Operation_InvalidNoOpcode) {
-    const std::regex expectedLastError(".*Failed to obtain a valid unsigned int for .*");
-
     m_xmlDocument.Parse(XmlOperationInvalidNoOpcode);
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
-    ASSERT_FALSE(parseSuccess);
+    ASSERT_FALSE(m_xmlParser.ParseXmlElement(element, operation));
 
     const auto actualLastError = m_xmlParser.GetLastError();
-    EXPECT_TRUE(std::regex_match(actualLastError, expectedLastError));
+    EXPECT_THAT(m_xmlParser.GetLastError(), testing::HasSubstr("Failed to obtain a valid unsigned int for "));
 }
 
 TEST_F(XmlElementParserTests, Operation_InvalidNoCommand) {
-    const std::regex expectedLastError(".*Failed to obtain a valid string for .*");
 
     m_xmlDocument.Parse(XmlOperationInvalidNoCommand);
     const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
-    const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
-    ASSERT_FALSE(parseSuccess);
-
-    const auto actualLastError = m_xmlParser.GetLastError();
-    EXPECT_TRUE(std::regex_match(actualLastError, expectedLastError));
+    ASSERT_FALSE(m_xmlParser.ParseXmlElement(element, operation));
+    EXPECT_THAT(m_xmlParser.GetLastError(), testing::HasSubstr("Failed to obtain a valid string for "));
 }
 
 const auto ArgA = R"(<arg value="A"/>)";
@@ -464,6 +442,5 @@ TEST_F(XmlElementParserTests, Argument_ArgSpOffsetExplicit) {
     EXPECT_EQ(argument.value.reg, "SP");
     EXPECT_EQ(argument.value.offset, 0U);
 }
-
 
 }
