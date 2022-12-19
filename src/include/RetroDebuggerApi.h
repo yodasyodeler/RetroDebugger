@@ -12,15 +12,13 @@ namespace Rdb {
 /// Gets the RetroDebugger version.
 /// Version is formatted as following "<MAJOR>.<MINOR>.<PATCH>".
 /// @return RetroDebugger version string.
-RDB_EXPORT [[nodiscard]] std::string GetRdbVersion() noexcept;
+RDB_EXPORT std::string GetRdbVersion [[nodiscard]] ();
 
 /// @brief Returns a string for RetroDebugger that can be used as a prompt.
 /// @return A string of RetroDebugger command prompt.
-RDB_EXPORT [[nodiscard]] std::string GetCommandPrompt() noexcept;
+RDB_EXPORT std::string GetCommandPrompt [[nodiscard]] () noexcept;
 
-RDB_EXPORT [[nodiscard]] std::string GetCommandResponse();
-
-// RDB_EXPORT size_t GetCommandResponseSize(); //TODO: when using string is this needed?
+RDB_EXPORT std::string GetCommandResponse [[nodiscard]] ();
 
 RDB_EXPORT int ProcessCommandString(const std::string& message);
 
@@ -43,7 +41,7 @@ RDB_EXPORT bool DeleteBreakpoints(unsigned int breakRange0, unsigned int breakRa
 
 // RDB_EXPORT RegInfo GetRegInfo(int register);
 
-RDB_EXPORT [[nodiscard]] BreakInfo GetBreakpointInfo(unsigned int breakPointNum);
+RDB_EXPORT BreakInfo GetBreakpointInfo [[nodiscard]] (unsigned int breakPointNum);
 
 // RDB_EXPORT CommandInfo GetCommandInfo(unsigned int location, unsigned int& instruction);
 
@@ -58,7 +56,7 @@ RDB_EXPORT void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb);
 
 RDB_EXPORT void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
 
-RDB_EXPORT void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readMemory_cb);
+RDB_EXPORT void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb);
 
 RDB_EXPORT void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
 }

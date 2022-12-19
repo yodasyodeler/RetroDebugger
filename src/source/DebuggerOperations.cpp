@@ -7,12 +7,12 @@
 #include <algorithm>
 #include <memory>
 
-DebuggerOperations::DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser) :
-    m_debuggerParser(debuggerParser) {}
+DebuggerOperations::DebuggerOperations(std::shared_ptr<DebuggerXmlParser> debuggerParser) :
+    m_debuggerParser(std::move(debuggerParser)) {}
 
 
-DebuggerOperations::DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser, const std::string& filename) :
-    m_debuggerParser(debuggerParser) {
+DebuggerOperations::DebuggerOperations(std::shared_ptr<DebuggerXmlParser> debuggerParser, const std::string& filename) :
+    m_debuggerParser(std::move(debuggerParser)) {
     ParseFile(filename);
 }
 
@@ -25,7 +25,7 @@ void DebuggerOperations::Reset() {
     m_jumpOperations.opcodeLength = 0;
 }
 
-bool DebuggerOperations::IsValid() {
+bool DebuggerOperations::IsValid() const {
     return m_isValid;
 }
 
@@ -47,50 +47,50 @@ std::vector<RegisterInfoPtr> DebuggerOperations::GetRegisters() {
 
 // TODO: optimize, there is some repeated stuff here
 size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
+    static constexpr auto byteSize = 8U;
     const auto opcode1 = DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++));
 
-    if (opcode1 >= (1u << m_operations.opcodeLength)) {
+    if (opcode1 >= (1U << m_operations.opcodeLength)) {
         auto name = std::to_string(opcode1);
         operation.info = std::make_shared<OperationInfo>(name, false);
         return 1;
     } // TODO: add error info, opcode length is too great
 
-    auto re = 1u; // opcode
     if (m_operations.operations.find(opcode1) != m_operations.operations.end()) {
         operation = m_operations.operations.at(opcode1);
+        auto numOpcodes = (m_operations.opcodeLength / byteSize); // byte length
         for (const auto& arg : operation.arguments) {
             // TODO: immediate values a bit hacky, assumes a byte being read back
             const auto argLength = GetArgTypeLength(arg->type);
-            for (auto i = 0u; i < argLength; ++i) {
-                constexpr auto byteSize = 8u;
+            for (auto i = 0U; i < argLength; ++i) {
                 const auto bitShift = byteSize * i;
                 arg->operationValue |= DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++)) << bitShift;
             }
-            re += argLength;
+            numOpcodes += argLength;
         }
+        return numOpcodes;
     }
     else if (m_operations.extendedOperations.find(opcode1) != m_operations.extendedOperations.end()) {
         const auto extOperations = m_operations.extendedOperations.at(opcode1);
         const auto opcode2 = DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++));
-        re += 1; // extended opcode
+        auto numOpcodes = (m_operations.opcodeLength * 2) / byteSize; // Extended Opcode and Opcode. TODO: this assumes extended opcode is the same size as opcode.
         operation = extOperations.at(opcode2);
         for (const auto& arg : operation.arguments) {
             // TODO: immediate values a bit hacky, assumes a byte being read back
             const auto argLength = GetArgTypeLength(arg->type);
-            for (auto i = 0u; i < argLength; ++i) {
-                constexpr auto byteSize = 8u;
+            for (auto i = 0U; i < argLength; ++i) {
                 const auto bitShift = byteSize * i;
                 arg->operationValue |= DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++)) << bitShift;
             }
-            re += argLength;
+            numOpcodes += argLength;
         }
+        return numOpcodes;
     }
     else {
         auto name = std::to_string(opcode1);
         operation.info = std::make_shared<OperationInfo>(name, false);
+        return 1;
     }
-
-    return re;
 }
 
 bool DebuggerOperations::ParseFile(const std::string& filename) {
@@ -152,7 +152,7 @@ void DebuggerOperations::ConvertOperation(OpcodeToOperation& operationMap, const
 
     std::vector<ArgumentPtr> operationArguments;
     for (const auto& arg : xmlOperation.arguments) {
-        Argument argument = { arg.type, arg.indirectArg, arg.operation, arg.value.offset, arg.value.name, arg.value.reg };
+        const Argument argument = { arg.type, arg.indirectArg, arg.operation, arg.value.offset, arg.value.name, arg.value.reg };
 
         ArgumentPtr argumentPtr;
         const auto argumentFind = std::find_if(m_argumentList.begin(), m_argumentList.end(), [argument](const ArgumentPtr& arg) -> bool { return argument == *arg; });
@@ -171,6 +171,6 @@ void DebuggerOperations::ConvertOperation(OpcodeToOperation& operationMap, const
     }
 
     auto opcode = xmlOperation.opcode;
-    Operation operation = { operationInfoPtr, operationArguments };
+    const Operation operation = { operationInfoPtr, operationArguments };
     operationMap.emplace(opcode, operation);
 }

@@ -24,7 +24,7 @@ public:
     BreakpointManager() = default;
     explicit BreakpointManager(std::shared_ptr<DebuggerOperations> operations);
 
-    bool CheckBreakpoints(BreakInfo& breakpointNum); // TODO: what args are needed
+    bool CheckBreakpoints(BreakInfo& breakInfo); // TODO: what args are needed
 
     bool Run(unsigned int numBreakpointsToSkip = 0);
     bool RunInstructions(unsigned int numInstructions = 0);
@@ -32,7 +32,7 @@ public:
     BreakNum SetBreakpoint(unsigned int address);
     BreakNum SetBreakpoint(BankNum bank, unsigned int address);
     BreakNum SetWatchpoint(unsigned int addressStart, unsigned int addressEnd);
-    BreakNum SetWatchpoint(BankNum bank, unsigned int addressStart, unsigned int addressEnd);
+    // BreakNum SetWatchpoint(BankNum bank, unsigned int addressStart, unsigned int addressEnd);
     bool EnableBreakpoints(const std::vector<BreakNum>& list);
     bool DisableBreakpoints(const std::vector<BreakNum>& list);
     bool DeleteBreakpoints(const std::vector<BreakNum>& list = {});
@@ -41,7 +41,7 @@ public:
 private:
     void CheckBreakInfo(BreakInfo& info);
     bool HandleBreakInfo(BreakInfo& info);
-    bool ModifyBreak(std::vector<BreakNum> list, bool isEnabled);
+    bool ModifyBreak(const std::vector<BreakNum>& list, bool isEnabled);
 
     std::map<BreakNum, BreakInfo> m_breakpoints = {};
     std::shared_ptr<DebuggerOperations> m_operations;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "tinyxml2.h"
-#include <string>
 
 #include "DebuggerCommon.h"
 
@@ -10,7 +9,7 @@
 class DebuggerXmlParser {
 public:
     DebuggerXmlParser() = default;
-    explicit DebuggerXmlParser(const std::string& filename);
+    explicit DebuggerXmlParser(const std::string& filename); //TODO: should this be a PATH type instead?
 
     void Reset();
 
@@ -23,12 +22,12 @@ public:
     std::string GetLastError();
 
 private:
-    bool ParseOperations(const tinyxml2::XMLElement* command, XmlDebuggerOperations& operations);
-    bool ParseOperation(const tinyxml2::XMLElement* command, XmlDebuggerOperation& operation);
+    bool ParseOperations(const tinyxml2::XMLElement* operationElements, XmlDebuggerOperations& operations);
+    bool ParseOperation(const tinyxml2::XMLElement* operationElement, XmlDebuggerOperation& operation);
 
 
-    bool SetLastError(const std::string& elementName, const std::string& error);
-    bool SetLastError(const tinyxml2::XMLElement* element, const std::string& error);
+    bool SetLastError(std::string_view elementName, std::string_view error);
+    bool SetLastError(const tinyxml2::XMLElement* element, std::string_view error);
 
     // bool ParseCommands();
     // bool ParseCommand(const tinyxml2::XMLElement& command);

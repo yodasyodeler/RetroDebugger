@@ -4,7 +4,7 @@
 
 class DebuggerConsole {
 public:
-    DebuggerConsole(DebuggerInterpreter* interpreter);
+    explicit DebuggerConsole(DebuggerInterpreter* interpreter);
 
     bool AdvanceDebugger(const std::string& command);
 
@@ -12,7 +12,7 @@ public:
 
     size_t GetResponseLength();
 
-    std::string GetPrompt();
+    static std::string GetPrompt();
 
 private:
     bool ParseCommand(std::vector<std::string>& words);

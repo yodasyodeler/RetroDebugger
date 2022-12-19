@@ -14,9 +14,9 @@ bool BreakpointManager::CheckBreakpoints(BreakInfo& breakInfo) {
     return HandleBreakInfo(breakInfo);
 }
 
-bool BreakpointManager::Run(const unsigned int numBreakToPass) {
+bool BreakpointManager::Run(const unsigned int numBreakpointsToSkip) {
     m_debugOp = DebugOperation::RunOp;
-    m_instructionsToStep = numBreakToPass;
+    m_instructionsToStep = numBreakpointsToSkip;
     return false;
 }
 
@@ -32,7 +32,7 @@ bool BreakpointManager::RunTillJump() {
 }
 
 BreakNum BreakpointManager::SetBreakpoint(const unsigned int address) {
-    BreakInfo breakpoint = {
+    const BreakInfo breakpoint = {
         address,
         m_breakPointCounter++,
         0,
@@ -51,7 +51,7 @@ BreakNum BreakpointManager::SetBreakpoint(const unsigned int address) {
 }
 
 BreakNum BreakpointManager::SetBreakpoint(const BankNum bank, const unsigned int address) {
-    BreakInfo breakpoint = {
+    const BreakInfo breakpoint = {
         address,
         m_breakPointCounter++,
         bank,
@@ -74,9 +74,9 @@ BreakNum BreakpointManager::SetWatchpoint(const unsigned int addressStart, unsig
     if (addressEnd == std::numeric_limits<BreakNum>::max()) { addressEnd = addressStart; }
 
     // TODO: this is experimental, but could be optimized by adding a range breakpoint. Also may make sense to make BreakInfo a polymorphed class to make it easier to read and maintain
-    BreakNum breakNum = m_breakPointCounter + 1;
+    const BreakNum breakNum = m_breakPointCounter + 1;
     for (auto address = addressStart; address <= addressEnd; ++address) {
-        BreakInfo breakpoint = {
+        const BreakInfo breakpoint = {
             address,
             m_breakPointCounter++,
             0,
@@ -95,9 +95,9 @@ BreakNum BreakpointManager::SetWatchpoint(const unsigned int addressStart, unsig
     return breakNum;
 }
 
-BreakNum BreakpointManager::SetWatchpoint(BankNum /*bank*/, unsigned int /*addressStart*/, unsigned int /*addressEnd*/) {
-    return std::numeric_limits<BreakNum>::max();
-}
+//BreakNum BreakpointManager::SetWatchpoint(BankNum /*bank*/, unsigned int /*addressStart*/, unsigned int /*addressEnd*/) {
+//    return std::numeric_limits<BreakNum>::max();
+//}
 
 bool BreakpointManager::EnableBreakpoints(const std::vector<BreakNum>& list) {
     return ModifyBreak(list, true);
@@ -109,23 +109,23 @@ bool BreakpointManager::DisableBreakpoints(const std::vector<BreakNum>& list) {
 
 bool BreakpointManager::DeleteBreakpoints(const std::vector<BreakNum>& list) {
     // If no breakpoints are specified, delete them all
-    if (list.empty())
+    if (list.empty()) {
         m_breakpoints.clear();
+    }
 
     // Delete breakpoints from list
-    auto re = false;
+    auto breakPointDeleted = false;
     for (const auto& breakpointNum : list) {
         if (m_breakpoints.find(breakpointNum) != m_breakpoints.end()) {
-            re = true;
+            breakPointDeleted = true;
             m_breakpoints.erase(breakpointNum);
         }
     }
-    return re;
+    return breakPointDeleted;
 }
 
 std::map<unsigned int, BreakInfo> BreakpointManager::GetBreakpointInfoList(const std::vector<unsigned int>& list) {
-    if (list.empty())
-        return m_breakpoints;
+    if (list.empty()) { return m_breakpoints; }
 
     std::map<BreakNum, BreakInfo> tempMap = {};
     for (const auto& breakpointNum : list) {
@@ -137,10 +137,10 @@ std::map<unsigned int, BreakInfo> BreakpointManager::GetBreakpointInfoList(const
 }
 
 void BreakpointManager::CheckBreakInfo(BreakInfo& info) {
-    const auto pc = DebuggerCallback::GetPcReg();
+    const auto pcReg = DebuggerCallback::GetPcReg();
     for (auto& [breakNum, breakInfo] : m_breakpoints) {
         if (breakInfo.isEnabled) {
-            if ((breakInfo.type == BreakType::Breakpoint) && (breakInfo.address == pc)) {
+            if ((breakInfo.type == BreakType::Breakpoint) && (breakInfo.address == pcReg)) {
                 ++breakInfo.timesHit;
                 info = breakInfo;
                 break;
@@ -150,7 +150,7 @@ void BreakpointManager::CheckBreakInfo(BreakInfo& info) {
                 info = breakInfo;
                 break;
             }
-            if ((breakInfo.type == BreakType::Watchpoint)) {
+            if (breakInfo.type == BreakType::Watchpoint) {
                 const auto newWatchValue = DebuggerCallback::ReadMemory(info.address);
                 if (breakInfo.newWatchValue != newWatchValue) {
                     breakInfo.oldWatchValue = breakInfo.newWatchValue;
@@ -168,7 +168,7 @@ bool BreakpointManager::HandleBreakInfo(BreakInfo& info) {
     const auto breakpointHit = (info.breakpointNumber != MaxBreakpointNumber);
     switch (m_debugOp) {
     case DebugOperation::RunOp:
-        if (!m_instructionsToStep && breakpointHit) {
+        if ((m_instructionsToStep == 0) && breakpointHit) {
             return true;
         }
         if (breakpointHit) {
@@ -176,20 +176,20 @@ bool BreakpointManager::HandleBreakInfo(BreakInfo& info) {
         }
         break;
     case DebugOperation::StepOp:
-        if (!m_instructionsToStep || breakpointHit) {
+        if ((m_instructionsToStep == 0) || breakpointHit) {
             return true;
         }
         --m_instructionsToStep;
         break;
     case DebugOperation::FinishOp:
         if (m_operations) {
-            const auto pc = DebuggerCallback::GetPcReg();
-            const auto cmd = DebuggerCallback::ReadMemory(pc);
+            const auto pcReg = DebuggerCallback::GetPcReg();
+            const auto cmd = DebuggerCallback::ReadMemory(pcReg);
             const auto jumpInstructions = m_operations->GetJumpOpertions();
 
             const auto extendedOperation = jumpInstructions.extendedOperations.find(cmd);
             if (extendedOperation != jumpInstructions.extendedOperations.end()) {
-                const auto extendedCommand = DebuggerCallback::ReadMemory(pc + jumpInstructions.opcodeLength);
+                const auto extendedCommand = DebuggerCallback::ReadMemory(pcReg + jumpInstructions.opcodeLength);
                 if (extendedOperation->second.find(extendedCommand) != extendedOperation->second.end()) {
                     return true;
                 }
@@ -199,17 +199,19 @@ bool BreakpointManager::HandleBreakInfo(BreakInfo& info) {
             }
         }
         break;
+    case DebugOperation::WatchOp: // TODO:
+        break;
     };
     return false;
 }
 
-bool BreakpointManager::ModifyBreak(std::vector<BreakNum> list, bool isEnabled) {
-    bool re = false;
+bool BreakpointManager::ModifyBreak(const std::vector<BreakNum>& list, bool isEnabled) {
+    bool foundBreakpoint = false;
     for (const auto& breakpointNum : list) {
         if (m_breakpoints.find(breakpointNum) != m_breakpoints.end()) {
-            re = true;
+            foundBreakpoint = true;
             m_breakpoints.at(breakpointNum).isEnabled = isEnabled;
         }
     }
-    return re;
+    return foundBreakpoint;
 }

@@ -1,5 +1,6 @@
 find_package(fmt CONFIG)
 find_package(tinyxml2 CONFIG)
+find_package(namedtype CONFIG)
 
 add_library(RetroDebugger SHARED)
 
@@ -8,7 +9,8 @@ target_link_system_libraries(
     RetroDebugger
     PRIVATE
     fmt::fmt
-    tinyxml2::tinyxml2)
+    tinyxml2::tinyxml2
+    namedtype::namedtype)
 
 # project_options: includes 'NCREMENTAL:NO', from what I can tell it is a bug also present in the CMake template this is using.
 # TODO: figure out impact of not including 'project_options' or the bug of including project_options.

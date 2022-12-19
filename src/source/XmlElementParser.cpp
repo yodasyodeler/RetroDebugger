@@ -1,5 +1,7 @@
 #include "XmlElementParser.h"
 
+#include <fmt/core.h>
+
 #include <algorithm>
 #include <string_view>
 
@@ -361,7 +363,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     operations.Reset();
 
     static constexpr auto OperationsStr = "operations";
-    if (element == nullptr) { return SetLastError(std::string(OperationsStr), std::string(ErrorNullptr)); }
+    if (element == nullptr) { return SetLastError(OperationsStr, ErrorNullptr); }
     if (!StringNCompare(element->Name(), "operations")) { return SetLastError(element, std::string(ErrorUnexpectedElement) + OperationsStr); }
 
     const char* opcodeLengthStr = "opcodeLength";
@@ -382,22 +384,24 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     operation.Reset();
 
     constexpr auto OperationStr = "operation";
-    if (!element) { return SetLastError(std::string(OperationStr), std::string(ErrorNullptr)); }
+    if (element == nullptr) { return SetLastError(std::string(OperationStr), std::string(ErrorNullptr)); }
     if (!StringNCompare(element->Name(), OperationStr)) { return SetLastError(element, std::string(ErrorUnexpectedElement) + OperationStr); }
 
     constexpr auto opcodeStr = "opcode";
-    const char* str = element->Attribute(opcodeStr);
-    if (!str || !StringToUnsigned(str, operation.opcode)) { return SetLastError(element, std::string(ErrorObtainingUnsignedInt) + opcodeStr); }
+    if (const char* str = element->Attribute(opcodeStr);
+        str == nullptr || !StringToUnsigned(str, operation.opcode)) { return SetLastError(element, std::string(ErrorObtainingUnsignedInt) + opcodeStr); }
 
     constexpr auto commandStr = "command";
-    str = element->Attribute(commandStr);
-    if (!str) { return SetLastError(element, std::string(ErrorObtainingString) + commandStr); }
-    operation.command = str;
+    if (const char* str = element->Attribute(commandStr);
+        str == nullptr) { return SetLastError(element, std::string(ErrorObtainingString) + commandStr); }
+    else {
+        operation.command = str;
+    }
 
     constexpr auto isJumpStr = "isJump";
     constexpr auto trueStr = "true";
-    str = element->Attribute(isJumpStr);
-    if (str) {
+    if (const auto* str = element->Attribute(isJumpStr);
+        str != nullptr) {
         operation.isJump = ToUpperString(str) == ToUpperString(trueStr); // TODO: cross platform issue
     }
 
@@ -409,12 +413,12 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     bool isCandidateForAuto = true;
     argument.Reset();
     constexpr auto argStr = "arg";
-    if (!element) { return SetLastError(std::string(argStr), std::string(ErrorNullptr)); }
+    if (element == nullptr) { return SetLastError(std::string(argStr), std::string(ErrorNullptr)); }
     if (!StringNCompare(element->Name(), argStr)) { return SetLastError(element, std::string(ErrorUnexpectedElement) + argStr); }
 
     constexpr auto typeStr = "type";
-    const char* str = element->Attribute(typeStr);
-    if (str) {
+    if (const char* str = element->Attribute(typeStr);
+        str != nullptr) {
         if (!StringToArgType(str, argument.type)) { return SetLastError(element, std::string(ErrorObtainingString) + typeStr); }
         else {
             isCandidateForAuto = false;
@@ -422,8 +426,8 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     }
 
     constexpr auto indirectStr = "indirect";
-    str = element->Attribute(indirectStr);
-    if (str) {
+    if (const char* str = element->Attribute(indirectStr);
+        str != nullptr) {
         if (!StringToBool(str, argument.indirectArg)) { return SetLastError(element, std::string(ErrorObtainingBool) + indirectStr); }
         else {
             isCandidateForAuto = false;
@@ -431,8 +435,8 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     }
 
     constexpr auto operationStr = "operation";
-    str = element->Attribute(operationStr);
-    if (str) {
+    if (const char* str = element->Attribute(operationStr);
+        str != nullptr) {
         if (!StringToRegOperation(str, argument.operation)) { return SetLastError(element, std::string(ErrorObtainingOperation) + operationStr); }
         else {
             isCandidateForAuto = false;
@@ -440,8 +444,8 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
     }
 
     constexpr auto offsetStr = "offset";
-    str = element->Attribute(offsetStr);
-    if (str) {
+    if (const char* str = element->Attribute(offsetStr);
+        str != nullptr) {
         if (!StringToUnsigned(str, argument.value.offset)) { return SetLastError(element, std::string(ErrorObtainingUnsignedInt) + offsetStr); }
         else {
             isCandidateForAuto = false;
@@ -450,15 +454,15 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
 
     // TODO: need to figure out what to do with reg when immediate
     constexpr auto regStr = "reg";
-    str = element->Attribute(regStr);
-    if (str) {
+    if (const char* str = element->Attribute(regStr);
+        str != nullptr) {
         argument.value.reg = str;
         isCandidateForAuto = false;
     }
 
     constexpr auto valueStr = "value";
-    str = element->Attribute(valueStr);
-    if (!str) { return SetLastError(element, std::string(ErrorObtainingString) + valueStr); }
+    if (const char* str = element->Attribute(valueStr);
+        str == nullptr) { return SetLastError(element, std::string(ErrorObtainingString) + valueStr); }
     else {
         argument.value.name = str;
     }
@@ -510,16 +514,15 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
 // }
 
 // Error handling helper
-const auto errorPreMsg = std::string("Error XmlElementParser: ");
-bool XmlElementParser::SetLastError(const std::string& elementName, const std::string& errorMsg) {
-    m_lastError = errorPreMsg + "failed to parse: \"" + elementName + "\", " + errorMsg;
+const auto errorPreMsg = std::string();
+bool XmlElementParser::SetLastError(const std::string& elementName, std::string_view errorMsg) {
+    m_lastError = fmt::format("Error XmlElementParser: failed to parse: \"{}\", ", errorPreMsg, elementName, errorMsg);
     return false;
 }
 
-bool XmlElementParser::SetLastError(const tinyxml2::XMLElement* element, const std::string& errorMsg) {
-    const auto name = element->Name();
+bool XmlElementParser::SetLastError(const tinyxml2::XMLElement* element, std::string_view errorMsg) {
+    const auto* name = element->Name();
     const auto lineNum = element->GetLineNum();
-    const auto fullErrorMsg = errorPreMsg + "\"" + name + "\" at line " + std::to_string(lineNum) + ", " + errorMsg;
-    m_lastError = fullErrorMsg;
+    m_lastError = fmt::format("Error XmlElementParser: \"{}\" at line {}, {}", name == nullptr ? "UnknownElement" : name, lineNum, errorMsg);
     return false;
 }

@@ -11,7 +11,8 @@ target_link_libraries(
     PRIVATE GTest::gtest
             GTest::gtest_main
             tinyxml2::tinyxml2
-            fmt::fmt)
+            fmt::fmt
+            namedtype::namedtype)
 set_target_properties(RetroDebuggerTests PROPERTIES FOLDER "Unit Tests")
 
 # Add configured_files

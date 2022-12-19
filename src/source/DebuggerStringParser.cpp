@@ -75,7 +75,7 @@ bool ParseNumber(const std::string& word, unsigned int& num) {
     try {
         size_t pos{};
         unsigned long temp{};
-        if (word.size() < 1) { return false; }
+        if (word.empty()) { return false; }
         if (word.size() > 2 && word.starts_with(binaryPrefix)) { // if binary
             temp = std::stoul(word.substr(2), &pos, 2);
             pos += 2; // stoul is using a substring without the '0b'

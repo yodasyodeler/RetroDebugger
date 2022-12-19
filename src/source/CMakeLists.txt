@@ -20,6 +20,8 @@ target_sources(
             DebuggerXmlParser.cpp
             DebuggerXmlParser.h
             RetroDebuggerApi.cpp
+            RetroDebugger.cpp
+            RetroDebugger.h
             XmlElementParser.cpp
             XmlElementParser.h)
 target_include_directories(RetroDebugger PRIVATE ${CMAKE_CURRENT_LIST_DIR})

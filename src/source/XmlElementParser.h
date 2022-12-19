@@ -32,8 +32,8 @@ public:
         return true;
     }*/
 private:
-    bool SetLastError(const std::string& elementName, const std::string& errorMsg);
-    bool SetLastError(const tinyxml2::XMLElement* element, const std::string& errorMsg);
+    bool SetLastError(const std::string& elementName, std::string_view errorMsg);
+    bool SetLastError(const tinyxml2::XMLElement* element, std::string_view errorMsg);
 
     std::string m_lastError;
 };

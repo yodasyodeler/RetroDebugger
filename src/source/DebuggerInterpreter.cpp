@@ -16,7 +16,7 @@ std::string DebuggerInterpreter::GetCommandResponse() {
 }
 
 void DebuggerInterpreter::SetCommandResponse(std::string response) {
-    m_commandResponse = response;
+    m_commandResponse = std::move(response);
 }
 
 size_t DebuggerInterpreter::GetCommandResponseLength() {
@@ -27,12 +27,15 @@ bool DebuggerInterpreter::Help(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
 
-    if (cmdCount == 1)
+    if (cmdCount == 1) {
         SetCommandResponse(DebuggerPrintFormat::PrintGeneralHelp());
-    else if (cmdCount == 2)
+    }
+    else if (cmdCount == 2) {
         SetCommandResponse(DebuggerPrintFormat::PrintCommandHelp(words[1]));
-    else
+    }
+    else {
         SetCommandResponse(DebuggerPrintFormat::PrintHelpHelp());
+    }
     return true;
 }
 
@@ -139,20 +142,22 @@ bool DebuggerInterpreter::GetInfo(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
 
-    if (cmdCount <= 1) return false;
+    if (cmdCount <= 1) { return false; }
 
     if ((words[1] == "break") || (words[1] == "breakpoint") || (words[1] == "watchpoint")) {
         std::vector<BreakNum> numbers;
         if (cmdCount == 2) {
             auto info = m_debugger->GetBreakpointInfoList();
-            if (!info.empty())
+            if (!info.empty()) {
                 SetCommandResponse(DebuggerPrintFormat::PrintBreakInfo(info));
+            }
             return true;
         }
         else if (cmdCount == 3 && DebuggerStringParser::ParseList(words[2], numbers)) {
             auto info = m_debugger->GetBreakpointInfoList(numbers);
-            if (!info.empty())
+            if (!info.empty()) {
                 SetCommandResponse(DebuggerPrintFormat::PrintBreakInfo(info));
+            }
             return true;
         }
     }
@@ -173,12 +178,10 @@ bool DebuggerInterpreter::SetWatch(const std::vector<std::string>& words) {
 
     if (cmdCount == 2) {
         if (DebuggerStringParser::ParseNumber(words[1], addressStart)) {
-            if (m_debugger->SetWatchpoint(addressStart) == std::numeric_limits<BreakNum>::max()) { return false; }
-            return true;
+            return m_debugger->SetWatchpoint(addressStart) != std::numeric_limits<BreakNum>::max();
         }
         else if (DebuggerStringParser::ParseNumberPair(words[1], addressStart, addressEnd, "-")) {
-            if (m_debugger->SetWatchpoint(addressStart, addressEnd) == std::numeric_limits<BreakNum>::max()) { return false; }
-            return true;
+            return m_debugger->SetWatchpoint(addressStart, addressEnd) != std::numeric_limits<BreakNum>::max();
         }
     }
     return false;
@@ -187,7 +190,7 @@ bool DebuggerInterpreter::SetWatch(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    BreakNum number;
+    BreakNum number{};
     if (cmdCount == 2) {
         const auto regSet = DebuggerCallback::GetRegSet();
         auto reg = regSet.find(words[1]);
@@ -218,24 +221,20 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    std::vector<BreakNum> numbers;
     unsigned int number = DebuggerCallback::GetPcReg();
 
     if ((cmdCount == 1) || (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number))) {
-        if (cmdCount == 1 && m_listNext) number = static_cast<unsigned int>(m_listAddress);
+        if (cmdCount == 1 && m_listNext) { number = static_cast<unsigned int>(m_listAddress); }
 
         auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), m_listsize);
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
         if (!commands.empty()) {
-            auto lastAddress = m_listAddress; // TODO: I hate this, but I'm lazy right now. Find a better way to get last address
-            if (!commands.empty()) {
-                const auto command = (--commands.end());
-                lastAddress = command->first;
-                for (const auto arg : command->second.arguments) {
-                    lastAddress += GetArgTypeLength(arg->type);
-                }
-                m_listAddress = lastAddress + 1u;
+            const auto command = (--commands.end());
+            auto lastAddress = command->first;
+            for (const auto& arg : command->second.arguments) {
+                lastAddress += GetArgTypeLength(arg->type);
             }
+            m_listAddress = lastAddress + 1U;
         }
         m_listNext = true;
         return true;
@@ -246,12 +245,13 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
 
 bool DebuggerInterpreter::Set(const std::vector<std::string>& words) {
     m_commandResponse.clear();
-    unsigned int number;
+    unsigned int number{};
 
-    if (words.size() != 3) return false; // TODO: look for more uses of set to verfiy if this check is valid.
+    if (words.size() != 3) { return false; } // TODO: look for more uses of set to verfiy if this check is valid.
 
-    if (words[1] == "listsize" && DebuggerStringParser::ParseNumber(words[2], number))
-        return SetListsize(number);
+    if (words[1] == "listsize" && DebuggerStringParser::ParseNumber(words[2], number)) {
+        return SetListsize(static_cast<int>(number));
+    }
     return false;
 }
 

@@ -6,18 +6,18 @@ class DebuggerXmlParser;
 
 class DebuggerOperations {
 public:
-    explicit DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser);
-    DebuggerOperations(const std::shared_ptr<DebuggerXmlParser>& debuggerParser, const std::string& filename);
+    explicit DebuggerOperations(std::shared_ptr<DebuggerXmlParser> debuggerParser);
+    DebuggerOperations(std::shared_ptr<DebuggerXmlParser> debuggerParser, const std::string& filename);
 
     void Reset();
 
-    bool IsValid();
+    bool IsValid() const;
     std::string GetErrorMessage();
     Operations GetOperations();
     Operations GetJumpOpertions();
     std::vector<RegisterInfoPtr> GetRegisters();
 
-    size_t GetOperation(size_t opcode, Operation& operation);
+    size_t GetOperation(size_t address, Operation& operation);
     bool ParseFile(const std::string& filename);
 
 private:
