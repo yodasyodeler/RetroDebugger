@@ -1,17 +1,18 @@
 
-#include <sstream>
 
 #include "DebuggerInterpreter.h"
 
+#include "DebuggerCallbacks.h"
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
 
-#include "DebuggerCallbacks.h"
+#include <numeric>
+#include <sstream>
 
 DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger) :
     m_debugger(debugger) {}
 
-std::string DebuggerInterpreter::GetCommandResponse() {
+std::string DebuggerInterpreter::GetCommandResponse() const {
     return m_commandResponse;
 }
 
@@ -19,7 +20,7 @@ void DebuggerInterpreter::SetCommandResponse(std::string response) {
     m_commandResponse = std::move(response);
 }
 
-size_t DebuggerInterpreter::GetCommandResponseLength() {
+size_t DebuggerInterpreter::GetCommandResponseLength() const {
     return m_commandResponse.size();
 }
 
@@ -78,14 +79,14 @@ bool DebuggerInterpreter::Finish(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::SetBreakpoint(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    BreakNum breakNumber = 0;
-    BankNum bankNumber = 0;
 
     if (cmdCount == 1) {
         m_debugger->SetBreakpoint(DebuggerCallback::GetPcReg());
         return true;
     }
     if (cmdCount == 2) {
+        BankNum bankNumber{};
+        BreakNum breakNumber{};
         if (DebuggerStringParser::ParseNumber(words[1], breakNumber)) {
             m_debugger->SetBreakpoint(breakNumber);
             return true;
@@ -173,10 +174,10 @@ bool DebuggerInterpreter::GetInfo(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::SetWatch(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    unsigned int addressStart = 0;
-    unsigned int addressEnd = 0;
 
     if (cmdCount == 2) {
+        unsigned int addressStart{};
+        unsigned int addressEnd{};
         if (DebuggerStringParser::ParseNumber(words[1], addressStart)) {
             return m_debugger->SetWatchpoint(addressStart) != std::numeric_limits<BreakNum>::max();
         }
@@ -190,8 +191,9 @@ bool DebuggerInterpreter::SetWatch(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    BreakNum number{};
+
     if (cmdCount == 2) {
+        BreakNum number{};
         const auto regSet = DebuggerCallback::GetRegSet();
         auto reg = regSet.find(words[1]);
         if (reg != regSet.end()) {
@@ -231,10 +233,9 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
         if (!commands.empty()) {
             const auto command = (--commands.end());
             auto lastAddress = command->first;
-            for (const auto& arg : command->second.arguments) {
-                lastAddress += GetArgTypeLength(arg->type);
-            }
-            m_listAddress = lastAddress + 1U;
+
+            const auto& args = command->second.arguments;
+            m_listAddress = std::accumulate(args.begin(), args.end(), lastAddress + 1, [](auto sum, auto arg) { return sum + GetArgTypeLength(arg->type); });
         }
         m_listNext = true;
         return true;
@@ -247,10 +248,10 @@ bool DebuggerInterpreter::Set(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     unsigned int number{};
 
-    if (words.size() != 3) { return false; } // TODO: look for more uses of set to verfiy if this check is valid.
+    if (words.size() != 3) { return false; } // TODO: look for more uses of set to verify if this check is valid.
 
     if (words[1] == "listsize" && DebuggerStringParser::ParseNumber(words[2], number)) {
-        return SetListsize(static_cast<int>(number));
+        return SetListsize(number);
     }
     return false;
 }
@@ -265,7 +266,7 @@ bool DebuggerInterpreter::Show(const std::vector<std::string>& words) {
 }
 
 // Debug variable Setters
-bool DebuggerInterpreter::SetListsize(const int listsize) {
+bool DebuggerInterpreter::SetListsize(const unsigned int listsize) {
     m_commandResponse.clear();
     m_listsize = listsize;
     return true;

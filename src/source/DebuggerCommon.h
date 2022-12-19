@@ -2,6 +2,8 @@
 
 #include "RetroDebuggerCommon.h"
 
+#include <limits>
+
 enum DbgRegName {};
 
 struct RegInfo

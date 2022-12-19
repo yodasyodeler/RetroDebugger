@@ -19,11 +19,11 @@ std::string DebuggerConsole::GetPrompt() {
     return std::string(DebuggerPrompt);
 }
 
-std::string DebuggerConsole::GetResponse() {
+std::string DebuggerConsole::GetResponse() const {
     return m_interpreter->GetCommandResponse();
 }
 
-size_t DebuggerConsole::GetResponseLength() {
+size_t DebuggerConsole::GetResponseLength() const {
     return m_interpreter->GetCommandResponseLength();
 }
 

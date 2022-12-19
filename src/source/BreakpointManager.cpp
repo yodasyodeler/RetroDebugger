@@ -95,9 +95,9 @@ BreakNum BreakpointManager::SetWatchpoint(const unsigned int addressStart, unsig
     return breakNum;
 }
 
-//BreakNum BreakpointManager::SetWatchpoint(BankNum /*bank*/, unsigned int /*addressStart*/, unsigned int /*addressEnd*/) {
-//    return std::numeric_limits<BreakNum>::max();
-//}
+// BreakNum BreakpointManager::SetWatchpoint(BankNum /*bank*/, unsigned int /*addressStart*/, unsigned int /*addressEnd*/) {
+//     return std::numeric_limits<BreakNum>::max();
+// }
 
 bool BreakpointManager::EnableBreakpoints(const std::vector<BreakNum>& list) {
     return ModifyBreak(list, true);
@@ -138,7 +138,8 @@ std::map<unsigned int, BreakInfo> BreakpointManager::GetBreakpointInfoList(const
 
 void BreakpointManager::CheckBreakInfo(BreakInfo& info) {
     const auto pcReg = DebuggerCallback::GetPcReg();
-    for (auto& [breakNum, breakInfo] : m_breakpoints) {
+    for (auto& breakpoint : m_breakpoints) {
+        auto& breakInfo = breakpoint.second;
         if (breakInfo.isEnabled) {
             if ((breakInfo.type == BreakType::Breakpoint) && (breakInfo.address == pcReg)) {
                 ++breakInfo.timesHit;
@@ -164,7 +165,7 @@ void BreakpointManager::CheckBreakInfo(BreakInfo& info) {
     }
 }
 
-bool BreakpointManager::HandleBreakInfo(BreakInfo& info) {
+bool BreakpointManager::HandleBreakInfo(const BreakInfo& info) {
     const auto breakpointHit = (info.breakpointNumber != MaxBreakpointNumber);
     switch (m_debugOp) {
     case DebugOperation::RunOp:

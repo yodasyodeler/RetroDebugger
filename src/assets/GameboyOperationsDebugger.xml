@@ -185,81 +185,81 @@
     <operation opcode="0x9D" command="SBC">     <arg value="A"/>              <arg value="L"/>      </operation>
     <operation opcode="0x9E" command="SBC">     <arg value="A"/>              <arg value="(HL)"/>   </operation>
     <operation opcode="0x9F" command="SBC">     <arg value="A"/>              <arg value="A"/>      </operation>
-    <operation opcode="0xA0" command="AND">     <arg value="B"/>                                  </operation>
-    <operation opcode="0xA1" command="AND">     <arg value="C"/>                                  </operation>
-    <operation opcode="0xA2" command="AND">     <arg value="D"/>                                  </operation>
-    <operation opcode="0xA3" command="AND">     <arg value="E"/>                                  </operation>
-    <operation opcode="0xA4" command="AND">     <arg value="H"/>                                  </operation>
-    <operation opcode="0xA5" command="AND">     <arg value="L"/>                                  </operation>
-    <operation opcode="0xA6" command="AND">     <arg value="(HL)"/>                               </operation>
-    <operation opcode="0xA7" command="AND">     <arg value="A"/>                                  </operation>
-    <operation opcode="0xA8" command="XOR">     <arg value="B"/>                                  </operation>
-    <operation opcode="0xA9" command="XOR">     <arg value="C"/>                                  </operation>
-    <operation opcode="0xAA" command="XOR">     <arg value="D"/>                                  </operation>
-    <operation opcode="0xAB" command="XOR">     <arg value="E"/>                                  </operation>
-    <operation opcode="0xAC" command="XOR">     <arg value="H"/>                                  </operation>
-    <operation opcode="0xAD" command="XOR">     <arg value="L"/>                                  </operation>
-    <operation opcode="0xAE" command="XOR">     <arg value="(HL)"/>                               </operation>
-    <operation opcode="0xAF" command="XOR">     <arg value="A"/>                                  </operation>
-    <operation opcode="0xB0" command="OR">      <arg value="B"/>                                  </operation>
-    <operation opcode="0xB1" command="OR">      <arg value="C"/>                                  </operation>
-    <operation opcode="0xB2" command="OR">      <arg value="D"/>                                  </operation>
-    <operation opcode="0xB3" command="OR">      <arg value="E"/>                                  </operation>
-    <operation opcode="0xB4" command="OR">      <arg value="H"/>                                  </operation>
-    <operation opcode="0xB5" command="OR">      <arg value="L"/>                                  </operation>
-    <operation opcode="0xB6" command="OR">      <arg value="(HL)"/>                               </operation>
-    <operation opcode="0xB7" command="OR">      <arg value="A"/>                                  </operation>
-    <operation opcode="0xB8" command="CP">      <arg value="B"/>                                  </operation>
-    <operation opcode="0xB9" command="CP">      <arg value="C"/>                                  </operation>
-    <operation opcode="0xBA" command="CP">      <arg value="D"/>                                  </operation>
-    <operation opcode="0xBB" command="CP">      <arg value="E"/>                                  </operation>
-    <operation opcode="0xBC" command="CP">      <arg value="H"/>                                  </operation>
-    <operation opcode="0xBD" command="CP">      <arg value="L"/>                                  </operation>
-    <operation opcode="0xBE" command="CP">      <arg value="(HL)"/>                               </operation>
-    <operation opcode="0xBF" command="CP">      <arg value="A"/>                                  </operation>
-    <operation opcode="0xC0" command="RET" isJump="true">     <arg type="cond" value="NZ"/>       </operation>
-    <operation opcode="0xC1" command="POP">     <arg value="BC"/>                                 </operation>
-    <operation opcode="0xC2" command="JP" isJump="true">      <arg type="cond" value="NZ"/>   <arg value="a16"/>    </operation>
-    <operation opcode="0xC3" command="JP" isJump="true">      <arg value="a16"/>                                </operation>
-    <operation opcode="0xC4" command="CALL" isJump="true">    <arg type="cond" value="NZ"/>   <arg value="a16"/>    </operation>
-    <operation opcode="0xC5" command="PUSH">    <arg value="BC"/>                                 </operation>
-    <operation opcode="0xC6" command="ADD">     <arg value="A"/>              <arg value="d8"/>   </operation>
-    <operation opcode="0xC7" command="RST" isJump="true">     <arg value="0x00"/>                               </operation>
-    <operation opcode="0xC8" command="RET" isJump="true">     <arg type="cond" value="Z"/>                        </operation>
-    <operation opcode="0xC9" command="RET" isJump="true"/>
-    <operation opcode="0xCA" command="JP" isJump="true">      <arg type="cond" value="Z"/>    <arg value="a16"/>    </operation>
+    <operation opcode="0xA0" command="AND">     <arg value="B"/>                                    </operation>
+    <operation opcode="0xA1" command="AND">     <arg value="C"/>                                    </operation>
+    <operation opcode="0xA2" command="AND">     <arg value="D"/>                                    </operation>
+    <operation opcode="0xA3" command="AND">     <arg value="E"/>                                    </operation>
+    <operation opcode="0xA4" command="AND">     <arg value="H"/>                                    </operation>
+    <operation opcode="0xA5" command="AND">     <arg value="L"/>                                    </operation>
+    <operation opcode="0xA6" command="AND">     <arg value="(HL)"/>                                 </operation>
+    <operation opcode="0xA7" command="AND">     <arg value="A"/>                                    </operation>
+    <operation opcode="0xA8" command="XOR">     <arg value="B"/>                                    </operation>
+    <operation opcode="0xA9" command="XOR">     <arg value="C"/>                                    </operation>
+    <operation opcode="0xAA" command="XOR">     <arg value="D"/>                                    </operation>
+    <operation opcode="0xAB" command="XOR">     <arg value="E"/>                                    </operation>
+    <operation opcode="0xAC" command="XOR">     <arg value="H"/>                                    </operation>
+    <operation opcode="0xAD" command="XOR">     <arg value="L"/>                                    </operation>
+    <operation opcode="0xAE" command="XOR">     <arg value="(HL)"/>                                 </operation>
+    <operation opcode="0xAF" command="XOR">     <arg value="A"/>                                    </operation>
+    <operation opcode="0xB0" command="OR">      <arg value="B"/>                                    </operation>
+    <operation opcode="0xB1" command="OR">      <arg value="C"/>                                    </operation>
+    <operation opcode="0xB2" command="OR">      <arg value="D"/>                                    </operation>
+    <operation opcode="0xB3" command="OR">      <arg value="E"/>                                    </operation>
+    <operation opcode="0xB4" command="OR">      <arg value="H"/>                                    </operation>
+    <operation opcode="0xB5" command="OR">      <arg value="L"/>                                    </operation>
+    <operation opcode="0xB6" command="OR">      <arg value="(HL)"/>                                 </operation>
+    <operation opcode="0xB7" command="OR">      <arg value="A"/>                                    </operation>
+    <operation opcode="0xB8" command="CP">      <arg value="B"/>                                    </operation>
+    <operation opcode="0xB9" command="CP">      <arg value="C"/>                                    </operation>
+    <operation opcode="0xBA" command="CP">      <arg value="D"/>                                    </operation>
+    <operation opcode="0xBB" command="CP">      <arg value="E"/>                                    </operation>
+    <operation opcode="0xBC" command="CP">      <arg value="H"/>                                    </operation>
+    <operation opcode="0xBD" command="CP">      <arg value="L"/>                                    </operation>
+    <operation opcode="0xBE" command="CP">      <arg value="(HL)"/>                                 </operation>
+    <operation opcode="0xBF" command="CP">      <arg value="A"/>                                    </operation>
+    <operation opcode="0xC0" command="RET"  isJump="true">      <arg type="cond" value="NZ"/>       </operation>
+    <operation opcode="0xC1" command="POP">     <arg value="BC"/>                                   </operation>
+    <operation opcode="0xC2" command="JP"   isJump="true">      <arg type="cond" value="NZ"/>   <arg value="a16"/>    </operation>
+    <operation opcode="0xC3" command="JP"   isJump="true">      <arg value="a16"/>                                    </operation>
+    <operation opcode="0xC4" command="CALL" isJump="true">      <arg type="cond" value="NZ"/>   <arg value="a16"/>    </operation>
+    <operation opcode="0xC5" command="PUSH">    <arg value="BC"/>                                   </operation>
+    <operation opcode="0xC6" command="ADD">     <arg value="A"/>              <arg value="d8"/>     </operation>
+    <operation opcode="0xC7" command="RST"  isJump="true">     <arg value="0x00"/>                                    </operation>
+    <operation opcode="0xC8" command="RET"  isJump="true">     <arg type="cond" value="Z"/>                           </operation>
+    <operation opcode="0xC9" command="RET"  isJump="true"/>
+    <operation opcode="0xCA" command="JP"   isJump="true">      <arg type="cond" value="Z"/>    <arg value="a16"/>    </operation>
     <!-- <operation opcode="0xCB" command="PREFIX">                                                          </operation> -->
-    <operation opcode="0xCC" command="CALL" isJump="true">    <arg type="cond" value="Z"/>    <arg value="a16"/>    </operation>
-    <operation opcode="0xCD" command="CALL" isJump="true">    <arg value="a16"/>                                </operation>
+    <operation opcode="0xCC" command="CALL" isJump="true">    <arg type="cond" value="Z"/>    <arg value="a16"/>      </operation>
+    <operation opcode="0xCD" command="CALL" isJump="true">    <arg value="a16"/>                                      </operation>
     <operation opcode="0xCE" command="ADC">     <arg value="A"/>              <arg value="d8"/>     </operation>
-    <operation opcode="0xCF" command="RST" isJump="true">     <arg value="0x08"/>                               </operation>
-    <operation opcode="0xD0" command="RET" isJump="true">     <arg type="cond" value="NC"/>                       </operation>
+    <operation opcode="0xCF" command="RST"  isJump="true">     <arg value="0x08"/>                                    </operation>
+    <operation opcode="0xD0" command="RET"  isJump="true">     <arg type="cond" value="NC"/>                          </operation>
     <operation opcode="0xD1" command="POP">     <arg value="DE"/>                                 </operation>
-    <operation opcode="0xD2" command="JP" isJump="true">      <arg type="cond" value="NC"/>   <arg value="a16"/>    </operation>
+    <operation opcode="0xD2" command="JP"   isJump="true">      <arg type="cond" value="NC"/>   <arg value="a16"/>    </operation>
     <!-- 0xD3 NOP -->
-    <operation opcode="0xD4" command="CALL" isJump="true">    <arg type="cond" value="NC"/>   <arg value="a16"/>    </operation>
-    <operation opcode="0xD5" command="PUSH">    <arg value="DE"/>                                 </operation>
-    <operation opcode="0xD6" command="SUB">     <arg value="d8"/>                                 </operation>
-    <operation opcode="0xD7" command="RST" isJump="true">     <arg value="0x10"/>                               </operation>
-    <operation opcode="0xD8" command="RET" isJump="true">     <arg value="C"/>                                  </operation>
+    <operation opcode="0xD4" command="CALL" isJump="true">    <arg type="cond" value="NC"/>   <arg value="a16"/>      </operation>
+    <operation opcode="0xD5" command="PUSH">    <arg value="DE"/>                                                     </operation>
+    <operation opcode="0xD6" command="SUB">     <arg value="d8"/>                                                     </operation>
+    <operation opcode="0xD7" command="RST"  isJump="true">     <arg value="0x10"/>                                    </operation>
+    <operation opcode="0xD8" command="RET"  isJump="true">     <arg value="C"/>                                       </operation>
     <operation opcode="0xD9" command="RETI" isJump="true"/>
-    <operation opcode="0xDA" command="JP" isJump="true">      <arg value="C"/>              <arg value="a16"/>    </operation>
+    <operation opcode="0xDA" command="JP"   isJump="true">    <arg value="C"/>              <arg value="a16"/>        </operation>
     <!-- 0xDB NOP -->
-    <operation opcode="0xDC" command="CALL" isJump="true">    <arg value="C"/>              <arg value="a16"/>    </operation>
+    <operation opcode="0xDC" command="CALL" isJump="true">    <arg value="C"/>              <arg value="a16"/>        </operation>
     <!-- 0xDD NOP -->
-    <operation opcode="0xDE" command="SBC">     <arg value="A"/>              <arg value="d8"/>     </operation>
-    <operation opcode="0xDF" command="RST" isJump="true">     <arg value="0x18"/>                               </operation>
-    <operation opcode="0xE0" command="LDH">     <arg value="(a8)"/>           <arg value="A"/>      </operation>
-    <operation opcode="0xE1" command="POP">     <arg value="HL"/>                                 </operation>
-    <operation opcode="0xE2" command="LD">      <arg value="(C)"/>            <arg value="A"/>      </operation>
+    <operation opcode="0xDE" command="SBC">     <arg value="A"/>              <arg value="d8"/>      </operation>
+    <operation opcode="0xDF" command="RST"  isJump="true">     <arg value="0x18"/>                                    </operation>
+    <operation opcode="0xE0" command="LDH">     <arg value="(a8)"/>           <arg value="A"/>       </operation>
+    <operation opcode="0xE1" command="POP">     <arg value="HL"/>                                    </operation>
+    <operation opcode="0xE2" command="LD">      <arg value="(C)"/>            <arg value="A"/>       </operation>
     <!-- 0xE3 NOP -->
     <!-- 0xE4 NOP -->
-    <operation opcode="0xE5" command="PUSH">    <arg value="HL"/>                                   </operation>
-    <operation opcode="0xE6" command="AND">     <arg value="d8"/>                                   </operation>
-    <operation opcode="0xE7" command="RST" isJump="true">     <arg value="0x20"/>                   </operation>
-    <operation opcode="0xE8" command="ADD">     <arg value="SP"/>             <arg value="r8"/>     </operation>
-    <operation opcode="0xE9" command="JP" isJump="true">      <arg value="(HL)"/>                   </operation>
-    <operation opcode="0xEA" command="LD">      <arg value="(a16)"/>          <arg value="A"/>      </operation>
+    <operation opcode="0xE5" command="PUSH">    <arg value="HL"/>                                    </operation>
+    <operation opcode="0xE6" command="AND">     <arg value="d8"/>                                    </operation>
+    <operation opcode="0xE7" command="RST"  isJump="true">     <arg value="0x20"/>                   </operation>
+    <operation opcode="0xE8" command="ADD">     <arg value="SP"/>             <arg value="r8"/>      </operation>
+    <operation opcode="0xE9" command="JP"   isJump="true">      <arg value="(HL)"/>                  </operation>
+    <operation opcode="0xEA" command="LD">      <arg value="(a16)"/>          <arg value="A"/>       </operation>
     <!-- 0xEB NOP -->
     <!-- 0xEC NOP -->
     <!-- 0xED NOP -->

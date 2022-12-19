@@ -14,10 +14,6 @@ namespace IntegrationTests {
 
 class RetroDebuggerIntegrationTests : public ::testing::Test {
 protected:
-    RetroDebuggerIntegrationTests() {}
-
-    ~RetroDebuggerIntegrationTests() override {}
-
     void SetUp() override {}
 
     void TearDown() override {}

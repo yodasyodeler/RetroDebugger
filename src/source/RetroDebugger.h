@@ -12,7 +12,7 @@ public:
 
     [[nodiscard]] std::string GetCommandPrompt() noexcept;
 
-    [[nodiscard]] std::string GetCommandResponse();
+    [[nodiscard]] std::string GetCommandResponse() const;
 
     int ProcessCommandString(const std::string& message);
 

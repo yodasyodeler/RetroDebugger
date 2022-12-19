@@ -33,15 +33,15 @@ std::string DebuggerOperations::GetErrorMessage() {
     return m_debuggerParser->GetLastError();
 }
 
-Operations DebuggerOperations::GetOperations() {
+Operations DebuggerOperations::GetOperations() const {
     return m_operations;
 }
 
-Operations DebuggerOperations::GetJumpOpertions() {
+Operations DebuggerOperations::GetJumpOpertions() const {
     return m_jumpOperations;
 }
 
-std::vector<RegisterInfoPtr> DebuggerOperations::GetRegisters() {
+std::vector<RegisterInfoPtr> DebuggerOperations::GetRegisters() const {
     return m_registerList;
 }
 
@@ -155,7 +155,7 @@ void DebuggerOperations::ConvertOperation(OpcodeToOperation& operationMap, const
         const Argument argument = { arg.type, arg.indirectArg, arg.operation, arg.value.offset, arg.value.name, arg.value.reg };
 
         ArgumentPtr argumentPtr;
-        const auto argumentFind = std::find_if(m_argumentList.begin(), m_argumentList.end(), [argument](const ArgumentPtr& arg) -> bool { return argument == *arg; });
+        const auto argumentFind = std::find_if(m_argumentList.begin(), m_argumentList.end(), [argument](const ArgumentPtr& argPtr) -> bool { return argument == *argPtr; });
         if (argumentFind == m_argumentList.end()) {
             auto argumentInfo = std::make_shared<Argument>(argument);
             argumentPtr = m_argumentList.emplace_back(argumentInfo);

@@ -40,7 +40,7 @@ public:
 
 private:
     void CheckBreakInfo(BreakInfo& info);
-    bool HandleBreakInfo(BreakInfo& info);
+    bool HandleBreakInfo(const BreakInfo& info);
     bool ModifyBreak(const std::vector<BreakNum>& list, bool isEnabled);
 
     std::map<BreakNum, BreakInfo> m_breakpoints = {};

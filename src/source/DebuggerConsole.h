@@ -8,9 +8,9 @@ public:
 
     bool AdvanceDebugger(const std::string& command);
 
-    std::string GetResponse();
+    std::string GetResponse() const;
 
-    size_t GetResponseLength();
+    size_t GetResponseLength() const;
 
     static std::string GetPrompt();
 

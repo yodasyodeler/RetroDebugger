@@ -5,12 +5,12 @@
 #include <NamedType/named_type.hpp>
 #include <fmt/core.h>
 
+#include <cstdio>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
-
-#include <cstdio>
 #include <map>
+#include <numeric>
+#include <sstream>
 
 using namespace std::literals;
 
@@ -166,11 +166,7 @@ std::string PrintLineInfo(const unsigned int line) {
 }
 
 std::string PrintAllRegisters(const RegSet& regset) {
-    std::string msg;
-    for (const auto& reg : regset) {
-        msg += "  " + PrintRegister(reg.first, reg.second) + "\n";
-    }
-    return msg;
+    return std::accumulate(regset.begin(), regset.end(), std::string(""), [](auto sum, auto reg) { return fmt::format("{}  {}\n", sum, PrintRegister(reg.first, reg.second)); });
 }
 
 

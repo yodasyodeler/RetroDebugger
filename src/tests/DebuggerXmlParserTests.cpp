@@ -18,11 +18,7 @@
 namespace DebuggerXmlParserTests {
 
 class DebuggerXmlParserTests : public ::testing::Test {
-protected:
-    DebuggerXmlParserTests() {}
-
-    ~DebuggerXmlParserTests() override {}
-
+public:
     void SetUp() override {}
 
     void TearDown() override {}
@@ -33,10 +29,10 @@ protected:
 TEST_F(DebuggerXmlParserTests, GameboyOperations_ParseFileTest) {
     const auto GAMEBOY_EXTENDED_OPCODE_KEY = 0xCB;
     const auto expectedGameboyOpcodeSize = 8;
-    const auto expectedNumOfOperations = 2u;
+    const auto expectedNumOfOperations = 2U;
 
-    const auto expectedNormalOperationsSize = 244u;
-    const auto expectedExtendedOperationsSize = 256u;
+    const auto expectedNormalOperationsSize = 244U;
+    const auto expectedExtendedOperationsSize = 256U;
 
     const auto parseFileReturn = m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
     ASSERT_TRUE(parseFileReturn) << m_xmlParser.GetLastError();

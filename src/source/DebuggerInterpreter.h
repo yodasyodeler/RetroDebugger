@@ -7,11 +7,11 @@
 
 class DebuggerInterpreter {
 public:
-    DebuggerInterpreter(Debugger* debugger);
+    explicit DebuggerInterpreter(Debugger* debugger);
 
-    [[nodiscard]] std::string GetCommandResponse();
+    [[nodiscard]] std::string GetCommandResponse() const;
     void SetCommandResponse(std::string response);
-    size_t GetCommandResponseLength();
+    size_t GetCommandResponseLength() const;
 
     bool Help(const std::vector<std::string>& words);
     bool Continue(const std::vector<std::string>& words);
@@ -29,7 +29,7 @@ public:
     bool Show(const std::vector<std::string>& words);
 
 private:
-    bool SetListsize(const int listsize);
+    bool SetListsize(unsigned int listsize);
 
     bool m_listNext = false;
     unsigned int m_listsize = 10;

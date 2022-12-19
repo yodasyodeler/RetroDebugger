@@ -19,7 +19,7 @@ std::string RetroDebugger::GetCommandPrompt() noexcept {
     return m_console.GetPrompt();
 }
 
-std::string RetroDebugger::GetCommandResponse() {
+std::string RetroDebugger::GetCommandResponse() const {
     return m_console.GetResponse();
 }
 

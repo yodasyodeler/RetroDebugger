@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 
 TEST(DebuggerStringParser, ParseBuffer_BuffersOfDiffrentSizes) {
-    const std::string EmptyString(""); // empty
+    const std::string EmptyString;
     const std::string OneWord("OneWord");
     const std::string TwoWord("Two Words");
 
@@ -62,7 +62,7 @@ TEST(DebuggerStringParser, DebugStringParser_ParseNumberSingleInvalidNum) {
     const std::string number_endAsNum("abc1");
     EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_endAsNum, numberOut));
 
-    const std::string number_empty("");
+    const std::string number_empty;
     EXPECT_FALSE(DebuggerStringParser::ParseNumber(number_empty, numberOut));
 
     const std::string number_numSpaceNum("1 2");

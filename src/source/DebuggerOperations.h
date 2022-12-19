@@ -13,9 +13,9 @@ public:
 
     bool IsValid() const;
     std::string GetErrorMessage();
-    Operations GetOperations();
-    Operations GetJumpOpertions();
-    std::vector<RegisterInfoPtr> GetRegisters();
+    Operations GetOperations() const;
+    Operations GetJumpOpertions() const;
+    std::vector<RegisterInfoPtr> GetRegisters() const;
 
     size_t GetOperation(size_t address, Operation& operation);
     bool ParseFile(const std::string& filename);

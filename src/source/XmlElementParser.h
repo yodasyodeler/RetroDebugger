@@ -6,7 +6,7 @@
 
 class XmlElementParser {
 public:
-    std::string GetLastError();
+    std::string GetLastError() const;
 
     bool ParseXmlElement(const tinyxml2::XMLElement* element, XmlDebuggerOperations& operations);
     bool ParseXmlElement(const tinyxml2::XMLElement* element, XmlDebuggerOperation& operation);

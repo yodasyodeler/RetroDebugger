@@ -10,7 +10,6 @@
  *
  ******************************************************************************/
 
-
 namespace XmlElementParserTests {
 
 const auto XmlOperations = R"(<operations opcodeLength="8"></operations>)";
@@ -24,13 +23,8 @@ const auto XmlOperationMinimal = R"(<operation opcode="0x40" command="BIT"/>)";
 const auto XmlOperationInvalidNoOpcode = R"(<operation command="BIT"/>)";
 const auto XmlOperationInvalidNoCommand = R"(<operation opcode="0x40"/>)";
 
-
 class XmlElementParserTests : public ::testing::Test {
-protected:
-    XmlElementParserTests() {}
-
-    ~XmlElementParserTests() override {}
-
+public:
     void SetUp() override {}
 
     void TearDown() override { m_xmlDocument.Clear(); }
@@ -41,10 +35,10 @@ protected:
 
 TEST_F(XmlElementParserTests, Operations_ParseOperations) {
     const auto expectedOcodeLength = 8;
-    const auto expectedOperationsSize = 0u;
+    const auto expectedOperationsSize = 0U;
 
     m_xmlDocument.Parse(XmlOperations);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
@@ -55,12 +49,12 @@ TEST_F(XmlElementParserTests, Operations_ParseOperations) {
 }
 
 TEST_F(XmlElementParserTests, Operations_ParseExtendedOperations) {
-    const auto expectedExtendedOpcode = 0xCBu;
+    const auto expectedExtendedOpcode = 0xCBU;
     const auto expectedOcodeLength = 8;
-    const auto expectedOperationsSize = 0u;
+    const auto expectedOperationsSize = 0U;
 
     m_xmlDocument.Parse(XmlOperationsExtended);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
@@ -71,12 +65,12 @@ TEST_F(XmlElementParserTests, Operations_ParseExtendedOperations) {
 }
 
 TEST_F(XmlElementParserTests, Operations_InvalidOpcodeLength) {
-    const auto expectedDefaultOpcodeLength = 0u;
-    const auto expectedOperationsSize = 0u;
+    const auto expectedDefaultOpcodeLength = 0U;
+    const auto expectedOperationsSize = 0U;
     const std::regex expectedLastError(".*Failed to obtain a valid OperationLength for .*");
 
     m_xmlDocument.Parse(XmlOperationsInvalidOpcodeLength);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
@@ -89,12 +83,12 @@ TEST_F(XmlElementParserTests, Operations_InvalidOpcodeLength) {
 }
 
 TEST_F(XmlElementParserTests, Operations_InvalidNoOpcodeLength) {
-    const auto expectedDefaultOpcodeLength = 0u;
-    const auto expectedOperationsSize = 0u;
+    const auto expectedDefaultOpcodeLength = 0U;
+    const auto expectedOperationsSize = 0U;
     const std::regex expectedLastError(".*Failed to obtain a valid OperationLength for .*");
 
     m_xmlDocument.Parse(XmlOperationsInvalidNoOpcodeLength);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
@@ -105,12 +99,12 @@ TEST_F(XmlElementParserTests, Operations_InvalidNoOpcodeLength) {
 }
 
 TEST_F(XmlElementParserTests, Operations_InvalidExtendedOpcode) {
-    const auto expectedDefaultOpcodeLength = 0u;
-    const auto expectedOperationsSize = 0u;
+    const auto expectedDefaultOpcodeLength = 0U;
+    const auto expectedOperationsSize = 0U;
     const std::regex expectedLastError(".*Failed to obtain a valid unsigned int for .*");
 
     m_xmlDocument.Parse(XmlOperationsInvalidExtendedOpcode);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperations operations;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operations);
@@ -122,9 +116,9 @@ TEST_F(XmlElementParserTests, Operations_InvalidExtendedOpcode) {
 
 TEST_F(XmlElementParserTests, Operation_ParseOperation) {
     const auto expectedOpcode = 0x40;
-    const auto expectedCommand = "BIT";
+    const auto* expectedCommand = "BIT";
     m_xmlDocument.Parse(XmlOperation);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
@@ -136,9 +130,9 @@ TEST_F(XmlElementParserTests, Operation_ParseOperation) {
 
 TEST_F(XmlElementParserTests, Operation_ParseOperationMinimal) {
     const auto expectedOpcode = 0x40;
-    const auto expectedCommand = "BIT";
+    const auto* expectedCommand = "BIT";
     m_xmlDocument.Parse(XmlOperationMinimal);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
@@ -152,7 +146,7 @@ TEST_F(XmlElementParserTests, Operation_InvalidNoOpcode) {
     const std::regex expectedLastError(".*Failed to obtain a valid unsigned int for .*");
 
     m_xmlDocument.Parse(XmlOperationInvalidNoOpcode);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
@@ -166,7 +160,7 @@ TEST_F(XmlElementParserTests, Operation_InvalidNoCommand) {
     const std::regex expectedLastError(".*Failed to obtain a valid string for .*");
 
     m_xmlDocument.Parse(XmlOperationInvalidNoCommand);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerOperation operation;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, operation);
@@ -197,7 +191,7 @@ const auto ArgSpOffsetExplicit = R"(<arg type="reg" indirect="false" operation="
 
 TEST_F(XmlElementParserTests, Argument_ArgA) {
     m_xmlDocument.Parse(ArgA);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -207,12 +201,12 @@ TEST_F(XmlElementParserTests, Argument_ArgA) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "A");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgAExplicit) {
     m_xmlDocument.Parse(ArgAExplicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -222,12 +216,12 @@ TEST_F(XmlElementParserTests, Argument_ArgAExplicit) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "A");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgBcIndir) {
     m_xmlDocument.Parse(ArgBcIndir);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -237,12 +231,12 @@ TEST_F(XmlElementParserTests, Argument_ArgBcIndir) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "(BC)");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgBcIndirExplicit) {
     m_xmlDocument.Parse(ArgBcIndirExplicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -252,12 +246,12 @@ TEST_F(XmlElementParserTests, Argument_ArgBcIndirExplicit) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "(BC)");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgDec16) {
     m_xmlDocument.Parse(ArgDec16);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -267,12 +261,12 @@ TEST_F(XmlElementParserTests, Argument_ArgDec16) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::U16BIT);
     EXPECT_EQ(argument.value.name, "d16");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgDec16Explicit) {
     m_xmlDocument.Parse(ArgDec16Explicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -282,12 +276,12 @@ TEST_F(XmlElementParserTests, Argument_ArgDec16Explicit) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::U16BIT);
     EXPECT_EQ(argument.value.name, "d16");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgDec8) {
     m_xmlDocument.Parse(ArgDec8);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -297,12 +291,12 @@ TEST_F(XmlElementParserTests, Argument_ArgDec8) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::U8BIT);
     EXPECT_EQ(argument.value.name, "d8");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgDec8Explicit) {
     m_xmlDocument.Parse(ArgDec8Explicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -312,12 +306,12 @@ TEST_F(XmlElementParserTests, Argument_ArgDec8Explicit) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::U8BIT);
     EXPECT_EQ(argument.value.name, "d8");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgCondNz) {
     m_xmlDocument.Parse(ArgCondNz);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -327,12 +321,12 @@ TEST_F(XmlElementParserTests, Argument_ArgCondNz) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::CONDITIONAL);
     EXPECT_EQ(argument.value.name, "NZ");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgPostIncIndir) {
     m_xmlDocument.Parse(ArgHlPostIncIndir);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -342,12 +336,12 @@ TEST_F(XmlElementParserTests, Argument_ArgPostIncIndir) {
     EXPECT_EQ(argument.operation, RegOperationType::POSTINC);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "(HL+)");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgPostIncIndirExplicit) {
     m_xmlDocument.Parse(ArgHlPostIncIndirExplicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -357,12 +351,12 @@ TEST_F(XmlElementParserTests, Argument_ArgPostIncIndirExplicit) {
     EXPECT_EQ(argument.operation, RegOperationType::POSTINC);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "(HL+)");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgPostDec) {
     m_xmlDocument.Parse(ArgHlPostDec);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -372,12 +366,12 @@ TEST_F(XmlElementParserTests, Argument_ArgPostDec) {
     EXPECT_EQ(argument.operation, RegOperationType::POSTDEC);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "HL-");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgPreInc) {
     m_xmlDocument.Parse(ArgHlPreInc);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -387,12 +381,12 @@ TEST_F(XmlElementParserTests, Argument_ArgPreInc) {
     EXPECT_EQ(argument.operation, RegOperationType::PREINC);
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "+HL");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgAddr16) {
     m_xmlDocument.Parse(ArgAddr16);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -402,12 +396,12 @@ TEST_F(XmlElementParserTests, Argument_ArgAddr16) {
     EXPECT_EQ(argument.operation, RegOperationType::NONE);
     EXPECT_EQ(argument.type, ArgumentType::U16BIT);
     EXPECT_EQ(argument.value.name, "a16");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgConstDecHex) {
     m_xmlDocument.Parse(ArgConstDecHex);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -418,12 +412,13 @@ TEST_F(XmlElementParserTests, Argument_ArgConstDecHex) {
     EXPECT_EQ(argument.type, ArgumentType::CONSTANT);
     EXPECT_EQ(argument.value.name, "0x08");
     EXPECT_TRUE(argument.value.reg.empty());
-    EXPECT_EQ(argument.value.offset, 8u);
+    static constexpr auto expectedValue = 8U;
+    EXPECT_EQ(argument.value.offset, expectedValue);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgConstDecHexExplicit) {
     m_xmlDocument.Parse(ArgConstDecHexExplicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -434,12 +429,13 @@ TEST_F(XmlElementParserTests, Argument_ArgConstDecHexExplicit) {
     EXPECT_EQ(argument.type, ArgumentType::CONSTANT);
     EXPECT_EQ(argument.value.name, "0x08");
     EXPECT_TRUE(argument.value.reg.empty());
-    EXPECT_EQ(argument.value.offset, 8u);
+    static constexpr auto expectedValue = 8U;
+    EXPECT_EQ(argument.value.offset, expectedValue);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgSpOffset) {
     m_xmlDocument.Parse(ArgSpOffset);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -450,12 +446,12 @@ TEST_F(XmlElementParserTests, Argument_ArgSpOffset) {
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "SP+r8");
     EXPECT_EQ(argument.value.reg, "SP");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 TEST_F(XmlElementParserTests, Argument_ArgSpOffsetExplicit) {
     m_xmlDocument.Parse(ArgSpOffsetExplicit);
-    const auto element = m_xmlDocument.FirstChildElement();
+    const auto* element = m_xmlDocument.FirstChildElement();
 
     XmlDebuggerArgument argument;
     const auto parseSuccess = m_xmlParser.ParseXmlElement(element, argument);
@@ -466,7 +462,7 @@ TEST_F(XmlElementParserTests, Argument_ArgSpOffsetExplicit) {
     EXPECT_EQ(argument.type, ArgumentType::REG);
     EXPECT_EQ(argument.value.name, "SP+r8");
     EXPECT_EQ(argument.value.reg, "SP");
-    EXPECT_EQ(argument.value.offset, 0u);
+    EXPECT_EQ(argument.value.offset, 0U);
 }
 
 

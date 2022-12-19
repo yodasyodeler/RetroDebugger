@@ -40,7 +40,7 @@ bool DebuggerXmlParser::ParseFile(const std::string& filename) {
     return ParseXmlDocument(m_xmlDocument);
 }
 
-XmlOperationsMap DebuggerXmlParser::GetOperations() {
+XmlOperationsMap DebuggerXmlParser::GetOperations() const {
     return m_operationMap;
 }
 
@@ -123,7 +123,7 @@ bool DebuggerXmlParser::ParseOperation(const tinyxml2::XMLElement* operationElem
     return true;
 }
 
-std::string DebuggerXmlParser::GetLastError() {
+std::string DebuggerXmlParser::GetLastError() const {
     return m_lastError;
 }
 
