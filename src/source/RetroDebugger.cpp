@@ -24,7 +24,7 @@ std::string RetroDebugger::GetCommandResponse() const {
 }
 
 int RetroDebugger::ProcessCommandString(const std::string& message) {
-    return (m_console.AdvanceDebugger(message)) ? 1 : 0; // TODO: move to enum
+    return (m_console.AdvanceDebugger(message)) ? 1 : 0; // TODO: move to enum, (1: leave debugger, 0: continue looping on input)
 }
 
 // Direct debugger calls

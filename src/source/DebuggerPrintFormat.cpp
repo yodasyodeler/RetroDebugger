@@ -123,15 +123,15 @@ std::string PrintWatchpointHit(BreakInfo breakInfo) {
 std::string PrintTimerHelp() { return "TODO: write help\n"; }
 
 std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
-    const char* Num = "Num";
-    const char* Type = "Type";
-    const char* Disp = "Disp";
-    const char* Enb = "Enb";
-    const char* Address = "Address";
-    const char* What = "What";
+    static constexpr auto Num = "Num";
+    static constexpr auto Type = "Type";
+    static constexpr auto Disp = "Disp";
+    static constexpr auto Enb = "Enb";
+    static constexpr auto Address = "Address";
+    static constexpr auto What = "What";
 
     std::string breakInfoStr = fmt::format(
-        "{:-<8s}{:-<15s}{:-<5s}{:-<4s}{:-<19s}{}\n",
+        "{: <8s}{: <15s}{: <5s}{: <4s}{: <19s}{}\n",
         Num,
         Type,
         Disp,
@@ -141,7 +141,7 @@ std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
     for (const auto& info : breakInfo) {
         const auto what = (info.second.type == BreakType::BankBreakpoint) ? "Bank: "s + std::to_string(info.second.bankNumber) : ""s;
         breakInfoStr += fmt::format(
-            "{:-<8d}{:-<15s}{:-<5s}{:-<4s}0x{:016X}{}\n",
+            "{: <8d}{: <15s}{: <5s}{: <4s}0x{:016X} {}\n",
             info.first,
             BreakTypeToString.at(info.second.type),
             BreakDispToString.at(info.second.disp),
