@@ -52,9 +52,18 @@ bool DisableBreakpoints(const unsigned int breakRange0, const unsigned int break
     return m_debugger.DisableBreakpoints(breakRange0, breakRange1);
 }
 
+bool DeleteBreakpoints() {
+    return m_debugger.DeleteBreakpoints();
+}
+
 bool DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     return m_debugger.DeleteBreakpoints(breakRange0, breakRange1);
 }
+
+BreakList GetBreakpointInfo [[nodiscard]] () {
+    return m_debugger.GetBreakpointInfo();
+}
+
 
 BreakInfo GetBreakpointInfo(const unsigned int breakPointNum) {
     return m_debugger.GetBreakpointInfo(breakPointNum);

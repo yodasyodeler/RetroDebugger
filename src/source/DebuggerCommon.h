@@ -251,4 +251,3 @@ inline unsigned int GetArgTypeLength(const ArgumentType& argType) {
 }
 
 using CommandList = std::map<size_t, Operation>;
-using BreakList = std::map<BreakNum, BreakInfo>;

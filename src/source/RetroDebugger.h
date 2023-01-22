@@ -30,7 +30,11 @@ public:
 
     bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
+    bool DeleteBreakpoints();
+
     bool DeleteBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
+
+    [[nodiscard]] BreakList GetBreakpointInfo();
 
     [[nodiscard]] BreakInfo GetBreakpointInfo(unsigned int breakPointNum);
 

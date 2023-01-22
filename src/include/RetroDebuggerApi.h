@@ -37,9 +37,13 @@ RDB_EXPORT bool EnableBreakpoints(unsigned int breakRange0, unsigned int breakRa
 
 RDB_EXPORT bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
+RDB_EXPORT bool DeleteBreakpoints();
+
 RDB_EXPORT bool DeleteBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
 // RDB_EXPORT RegInfo GetRegInfo(int register);
+
+RDB_EXPORT BreakList GetBreakpointInfo [[nodiscard]] ();
 
 RDB_EXPORT BreakInfo GetBreakpointInfo [[nodiscard]] (unsigned int breakPointNum);
 

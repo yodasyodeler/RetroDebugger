@@ -79,12 +79,20 @@ bool RetroDebugger::DisableBreakpoints(const unsigned int breakRange0, const uns
     return m_debugger.DisableBreakpoints(breakRange);
 }
 
+bool RetroDebugger::DeleteBreakpoints() {
+    return m_debugger.DeleteBreakpoints({});
+}
+
 bool RetroDebugger::DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
     std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
     std::iota(breakRange.begin(), breakRange.end(), breakRange0);
 
     return m_debugger.DeleteBreakpoints(breakRange);
+}
+
+BreakList RetroDebugger::GetBreakpointInfo() {
+    return m_debugger.GetBreakpointInfoList({});
 }
 
 BreakInfo RetroDebugger::GetBreakpointInfo(const unsigned int breakPointNum) {

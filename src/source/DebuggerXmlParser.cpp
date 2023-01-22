@@ -5,22 +5,13 @@
 static constexpr std::string_view ErrorNullptr = "Encountered unexpected nullptr";
 static constexpr std::string_view ErrorEmptyFile = "couldn't find the first XML element in the file";
 static constexpr std::string_view ErrorPreMsg = "Error XmlParser: ";
+static constexpr std::string_view ErrorUnknownElementStr = "Unknown element";
 
 static constexpr std::string_view RetroDebuggerStr = "RetroDebugger";
 static constexpr std::string_view OperationsStr = "operations";
 static constexpr std::string_view OperationStr = "operation";
 static constexpr std::string_view ArgStr = "arg";
 
-bool DebuggerXmlParser::SetLastError(std::string_view elementName, std::string_view errorMsg) {
-    m_lastError = fmt::format("{}\"{}\", {}", ErrorPreMsg, elementName, errorMsg);
-    return false;
-}
-
-bool DebuggerXmlParser::SetLastError(const tinyxml2::XMLElement* element, std::string_view errorMsg) {
-    const auto* name = (element->Name() != nullptr) ? element->Name() : "UnkownElement";
-    m_lastError = fmt::format("{}\"{}\" at line {}, {}", ErrorPreMsg, name, element->GetLineNum(), errorMsg);
-    return false;
-}
 
 DebuggerXmlParser::DebuggerXmlParser(const std::string& filename) {
     ParseFile(filename);
@@ -67,14 +58,14 @@ bool DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocumen
 
         XmlDebuggerOperations operations;
         if (name == OperationsStr) { // TODO: functionalize this to make it easier to read/maintain
-            if (!ParseOperations(element, operations)) { return SetLastError(OperationsStr, m_parser.GetLastError()); }
+            if (!ParseOperations(element, operations)) { return SetLastError(OperationsStr, GetLastError()); }
             else {
                 if (m_operationMap.find(operations.extendedOpcode) != m_operationMap.end()) { return SetLastError(element, fmt::format("Reused extended operation opcode: {}", operations.extendedOpcode)); }
                 m_operationMap.emplace(operations.extendedOpcode, operations);
             }
         }
         else {
-            return SetLastError(element, "Unknown element");
+            return SetLastError(element, ErrorUnknownElementStr);
         }
         element = element->NextSiblingElement();
     }
@@ -100,7 +91,7 @@ bool DebuggerXmlParser::ParseOperations(const tinyxml2::XMLElement* operationEle
             }
         }
         else {
-            return SetLastError(element, "Unknown element");
+            return SetLastError(element, ErrorUnknownElementStr);
         }
         element = element->NextSiblingElement();
     }
@@ -127,11 +118,33 @@ bool DebuggerXmlParser::ParseOperation(const tinyxml2::XMLElement* operationElem
         }
 
         else {
-            return SetLastError(element, "Unknown element");
+            return SetLastError(element, ErrorUnknownElementStr);
         }
         element = element->NextSiblingElement();
     }
     return true;
+}
+
+bool DebuggerXmlParser::SetLastError(std::string_view elementName, const std::string& errorMsg) {
+    m_lastError = fmt::format("{}\"{}\", {}", ErrorPreMsg, elementName, errorMsg);
+    return false;
+}
+
+bool DebuggerXmlParser::SetLastError(const tinyxml2::XMLElement* element, const std::string& errorMsg) {
+    const auto* name = (element->Name() != nullptr) ? element->Name() : "UnkownElement";
+    m_lastError = fmt::format("{}\"{}\" at line {}, {}", ErrorPreMsg, name, element->GetLineNum(), errorMsg);
+    return false;
+}
+
+bool DebuggerXmlParser::SetLastError(std::string_view elementName, std::string_view errorMsg) {
+    m_lastError = fmt::format("{}\"{}\", {}", ErrorPreMsg, elementName, errorMsg);
+    return false;
+}
+
+bool DebuggerXmlParser::SetLastError(const tinyxml2::XMLElement* element, std::string_view errorMsg) {
+    const auto* name = (element->Name() != nullptr) ? element->Name() : "UnkownElement";
+    m_lastError = fmt::format("{}\"{}\" at line {}, {}", ErrorPreMsg, name, element->GetLineNum(), errorMsg);
+    return false;
 }
 
 std::string DebuggerXmlParser::GetLastError() const {

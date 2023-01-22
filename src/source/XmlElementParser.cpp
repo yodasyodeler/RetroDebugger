@@ -152,6 +152,10 @@ static bool StringToImmediateArgType(const std::string_view& str, ArgumentType& 
         type = ArgumentType::U8BIT;
         return true;
     }
+    if (StringNCompare(str, "U8")) {
+        type = ArgumentType::U8BIT;
+        return true;
+    }
     if (StringNCompare(str, "A8")) {
         type = ArgumentType::U8BIT;
         return true;
@@ -165,6 +169,10 @@ static bool StringToImmediateArgType(const std::string_view& str, ArgumentType& 
         return true;
     }
     if (StringNCompare(str, "D16")) {
+        type = ArgumentType::U16BIT;
+        return true;
+    }
+    if (StringNCompare(str, "U16")) {
         type = ArgumentType::U16BIT;
         return true;
     }
@@ -317,7 +325,7 @@ bool CheckRegOffset(std::string& name, XmlDebuggerArgument& arg, size_t operatio
     const auto secondParam = name.substr(operationPos + 1);
     if (IsAlphaString(firstParam) && StringToUnsigned(secondParam, arg.value.offset)) { // TODO: is there a unit test for this?
         name = firstParam;
-        arg.operation = (name[operationPos] == '+') ? RegOperationType::REG_OFFSET_ADD : RegOperationType::REG_OFFSET_SUB;
+        arg.operation = (name[operationPos] == '+') ? RegOperationType::REG_OFFSET_ADD : RegOperationType::REG_OFFSET_SUB; // TODO: add error checking for operation
     }
     else if (auto immediateType = ArgumentType::UNKOWN; IsAlphaString(firstParam) && StringToImmediateArgType(secondParam, immediateType)) { // TODO: Look at adding support for REG+REG, REG+S8BIT, REG+S16BIT,
         if (immediateType == ArgumentType::U8BIT) { arg.operation = RegOperationType::REG_OFFSET_U8BIT; }
@@ -423,7 +431,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
 
     if (const char *typeStr = "type", *str = element->Attribute(typeStr);
         str != nullptr) {
-        if (!StringToArgType(str, argument.type)) { return SetLastError(element, std::string(ErrorObtainingString) + typeStr); }
+        if (!StringToArgType(str, argument.type)) { return SetLastError(element, fmt::format("{}{}: {}", ErrorObtainingString, typeStr, str)); }
         else {
             isCandidateForAuto = false;
         }
@@ -513,9 +521,18 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
 // }
 
 // Error handling helper
-const auto errorPreMsg = std::string();
+bool XmlElementParser::SetLastError(const std::string& elementName, const std::string& errorMsg) {
+    m_lastError = fmt::format("Error XmlElementParser: failed to parse: \"{}\", {}", elementName, errorMsg);
+    return false;
+}
+bool XmlElementParser::SetLastError(const tinyxml2::XMLElement* element, const std::string& errorMsg) {
+    const auto* name = element->Name();
+    const auto lineNum = element->GetLineNum();
+    m_lastError = fmt::format("Error XmlElementParser: \"{}\" at line {}, {}", name == nullptr ? "UnknownElement" : name, lineNum, errorMsg);
+    return false;
+}
 bool XmlElementParser::SetLastError(const std::string& elementName, std::string_view errorMsg) {
-    m_lastError = fmt::format("Error XmlElementParser: failed to parse: \"{}\", ", errorPreMsg, elementName, errorMsg);
+    m_lastError = fmt::format("Error XmlElementParser: failed to parse: \"{}\", {}", elementName, errorMsg);
     return false;
 }
 

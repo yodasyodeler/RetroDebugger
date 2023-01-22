@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <RetroDebugger>
-    <operations opcodeLength=byte> <!--TODO: is the opcode length needed? -->
-        <operation opcode=0x00 command=nop/>    <!--operations with no args-->
-        <operation opcode=0x41 command=load> <arg type=reg value=B/> <arg type=reg value=C/> </operation> <!--operations with two reg args-->
-        <operation opcode=0x46 command=load> <arg type=reg value=B/> <arg type=indirect value=HL/> </operation> <!--operations with indirect arg-->
-        <operation opcode=0x87 command=add> <arg type=reg value=A/> <arg value=A/> </operation> <!--operations using default type of reg for 2nd arg-->
-        <operation opcode=0xE8 command=add> <arg type=reg value=SP/> <arg type=imm8bit/> </operation> <!--operations with 8bit immediate arg-->
-        <operation opcode=0xC2 command=jumpConditional> <arg type=condition value=NZ/> <arg type=immediate value=imm16bit/> </operation> <!--jump with conditional-->
-        <operation opcode=0xC3 command=jump> <arg type=imm16bit/> </operation> <!--jump with absolute address-->
+    <operations opcodeLength="byte"> <!--TODO: is the opcode length needed? -->
+        <operation opcode="0x00" command="nop"/>            <!--operations with no args-->
+        <operation opcode="0x21" command="load">            <arg value="B"/>                        <arg type="reg" value="C"/>                     </operation> <!--operations with two reg args-->
+        <operation opcode="0x26" command="load">            <arg value="B"/>                        <arg value="(HL)"/>                             </operation> <!--operations with indirect arg-->
+        <operation opcode="0x87" command="add">             <arg value="A"/>                        <arg value="A"/>                                </operation> <!--operations using default type of reg for 2nd arg-->
+        <operation opcode="0xE8" command="add">             <arg value="SP"/>                       <arg type="UNSIGNED8BIT"  value="d8"/>          </operation> <!--operations with 8bit immediate arg-->
+        <operation opcode="0xC2" command="jumpConditional"> <arg value="NZ"/>                       <arg type="UNSIGNED16BIT" value="d16"/>         </operation> <!--jump with conditional-->
+        <operation opcode="0xC3" command="jump">            <arg type="SIGNED16BIT" value="Name"/>                                                  </operation> <!--jump with absolute address-->
 
-        <operation prefix=0xCB opcode=0xDE command=set> <arg type=const value=2/> <arg type=reg value=B/> </operation> <!--operations with prefix and a const arg-->
+        <operation opcode="0x40" command="LD+">             <arg value="B"/>                        <arg value="+C"/>                               </operation> <!-- pre-inc load -->
+        <operation opcode="0x41" command="LD-">             <arg value="B"/>                        <arg value="-C"/>                               </operation> <!-- pre-dec load -->
+        <operation opcode="0x42" command="LD-">             <arg value="B"/>                        <arg value="C-"/>                               </operation> <!-- post-dec load -->
+        <operation opcode="0x43" command="LD-">             <arg value="B"/>                        <arg operation="POSTDEC" value="C-"/>                </operation> <!-- post-dec load -->
+        <operation opcode="0x44" command="LD-">             <arg value="B"/>                        <arg operation="PREDEC" value="C"/>                  </operation> <!-- post-dec load -->
+        <operation opcode="0x45" command="LD+">             <arg value="B"/>                        <arg operation="PREINC" value="C"/>                  </operation> <!-- pre-inc load -->
+        
+        <operation opcode="0x51" command="LD+">             <arg value="B"/>                        <arg operation="REG_OFFSET_ADD" value="C"/>          </operation> <!-- pre-inc load -->
+        <operation opcode="0x52" command="LD+">             <arg value="B"/>                        <arg operation="REG_OFFSET_SUB" value="C"/>          </operation> <!-- pre-inc load -->
+        <operation opcode="0x53" command="LD+">             <arg value="B"/>                        <arg operation="REG_OFFSET_U8BIT" value="C"/>        </operation> <!-- pre-inc load -->
+        <operation opcode="0x54" command="LD+">             <arg value="B"/>                        <arg operation="REG_OFFSET_U16BIT" value="C"/>       </operation> <!-- pre-inc load -->
+        <operation opcode="0x55" command="LD+">             <arg value="B"/>                        <arg operation="REG_OFFSET_S16BIT" value="C"/>       </operation> <!-- pre-inc load -->
+
+        <operation opcode="0x63" command="LD">              <arg value="HL"/>                       <arg value="SP+5"/>                             </operation> <!-- reg offset add reg -->
+        <operation opcode="0x64" command="LD">              <arg value="HL"/>                       <arg value="SP-7"/>                             </operation> <!-- reg offset sub reg -->
+        <operation opcode="0x65" command="LD">              <arg value="HL"/>                       <arg value="SP-r8"/>                            </operation> <!-- reg offset signed 8bit sub -->
+        <operation opcode="0x67" command="LD">              <arg value="HL"/>                       <arg value="SP+u8"/>                            </operation> <!-- reg offset unsigned 8bit add -->
+        <operation opcode="0x66" command="LD">              <arg value="HL"/>                       <arg value="SP-u8"/>                            </operation> <!-- reg offset unsigned 8bit sub -->
+        <operation opcode="0x68" command="LD">              <arg value="HL"/>                       <arg value="SP+r16"/>                           </operation> <!-- reg offset signed 16bit add -->
+        <operation opcode="0x69" command="LD">              <arg value="HL"/>                       <arg value="SP+u16"/>                           </operation> <!-- reg offset unsigned 16bit add -->
+        <operation opcode="0x6A" command="LD">              <arg value="HL"/>                       <arg value="SIGNED16BIT"/>                      </operation> <!-- load signed 16bit -->
+    </operations>
+    <operations extended="0xCB" opcodeLength="16"> 
+        <operation opcode="0xDE" command="set">   <arg type="const" value="2"/>           <arg type="reg" value="B"/>                 </operation> <!--operations with prefix and a const arg-->
+    </operations>
+    <operations extended="0xCC" opcodeLength="32"> 
+        <operation opcode="0xDE" command="set">   <arg type="const" value="2"/>           <arg type="reg" value="B"/>                 </operation> <!--operations with prefix and a const arg-->
     </operations>
 </RetroDebugger>

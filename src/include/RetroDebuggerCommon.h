@@ -40,6 +40,7 @@ struct BreakInfo
     BreakDisposition disp = BreakDisposition::Disable; // TODO: no way to use, is implemented though
     bool isEnabled = false;
 };
+using BreakList = std::map<BreakNum, BreakInfo>;
 
 struct RegisterInfo
 {

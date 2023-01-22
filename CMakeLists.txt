@@ -30,7 +30,7 @@ include(${_project_options_SOURCE_DIR}/Index.cmake)
 # Set the project name and language
 project(
     RetroDebugger
-    VERSION 0.0.1
+    VERSION 0.1.0
     DESCRIPTION "Generic library that mimics a gdb lite debug interface for retro emulators."
     LANGUAGES CXX)
 

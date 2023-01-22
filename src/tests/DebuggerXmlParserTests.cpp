@@ -24,7 +24,7 @@ public:
     DebuggerXmlParser m_xmlParser;
 };
 
-TEST_F(DebuggerXmlParserTests, GameboyOperations_ParseFileTest) {
+TEST_F(DebuggerXmlParserTests, ParseFile_GameboyOperations) {
     const auto GAMEBOY_EXTENDED_OPCODE_KEY = 0xCB;
     const auto expectedGameboyOpcodeSize = 8;
     const auto expectedNumOfOperations = 2U;
@@ -48,6 +48,13 @@ TEST_F(DebuggerXmlParserTests, GameboyOperations_ParseFileTest) {
     EXPECT_EQ(actualExtendedOperations.extendedOpcode, GAMEBOY_EXTENDED_OPCODE_KEY);
     EXPECT_EQ(actualExtendedOperations.opcodeLength, expectedGameboyOpcodeSize);
     EXPECT_EQ(actualExtendedOperations.operations.size(), expectedExtendedOperationsSize);
+}
+
+TEST_F(DebuggerXmlParserTests, ParseFile_ExampleOperations) {
+    ASSERT_TRUE(m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::ExampleOperationsXml))) << m_xmlParser.GetLastError(); // Just checking that example operations are valid
+
+    const auto operations = m_xmlParser.GetOperations();
+    ASSERT_FALSE(operations.empty());
 }
 
 TEST_F(DebuggerXmlParserTests, Invalid_ParseFileTest) {

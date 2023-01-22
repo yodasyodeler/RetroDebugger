@@ -25,7 +25,8 @@ private:
     bool ParseOperations(const tinyxml2::XMLElement* operationElements, XmlDebuggerOperations& operations);
     bool ParseOperation(const tinyxml2::XMLElement* operationElement, XmlDebuggerOperation& operation);
 
-
+    bool SetLastError(std::string_view elementName, const std::string& errorMsg);
+    bool SetLastError(const tinyxml2::XMLElement* element, const std::string& errorMsg);
     bool SetLastError(std::string_view elementName, std::string_view errorMsg);
     bool SetLastError(const tinyxml2::XMLElement* element, std::string_view errorMsg);
 

@@ -17,10 +17,13 @@
 
 <!-- 'type'     - 'description'             -->
 <!--  auto      -  Will attempt to determine the type based on value. (Default type) -->
-<!--  reg       -  Value is used as a key to a map of registers. Will -->
-<!--  imm8      -  immediate 8bit number    -->
-<!--  imm16     -  immediate 16bit number   -->
-<!--  cond      -  conditional value-->
+<!-- 'REG'                                      - Value is used as a key to a map of registers. Will -->
+<!-- 'CONST', 'CONSTANT'                        - Constant value -->
+<!-- 'COND', 'CONDITIONAL'                      - Conditional value-->
+<!-- 'R8', 'S8BIT', 'SIGNED8BIT'                - signed 8bit immediate value -->
+<!-- 'R16', 'S16BIT', 'SIGNED16BIT'             - signed 16bit immediate value -->
+<!-- 'D8', 'A8', 'U8BIT', 'UNSIGNED8BIT'        - signed 8bit immediate value -->
+<!-- 'D16', 'A16', 'U16BIT', 'UNSIGNED16BIT'    - unsigned 16bit immediate value -->
 <!--  -->
 
 <RetroDebugger>
