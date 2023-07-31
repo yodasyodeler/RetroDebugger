@@ -1,6 +1,5 @@
 enable_testing()
 
-message("Hello!")
 include(FetchContent)
 FetchContent_Declare(
     googletest

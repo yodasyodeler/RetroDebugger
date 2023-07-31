@@ -8,9 +8,6 @@ target_link_libraries(RetroDebugger PRIVATE fmt::fmt tinyxml2::tinyxml2 NamedTyp
 
 target_link_libraries(RetroDebugger PUBLIC project_warnings project_options)
 
-# Add configured_files
-target_include_directories(RetroDebugger PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
-
 include(BuildInfo)
 create_build_info_header(RetroDebugger)
 
@@ -25,11 +22,15 @@ target_sources(RetroDebugger
         FILE_SET HEADERS
         BASE_DIRS 
             include
+            ${CMAKE_BINARY_DIR}/bin/buildInfo
             ${CMAKE_CURRENT_BINARY_DIR}/include
+            ${CMAKE_BINARY_DIR}/configured_files/include/
         FILES 
             include/RetroDebuggerApi.h
             include/RetroDebuggerCommon.h
+            ${CMAKE_BINARY_DIR}/bin/buildInfo/BuildInfo.h
             ${CMAKE_CURRENT_BINARY_DIR}/include/RetroDebugger_export.h
+            ${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h
 )
 
 # Add Source files and assets

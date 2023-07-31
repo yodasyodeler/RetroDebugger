@@ -42,7 +42,6 @@ target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 #     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
 # endif()
 
-include(Testing)
 include(tinyxml2)
 include(fmt)
 include(NamedType)
@@ -57,6 +56,7 @@ endif()
 
 # Adding the tests:
 include(CTest)
+include(Testing)
 
 option(ENABLE_TESTING "Enable the tests" ${PROJECT_IS_TOP_LEVEL})
 if(ENABLE_TESTING)

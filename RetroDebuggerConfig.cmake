@@ -1,1 +1,1 @@
-include("${CMAKE_CURRENT_LIST_DIR}/RetroDebuggerLibrary.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/RetroDebuggerLib.cmake")
