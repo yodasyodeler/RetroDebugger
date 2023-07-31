@@ -25,8 +25,8 @@ target_sources(
             XmlElementParser.cpp
             XmlElementParser.h)
 target_include_directories(RetroDebugger PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-source_group(include REGULAR_EXPRESSION *.h)
-source_group(source REGULAR_EXPRESSION *.cpp)
+#source_group(include REGULAR_EXPRESSION *.h)
+#source_group(source REGULAR_EXPRESSION *.cpp)
 
 if(ENABLE_TESTING)
     target_sources(

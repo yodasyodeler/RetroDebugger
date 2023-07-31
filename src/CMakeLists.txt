@@ -1,30 +1,36 @@
-find_package(fmt CONFIG)
-find_package(tinyxml2 CONFIG)
-find_package(namedtype CONFIG)
+#find_package(fmt CONFIG)
+#find_package(tinyxml2 CONFIG)
+#find_package(namedtype CONFIG)
 
 add_library(RetroDebugger SHARED)
 
-# Link dependencies: Wrapper method from project_options(https://github.com/cpp-best-practices/project_options)
-target_link_system_libraries(
-    RetroDebugger
-    PRIVATE
-    fmt::fmt
-    tinyxml2::tinyxml2
-    namedtype::namedtype)
+target_link_libraries(RetroDebugger PRIVATE fmt::fmt tinyxml2::tinyxml2 NamedType)
 
-# project_options: includes 'NCREMENTAL:NO', from what I can tell it is a bug also present in the CMake template this is using.
-# TODO: figure out impact of not including 'project_options' or the bug of including project_options.
-# 'NCREMENTAL:NO' appears to be failed attempt of adding '/INCREMENTAL:NO'. -I is header include in gcc.
-target_link_libraries(RetroDebugger PUBLIC project_warnings) # project_options
+target_link_libraries(RetroDebugger PUBLIC project_warnings project_options)
 
 # Add configured_files
 target_include_directories(RetroDebugger PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
-target_sources(RetroDebugger PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include/RetroDebugger_config.h")
+
+include(BuildInfo)
+create_build_info_header(RetroDebugger)
 
 # Unit Tests
 if(ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
+
+# Sets up FILE_SET for RetroDebugger
+target_sources(RetroDebugger 
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS 
+            include
+            ${CMAKE_CURRENT_BINARY_DIR}/include
+        FILES 
+            include/RetroDebuggerApi.h
+            include/RetroDebuggerCommon.h
+            ${CMAKE_CURRENT_BINARY_DIR}/include/RetroDebugger_export.h
+)
 
 # Add Source files and assets
 add_subdirectory(assets) # Private assets used by unit tests

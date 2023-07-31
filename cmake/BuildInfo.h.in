@@ -1,0 +1,10 @@
+#include <string_view>
+
+namespace @PROJECT_NAME@ {
+    static constexpr std::string_view CommitSha = "@BUILDINFO_COMMIT_SHA@";
+    static constexpr std::string_view TimeStamp = "@BUILDINFO_TIMESTAMP@";
+    static constexpr std::string_view Version = "@PROJECT_VERSION@";
+    static constexpr int MajorVersion = @PROJECT_VERSION_MAJOR@;
+    static constexpr int MinorVersion = @PROJECT_VERSION_MINOR@;
+
+}

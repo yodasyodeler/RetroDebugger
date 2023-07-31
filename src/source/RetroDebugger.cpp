@@ -3,7 +3,7 @@
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
 
-#include "RetroDebugger_config.h"
+#include "BuildInfo.h"
 
 #include <iostream>
 #include <numeric>
@@ -11,7 +11,7 @@
 namespace Rdb {
 
 std::string RetroDebugger::GetRdbVersion() {
-    return std::string(::RetroDebugger::Config::ProjectVersion);
+    return std::string(::RetroDebugger::Version);
 }
 
 // Command interpreter calls
