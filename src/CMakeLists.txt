@@ -1,7 +1,3 @@
-#find_package(fmt CONFIG)
-#find_package(tinyxml2 CONFIG)
-#find_package(namedtype CONFIG)
-
 add_library(RetroDebugger SHARED)
 
 target_link_libraries(RetroDebugger PRIVATE fmt::fmt tinyxml2::tinyxml2 NamedType)
@@ -20,12 +16,12 @@ endif()
 target_sources(RetroDebugger 
     PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS 
+        BASE_DIRS
             include
             ${CMAKE_BINARY_DIR}/bin/buildInfo
             ${CMAKE_CURRENT_BINARY_DIR}/include
             ${CMAKE_BINARY_DIR}/configured_files/include/
-        FILES 
+        FILES
             include/RetroDebuggerApi.h
             include/RetroDebuggerCommon.h
             ${CMAKE_BINARY_DIR}/bin/buildInfo/BuildInfo.h

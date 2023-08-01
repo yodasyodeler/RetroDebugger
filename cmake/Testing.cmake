@@ -13,3 +13,7 @@ FetchContent_Declare(
 # option(INSTALL_GMOCK "Install GMock" OFF)
 # option(INSTALL_GTEST "Install GTest" OFF)
 FetchContent_MakeAvailable(googletest)
+set_target_properties(gtest PROPERTIES FOLDER "Dependencies/UnitTests")
+set_target_properties(gtest_main PROPERTIES FOLDER "Dependencies/UnitTests")
+set_target_properties(gmock PROPERTIES FOLDER "Dependencies/UnitTests")
+set_target_properties(gmock_main PROPERTIES FOLDER "Dependencies/UnitTests")
