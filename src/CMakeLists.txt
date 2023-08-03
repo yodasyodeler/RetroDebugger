@@ -1,35 +1,37 @@
 add_library(RetroDebugger SHARED)
 
-target_link_libraries(RetroDebugger PRIVATE fmt::fmt tinyxml2::tinyxml2 NamedType)
+target_link_libraries(
+    RetroDebugger
+    PUBLIC project_warnings project_options RetroDebuggerCommon
+    PRIVATE RetroDebuggerInternal)
 
-target_link_libraries(RetroDebugger PUBLIC project_warnings project_options)
-
-include(BuildInfo)
-create_build_info_header(RetroDebugger)
-
-# Unit Tests
-if(ENABLE_TESTING)
-    add_subdirectory(tests)
-endif()
+include(GenerateExportHeader)
+generate_export_header(
+    RetroDebugger
+    BASE_NAME
+    RDB
+    EXPORT_FILE_NAME
+    "${PROJECT_NAME}_export.h")
 
 # Sets up FILE_SET for RetroDebugger
+# cmake-format: off
 target_sources(RetroDebugger 
     PUBLIC
-        FILE_SET HEADERS
+        FILE_SET
+            HEADERS
         BASE_DIRS
             include
-            ${CMAKE_BINARY_DIR}/bin/buildInfo
-            ${CMAKE_CURRENT_BINARY_DIR}/include
+            ${CMAKE_CURRENT_BINARY_DIR}
             ${CMAKE_BINARY_DIR}/configured_files/include/
         FILES
             include/RetroDebuggerApi.h
-            include/RetroDebuggerCommon.h
-            ${CMAKE_BINARY_DIR}/bin/buildInfo/BuildInfo.h
-            ${CMAKE_CURRENT_BINARY_DIR}/include/RetroDebugger_export.h
-            ${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h
-)
+            ${CMAKE_CURRENT_BINARY_DIR}/RetroDebugger_export.h
+            ${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h)
+# cmake-format: on
+target_sources(RetroDebugger PRIVATE source/RetroDebuggerApi.cpp)
+target_include_directories(RetroDebugger PUBLIC include)
 
 # Add Source files and assets
-add_subdirectory(assets) # Private assets used by unit tests
-add_subdirectory(include) # Files shared with RetroDebugger and binaries using this library
-add_subdirectory(source) # Files private to RetroDebugger and unit tests
+add_subdirectory(assets)
+add_subdirectory(RetroDebugger)
+add_subdirectory(RetroDebuggerCommon)

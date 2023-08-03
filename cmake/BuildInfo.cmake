@@ -1,13 +1,11 @@
 set(BUILDINFO_TEMPLATE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/buildInfo")
+set(DESTINATION "${CMAKE_BINARY_DIR}/buildInfo")
 
 string(TIMESTAMP BUILDINFO_TIMESTAMP)
 find_program(GIT_PATH git REQUIRED)
-execute_process(COMMAND ${GIT_PATH} log --pretty=format:'%h' -n 1
-                OUTPUT_VARIABLE BUILDINFO_COMMIT_SHA)
+execute_process(COMMAND ${GIT_PATH} log --pretty=format:'%h' -n 1 OUTPUT_VARIABLE BUILDINFO_COMMIT_SHA)
 
-configure_file("${BUILDINFO_TEMPLATE_DIR}/BuildInfo.h.in"
-               "${DESTINATION}/BuildInfo.h")
+configure_file("${BUILDINFO_TEMPLATE_DIR}/BuildInfo.h.in" "${DESTINATION}/BuildInfo.h")
 
 #[=======================================================================[.rst:
 CreateBuildInfoHeader
@@ -42,6 +40,15 @@ This module defines the following variables:
 
 #]=======================================================================]
 function(create_build_info_header target)
-  target_include_directories(${target} PRIVATE ${DESTINATION})
-  target_sources(${target} PRIVATE "${DESTINATION}/BuildInfo.h")
+    target_include_directories(${target} PRIVATE ${DESTINATION})
+# cmake-format: off
+    target_sources(${target}
+        PUBLIC
+            FILE_SET
+                HEADERS
+            BASE_DIRS
+                ${DESTINATION}
+            FILES
+                ${DESTINATION}/BuildInfo.h)
+# cmake-format: on
 endfunction()

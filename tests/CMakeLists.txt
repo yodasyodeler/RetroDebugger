@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.23)
 
 project(RetroDebugPackageTests LANGUAGES CXX)
 
+add_executable(RetroDebuggerIntegrationTests)
+
+include(CTest)
+include(GoogleTest)
 if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
     enable_testing()
-    include(CTest)
-    include(GoogleTest)
 
     if(NOT DEFINED CMAKE_CXX_STANDARD)
         set(CMAKE_CXX_STANDARD 20)
@@ -20,24 +22,25 @@ if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
     add_library(project_options INTERFACE IMPORTED)
     add_library(project_warnings INTERFACE IMPORTED)
     target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
-    # if(NOT TARGET project_options)
-    #     message(FATAL_ERROR "Required config package not found!")
-    #     return() # be strictly paranoid for Template Janitor github action! CK
-    # endif()
+    target_link_libraries(RetroDebuggerIntegrationTests PRIVATE RetroDeb::RetroDebugger)
+else()
+    target_link_libraries(RetroDebuggerIntegrationTests PUBLIC RetroDebugger)
 endif()
 
-add_executable(RetroDebuggerIntegrationTests)
-
-if(PROJECT_IS_TOP_LEVEL)
-    set(RetroDebugger_Lib RetroDeb::RetroDebugger)
-else()
-    set(RetroDebugger_Lib RetroDebugger)
+#TODO: fFgure out if I should be looking at supporting `BUILD_SHARED_LIBS` to allow switch between static and shared
+if(WIN32)
+    add_custom_command(
+        TARGET RetroDebuggerIntegrationTests
+        PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:RetroDebuggerIntegrationTests>
+                $<TARGET_FILE_DIR:RetroDebuggerIntegrationTests>
+        COMMAND_EXPAND_LISTS)
 endif()
 
 target_link_libraries(
     RetroDebuggerIntegrationTests
-    PUBLIC ${RetroDebugger_Lib}
     PRIVATE ${project_options}
+            ${project_warnings}
             GTest::gtest
             GTest::gtest_main
             GTest::gmock
@@ -49,6 +52,5 @@ set_target_properties(RetroDebuggerIntegrationTests PROPERTIES FOLDER "Integrati
 gtest_discover_tests(RetroDebuggerIntegrationTests)
 
 # Source files: add configured_files and tests
-target_include_directories(RetroDebuggerIntegrationTests PRIVATE "${CMAKE_BINARY_DIR}/bin/BuildInfo"
-                                                                 "${CMAKE_BINARY_DIR}/configured_files/include")
+target_include_directories(RetroDebuggerIntegrationTests PRIVATE "${CMAKE_BINARY_DIR}/configured_files/include")
 target_sources(RetroDebuggerIntegrationTests PRIVATE RetroDebuggerIntegrationTests.cpp)
