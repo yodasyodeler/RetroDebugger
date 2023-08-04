@@ -29,7 +29,6 @@ target_sources(RetroDebugger
             ${CMAKE_BINARY_DIR}/configured_files/include/RetroDebuggerTests_assets.h)
 # cmake-format: on
 target_sources(RetroDebugger PRIVATE source/RetroDebuggerApi.cpp)
-target_include_directories(RetroDebugger PUBLIC include)
 
 # Add Source files and assets
 add_subdirectory(assets)
