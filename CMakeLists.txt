@@ -24,10 +24,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(NoInSourceBuilds)
 
 # TODO: The INTERFACE library NAMESPACE ALIAS are missing! See original CMake template for more info (https://github.com/cpp-best-practices/gui_starter_template)
-add_library(project_options INTERFACE IMPORTED)
-add_library(project_warnings INTERFACE IMPORTED)
+add_library(RetroDebugger_options INTERFACE IMPORTED)
+add_library(RetroDebugger_warnings INTERFACE IMPORTED)
 
-target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(RetroDebugger_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
 # Collect binaries under a stage subdirectory. Makes dependencies on Windows simpler.
 # set(stageDir ${CMAKE_CURRENT_BINARY_DIR}/stage)
@@ -94,11 +94,11 @@ include(Install)
 # package_project(
 #     TARGETS
 #     RetroDebugger
-#     project_options
-#     project_warnings
+#     RetroDebugger_options
+#     RetroDebugger_warnings
 #     PUBLIC_INCLUDES
 #     "src/include"
-#     # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings
+#     # PRIVATE_DEPENDENCIES_CONFIGURED RetroDebugger_options RetroDebugger_warnings
 # )
 
 # Experience shows that explicit package naming can help make it easier to sort

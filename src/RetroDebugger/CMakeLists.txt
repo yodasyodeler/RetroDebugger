@@ -33,8 +33,8 @@ target_include_directories(RetroDebuggerInternal PUBLIC include)
 target_link_libraries(
     RetroDebuggerInternal
     PUBLIC RetroDebuggerCommon
-           project_warnings
-           project_options
+           RetroDebugger_warnings
+           RetroDebugger_options
            fmt::fmt
            tinyxml2::tinyxml2
            NamedType)

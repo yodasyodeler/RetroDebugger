@@ -16,12 +16,12 @@ if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
     include(Testing)
 
-    find_package(RetroDebugger CONFIG REQUIRED) # for intro, project_options, ...
+    find_package(RetroDebugger CONFIG REQUIRED) # for intro, RetroDebugger_options, ...
 
     message("Test directory")
-    add_library(project_options INTERFACE IMPORTED)
-    add_library(project_warnings INTERFACE IMPORTED)
-    target_compile_features(project_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+    add_library(RetroDebugger_options INTERFACE IMPORTED)
+    add_library(RetroDebugger_warnings INTERFACE IMPORTED)
+    target_compile_features(RetroDebugger_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
     target_link_libraries(RetroDebuggerIntegrationTests PRIVATE RetroDeb::RetroDebugger)
 else()
     target_link_libraries(RetroDebuggerIntegrationTests PUBLIC RetroDebugger)
@@ -39,8 +39,8 @@ endif()
 
 target_link_libraries(
     RetroDebuggerIntegrationTests
-    PRIVATE ${project_options}
-            ${project_warnings}
+    PRIVATE ${RetroDebugger_options}
+            ${RetroDebugger_warnings}
             GTest::gtest
             GTest::gtest_main
             GTest::gmock
