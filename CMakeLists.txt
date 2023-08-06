@@ -18,7 +18,7 @@ project(
     LANGUAGES CXX C)
 
 # Add .cmake files to module path. So .cmake files can be accessible in different directories.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 # Check if we are doing an in source build
 include(NoInSourceBuilds)
