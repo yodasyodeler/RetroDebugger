@@ -231,7 +231,7 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
         auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), m_listsize);
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
         if (!commands.empty()) {
-            const auto& command = (--commands.end());
+            auto command = commands.rbegin();
             auto lastAddress = command->first;
 
             const auto& args = command->second.arguments;
