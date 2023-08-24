@@ -107,17 +107,11 @@ std::string PrintPpuHelp() { return "TODO: write help\n"; }
 std::string PrintApuHelp() { return "TODO: write help\n"; }
 
 std::string PrintBreakpointHit(BreakInfo breakInfo) {
-    std::stringstream msg;
-    msg << "Breakpoint " << std::to_string(breakInfo.breakpointNumber) << " , at 0x" << to_string(static_cast<uint16_t>(breakInfo.address), true);
-    return msg.str();
+    return fmt::format("Breakpoint {} , at 0x{}", breakInfo.breakpointNumber, to_string(static_cast<uint16_t>(breakInfo.address), true));
 }
 
 std::string PrintWatchpointHit(BreakInfo breakInfo) {
-    std::stringstream msg;
-    msg << "Watchpoint " << std::to_string(breakInfo.breakpointNumber) << ": at " << to_string(static_cast<uint16_t>(breakInfo.address), true) << "\n";
-    msg << "Old value = " << std::to_string(breakInfo.oldWatchValue) << "\n";
-    msg << "New value = " << std::to_string(breakInfo.newWatchValue);
-    return msg.str();
+    return fmt::format("Watchpoint {}: at {}\nOld value = {}\nNew value = {}", breakInfo.breakpointNumber, to_string(static_cast<uint16_t>(breakInfo.address), true), breakInfo.oldWatchValue, breakInfo.newWatchValue);
 }
 
 std::string PrintTimerHelp() { return "TODO: write help\n"; }

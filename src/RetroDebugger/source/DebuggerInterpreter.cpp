@@ -224,11 +224,36 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
     unsigned int number = DebuggerCallback::GetPcReg();
+    unsigned int listSize = m_listSize;
 
-    if ((cmdCount == 1) || (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number))) {
+    bool isAddressRange = false; // TODO: hack for now. Should rethink this to make it simpler
+
+    if ((cmdCount == 1) || (cmdCount == 2)) {
         if (cmdCount == 1 && m_listNext) { number = static_cast<unsigned int>(m_listAddress); }
+        else if (unsigned int number2 = 0;
+                 cmdCount == 2 && DebuggerStringParser::ParseNumberPair(words[1], number, number2, "-")) {
+            if (number > number2) {
+                m_listNext = false;
+                return false;
+            }
+            isAddressRange = true;
+            listSize = number2;
+        }
+        else if (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number)) {
+            m_listNext = false;
+            return false;
+        }
 
-        auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), m_listSize);
+        auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), listSize);
+
+        if (isAddressRange) { // TODO: hack for now. Removes commands that fall outside of the address range. Should rethink to make this simpler and less of a band-aid.
+            for (auto iter = commands.begin(); iter != commands.end(); ++iter) {
+                if (iter->first < number || iter->first > listSize) {
+                    commands.erase(iter);
+                }
+            }
+        }
+
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
         if (!commands.empty()) {
             auto command = commands.rbegin();

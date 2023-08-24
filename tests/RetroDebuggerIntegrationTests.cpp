@@ -1,9 +1,9 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#include <RetroDebuggerApi.h>
 
 #include "RetroDebuggerTests_assets.h"
 
-#include <RetroDebuggerApi.h>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <array>
 
