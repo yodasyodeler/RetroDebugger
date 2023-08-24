@@ -275,17 +275,16 @@ static bool ParseAutoArgType(XmlDebuggerArgument& argument) {
 }
 
 bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
-    const auto& value = name; // TODO: what am I doing here
     static constexpr std::string_view operationChars = "+-";
-    auto operationPos = value.find_first_of(operationChars);
+    auto operationPos = name.find_first_of(operationChars);
     if (operationPos == std::string::npos) {
         arg.operation = RegOperationType::NONE;
         return false;
     }
 
     if (operationPos == 0) { // PreOp
-        if (value[operationPos] == '+' && IsAlphaString(value.substr(1))) { arg.operation = RegOperationType::PREINC; }
-        else if (value[operationPos] == '-') {
+        if (name[operationPos] == '+' && IsAlphaString(name.substr(1))) { arg.operation = RegOperationType::PREINC; }
+        else if (name[operationPos] == '-') {
             arg.operation = RegOperationType::PREDEC;
         }
         else {
@@ -294,9 +293,9 @@ bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
         }
         name.erase(0, 1);
     }
-    else if (operationPos == value.size() - 1) { // PostOp
-        if (value[operationPos] == '+') { arg.operation = RegOperationType::POSTINC; }
-        else if (value[operationPos] == '-') {
+    else if (operationPos == name.size() - 1) { // PostOp
+        if (name[operationPos] == '+') { arg.operation = RegOperationType::POSTINC; }
+        else if (name[operationPos] == '-') {
             arg.operation = RegOperationType::POSTDEC;
         }
         else {

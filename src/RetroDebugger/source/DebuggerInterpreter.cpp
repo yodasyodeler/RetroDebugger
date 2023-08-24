@@ -228,7 +228,7 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     if ((cmdCount == 1) || (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number))) {
         if (cmdCount == 1 && m_listNext) { number = static_cast<unsigned int>(m_listAddress); }
 
-        auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), m_listsize);
+        auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), m_listSize);
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
         if (!commands.empty()) {
             auto command = commands.rbegin();
@@ -259,7 +259,7 @@ bool DebuggerInterpreter::Set(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::Show(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     if (words[1] == "listsize") {
-        SetCommandResponse(DebuggerPrintFormat::PrintListsize(m_listsize));
+        SetCommandResponse(DebuggerPrintFormat::PrintListsize(m_listSize));
         return true;
     }
     return false;
@@ -268,6 +268,6 @@ bool DebuggerInterpreter::Show(const std::vector<std::string>& words) {
 // Debug variable Setters
 bool DebuggerInterpreter::SetListsize(const unsigned int listsize) {
     m_commandResponse.clear();
-    m_listsize = listsize;
+    m_listSize = listsize;
     return true;
 }

@@ -96,6 +96,7 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
 bool DebuggerOperations::ParseFile(const std::string& filename) {
     m_isValid = m_debuggerParser->ParseFile(filename);
     if (!m_isValid) {
+        Reset();
         return false;
     }
 

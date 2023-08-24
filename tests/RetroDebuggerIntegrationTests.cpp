@@ -5,6 +5,8 @@
 
 #include <RetroDebuggerApi.h>
 
+#include <array>
+
 /******************************************************************************
  * TODOs
  *
@@ -235,5 +237,27 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_DirectCalls_SetBreakpoint_
     }
 }
 
+TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Interpreter_List_WhenCommandsEmpty) {
+    // Set up callbacks
+    unsigned int pc = 0;
+    static constexpr std::array<uint8_t, 10> memoryValues = { 0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C };
+    Rdb::SetGetPcRegCallback([&pc]() { return pc; });
+    Rdb::SetReadMemoryCallback([](unsigned int value) { return memoryValues[value % memoryValues.size()]; });
+
+    // Fail load a file
+    ASSERT_FALSE(Rdb::ParseXmlFile(""));
+
+    // Try to list
+    static constexpr auto listCommand = "list";
+    ASSERT_EQ(Rdb::ProcessCommandString(listCommand), 0);
+
+    // Check that
+    static constexpr std::string_view expectedResponse =
+        "0x0000  49\t  \n0x0001  254\t  \n0x0002  255\t  \n0x0003  175\t  \n0x0004  33\t  \n"
+        "0x0005  255\t  \n0x0006  159\t  \n0x0007  50\t  \n0x0008  203\t  \n0x0009  124\t  \n";
+
+    const auto response = Rdb::GetCommandResponse();
+    EXPECT_EQ(response, expectedResponse);
+}
 
 }

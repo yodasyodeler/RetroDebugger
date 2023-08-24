@@ -32,7 +32,7 @@ private:
     bool SetListsize(unsigned int listsize);
 
     bool m_listNext = false;
-    unsigned int m_listsize = 10;
+    unsigned int m_listSize = 10;
     size_t m_listAddress = 0;
     std::string m_commandResponse;
     Debugger* m_debugger;
