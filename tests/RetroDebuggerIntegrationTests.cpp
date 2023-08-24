@@ -251,11 +251,10 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Interpreter_List_WhenComma
     static constexpr auto listCommand = "list";
     ASSERT_EQ(Rdb::ProcessCommandString(listCommand), 0);
 
-    // Check that
+    // Check response is as expected
     static constexpr std::string_view expectedResponse =
         "0x0000  49\t  \n0x0001  254\t  \n0x0002  255\t  \n0x0003  175\t  \n0x0004  33\t  \n"
         "0x0005  255\t  \n0x0006  159\t  \n0x0007  50\t  \n0x0008  203\t  \n0x0009  124\t  \n";
-
     const auto response = Rdb::GetCommandResponse();
     EXPECT_EQ(response, expectedResponse);
 }
