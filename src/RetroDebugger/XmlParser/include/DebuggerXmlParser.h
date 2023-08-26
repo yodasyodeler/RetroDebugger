@@ -1,7 +1,5 @@
 #pragma once
 
-#include "tinyxml2.h"
-
 #include "DebuggerCommon.h"
 
 #include "XmlElementParser.h"

@@ -57,8 +57,8 @@ static std::string to_string(uint16_t value, bool isHex = false) {
 static constexpr std::string_view generalHelp =
     "[h]elp <cmd> -- display help for specific command\n"
     "\n"
-    "[c]ontinue -- continue execution of linkboy till a break\n"
-    "[c]ontinue <count> -- continue execution of linkboy ignore breakpoints till count breakpoints have been encountered\n"
+    "[c]ontinue -- continue execution of code till a break\n"
+    "[c]ontinue <count> -- continue execution of code ignore breakpoints till count breakpoints have been encountered\n"
     "[s]tep -- execute one instruction then break\n"
     "[s]tep <count> -- execute count of instructions then break\n"
     "[f]inish -- continue execution till a jump instruction\n"

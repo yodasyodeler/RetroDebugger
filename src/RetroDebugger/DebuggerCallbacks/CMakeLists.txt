@@ -1,0 +1,7 @@
+add_library(RetroDebuggerCallbacks STATIC)
+
+target_sources(RetroDebuggerCallbacks PRIVATE include/DebuggerCallbacks.h source/DebuggerCallbacks.cpp)
+
+target_include_directories(RetroDebuggerCallbacks PUBLIC include)
+
+target_link_libraries(RetroDebuggerCallbacks PUBLIC RetroDebuggerCommon RetroDebuggerInternalCommon)

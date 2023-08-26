@@ -1,6 +1,7 @@
 #include "DebuggerXmlParser.h"
 
 #include <fmt/core.h>
+#include <tinyxml2.h>
 
 static constexpr std::string_view ErrorNullptr = "Encountered unexpected nullptr";
 static constexpr std::string_view ErrorEmptyFile = "couldn't find the first XML element in the file";
@@ -155,11 +156,11 @@ std::string DebuggerXmlParser::GetLastError() const {
 //     //Get to first tempElement
 //     const auto commandsStr = "commands";
 //     const auto commands = m_xmlDocument.FirstChildElement(commandsStr);
-//     if (!commands) { return SetLastError(commandsStr, "Couldn't find xml element"); }
+//     if (!commands) { return SetLastError(commandsStr, "Couldn't find XML element"); }
 //
 //     const auto commandStr = "command";
 //     auto command = commands->FirstChildElement(commandStr);
-//     if (!command) { return SetLastError(commandStr, "Couldn't find xml element"); }
+//     if (!command) { return SetLastError(commandStr, "Couldn't find XML element"); }
 //
 //     //Parse all Commands
 //     do {
@@ -174,14 +175,14 @@ std::string DebuggerXmlParser::GetLastError() const {
 // }
 //
 ////TODO: could be a good idea to move tempElement null check before ParseXmlElement to log more info
-////TODO: figure out what should error out here, probably should make it strict so mistakes are caught and not glossed over in the xml.
-////TODO: maybe I should functionalize some of these, ie get string from tempElement, get enum from tempElement?
+////TODO: figure out what should error out here, probably should make it strict so mistakes are caught and not glossed over in the XML.
+////TODO: maybe I should functionalize some of these, ie) get string from tempElement, get enum from tempElement?
 // bool DebuggerXmlParser::ParseCommand(const tinyxml2::XMLElement& element) {
 //     DebuggerCommand dbgCommand = {};
 //
 //     auto tempElement = element.FirstChildElement("name");
 //     if (!m_parser.ParseXmlElement(tempElement, dbgCommand.m_name), false) { return false; }
-//     if (dbgCommand.m_name == "") { dbgCommand.m_name = "Unkown Command"; }
+//     if (dbgCommand.m_name == "") { dbgCommand.m_name = "Unknown Command"; }
 //
 //     tempElement = element.FirstChildElement("mnemonic");
 //     if (!m_parser.ParseXmlElement(tempElement, dbgCommand.m_mnemonicPrint), false) { return false; }
@@ -216,7 +217,7 @@ std::string DebuggerXmlParser::GetLastError() const {
 //     tempElement = element.FirstChildElement("opcodes");
 //     if (!m_parser.ParseXmlElement(tempElement, opcodes, false)) { return false; }
 //
-//     //construct dbg element
+//     //construct DBG element
 //     const auto dbgCommandPtr = std::make_shared<const DebuggerCommand>(dbgCommand);
 //     for (const auto& opcode : opcodes)
 //     {

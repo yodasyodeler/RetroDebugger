@@ -304,7 +304,7 @@ bool ParseArgOperations(std::string& name, XmlDebuggerArgument& arg) {
         }
         name.erase(name.size() - 1);
     }
-    else { // Check if regoffset
+    else { // Check if reg offset
         if (!CheckRegOffset(name, arg, operationPos)) {
             return false;
         }
@@ -508,7 +508,7 @@ bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, XmlD
 // }
 //
 // bool XmlElementParser::ParseXmlElement(const tinyxml2::XMLElement* element, FlagType& outValue, bool allowDefault) {
-//     const std::string errorString = "Failed to find FlagType for XML elment ";
+//     const std::string errorString = "Failed to find FlagType for XML element ";
 //     outValue = FlagType::NONE;
 //     if (!element) { return (allowDefault) ? true :/* SetLastError(errorString)*/ false; }
 //     const auto attribute = element->FindAttribute("name");

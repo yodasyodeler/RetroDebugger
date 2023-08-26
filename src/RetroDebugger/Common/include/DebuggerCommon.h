@@ -153,7 +153,6 @@ struct XmlDebuggerOperations
 
 typedef std::map<unsigned int, XmlDebuggerOperations> XmlOperationsMap;
 
-
 // TODO: clean this up, there is overlap and stale
 enum class ImmediateType : int {
     UNKOWN = -1,
