@@ -239,7 +239,7 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
             isAddressRange = true;
             listSize = number2;
         }
-        else if (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number)) {
+        else if (cmdCount == 2 && !DebuggerStringParser::ParseNumber(words[1], number)) {
             m_listNext = false;
             return false;
         }

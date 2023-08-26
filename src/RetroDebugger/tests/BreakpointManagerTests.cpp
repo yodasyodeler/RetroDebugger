@@ -34,7 +34,7 @@ public:
     unsigned int g_memory = 0; // TODO: make a gmock interface
 };
 
-TEST_F(BreakpointManagerTests, GetBrekpointInfoList_AddBreakCheckInfoDelete) {
+TEST_F(BreakpointManagerTests, GetBreakpointInfoList_AddBreakCheckInfoDelete) {
     const auto ExpectedAddress = 0x100;
 
     m_breakpointManager.DeleteBreakpoints();
@@ -51,7 +51,7 @@ TEST_F(BreakpointManagerTests, GetBrekpointInfoList_AddBreakCheckInfoDelete) {
     EXPECT_TRUE(breakInfo.find(breakNum) == breakInfo.end());
 }
 
-TEST_F(BreakpointManagerTests, GetBrekpointInfoList_AddDefaultBreakCheckInfoDelete) {
+TEST_F(BreakpointManagerTests, GetBreakpointInfoList_AddDefaultBreakCheckInfoDelete) {
     m_breakpointManager.DeleteBreakpoints();
     auto breakInfo = m_breakpointManager.GetBreakpointInfoList();
     EXPECT_EQ(breakInfo.size(), 0U);
@@ -66,7 +66,7 @@ TEST_F(BreakpointManagerTests, GetBrekpointInfoList_AddDefaultBreakCheckInfoDele
     EXPECT_TRUE(breakInfo.find(breakNum) == breakInfo.end());
 }
 
-TEST_F(BreakpointManagerTests, GetBrekpointInfoList_GetSpecificBreakInfo) {
+TEST_F(BreakpointManagerTests, GetBreakpointInfoList_GetSpecificBreakInfo) {
     static constexpr auto address1 = 0x101;
     static constexpr auto address2 = 0x102;
     static constexpr auto address3 = 0x103;
@@ -83,7 +83,7 @@ TEST_F(BreakpointManagerTests, GetBrekpointInfoList_GetSpecificBreakInfo) {
     EXPECT_EQ(breakInfo.at(breakNum3).address, address3);
 }
 
-TEST_F(BreakpointManagerTests, CheckBrekpoints_HitBreakpoint) {
+TEST_F(BreakpointManagerTests, CheckBreakpoints_HitBreakpoint) {
     BreakInfo breakInfo;
     static constexpr auto address1 = 0x100;
     static constexpr auto address2 = 0x101;
@@ -200,7 +200,7 @@ TEST_F(BreakpointManagerTests, RunInstructions_CheckBreakpoints_StepOneAndMany) 
     EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
 }
 
-TEST_F(BreakpointManagerTests, CheckBrekpoints_StepBreaksOnBreakpoint) {
+TEST_F(BreakpointManagerTests, CheckBreakpoints_StepBreaksOnBreakpoint) {
     static constexpr auto startAddress = 0x100;
     static constexpr auto address1 = 0x101;
     static constexpr auto address2 = 0x102;

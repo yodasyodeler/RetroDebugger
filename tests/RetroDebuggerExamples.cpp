@@ -55,7 +55,16 @@ protected:
     unsigned int m_pc = 0;
 };
 
-TEST_F(RetroDebuggerExamples, list_ListRangeOfAddress) {
+TEST_F(RetroDebuggerExamples, list_StartingAddress) {
+    // list commands from addresses 0x0010 through 0x0014
+    Rdb::ProcessCommandString("list 0x10");
+
+    // Get the response and check that it is the expected values from our
+    const auto expectedResults = "0x0010  LD\t  DE, 0x803E\n0x0013  LD\t  (HL-), A\n0x0014  LD\t  (C), A\n0x0015  INC\t  C\n0x0016  LD\t  A, 0x243\n0x0018  LD\t  (C), A\n0x0019  LD\t  (HL-), A\n0x001A  LD\t  A, 0x119\n0x001C  LD\t  (HL), A\n0x001D  LD\t  A, 0x252\n";
+    ASSERT_EQ(Rdb::GetCommandResponse(), expectedResults);
+}
+
+TEST_F(RetroDebuggerExamples, list_RangeOfAddress) {
     // list commands from addresses 0x0010 through 0x0014
     Rdb::ProcessCommandString("list 0x10-0x14");
 
