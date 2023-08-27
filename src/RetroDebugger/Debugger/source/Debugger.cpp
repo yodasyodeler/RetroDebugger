@@ -1,7 +1,9 @@
 #include "Debugger.h"
 
+#include "DebuggerOperations.h"
+
 Debugger::Debugger() :
-    m_xmlParser(std::make_shared<DebuggerXmlParser>()), m_operations(std::make_shared<DebuggerOperations>(m_xmlParser)), m_breakManager(m_operations) {}
+    m_operations(std::make_shared<DebuggerOperations>()), m_breakManager(m_operations) {}
 
 bool Debugger::CheckBreakpoints(BreakInfo& breakInfo) {
     return m_breakManager.CheckBreakpoints(breakInfo);
@@ -53,16 +55,20 @@ BreakList Debugger::GetBreakpointInfoList(const std::vector<unsigned int>& list)
     return m_breakManager.GetBreakpointInfoList(list);
 }
 
-bool Debugger::ParseXmlFile(const std::string& filename) {
-    return m_operations->ParseFile(filename);
-}
-
 // RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } // TODO: need to redo RegInfo
 
 AddrInfo Debugger::GetRomInfo(const unsigned int address) { return { address, DebuggerCallback::ReadMemory(address) }; }
 
 std::vector<RegisterInfoPtr> Debugger::GetRegisterInfoList() {
     return m_operations->GetRegisters();
+}
+
+void Debugger::ResetOperations() {
+    m_operations->Reset();
+}
+
+void Debugger::SetOperations(const XmlOperationsMap& operations) {
+    m_operations->SetOperations(operations);
 }
 
 CommandList Debugger::GetCommandInfoList(size_t address, const unsigned int numInstructions) {

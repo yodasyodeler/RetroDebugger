@@ -16,11 +16,11 @@ target_link_libraries(
     PUBLIC RetroDebuggerCallbacks
            RetroDebuggerCommon
            RetroDebuggerInternalCommon
-           RetroDebuggerXmlParser
            RetroDebugger_warnings
            RetroDebugger_options
            fmt::fmt
            NamedType)
+set_target_properties(RetroDebuggerDebugger PROPERTIES FOLDER "RetroDebugger Code")
 
 if(ENABLE_TESTING)
     add_subdirectory(tests)

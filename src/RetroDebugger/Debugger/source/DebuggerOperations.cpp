@@ -1,20 +1,10 @@
 
 #include "DebuggerOperations.h"
-#include "DebuggerXmlParser.h"
 
 #include "DebuggerCallbacks.h"
 
 #include <algorithm>
 #include <memory>
-
-DebuggerOperations::DebuggerOperations(std::shared_ptr<DebuggerXmlParser> debuggerParser) :
-    m_debuggerParser(std::move(debuggerParser)) {}
-
-
-DebuggerOperations::DebuggerOperations(std::shared_ptr<DebuggerXmlParser> debuggerParser, const std::string& filename) :
-    m_debuggerParser(std::move(debuggerParser)) {
-    ParseFile(filename);
-}
 
 void DebuggerOperations::Reset() {
     m_operations.operations.clear();
@@ -23,14 +13,6 @@ void DebuggerOperations::Reset() {
     m_jumpOperations.operations.clear();
     m_jumpOperations.extendedOperations.clear();
     m_jumpOperations.opcodeLength = 0;
-}
-
-bool DebuggerOperations::IsValid() const {
-    return m_isValid;
-}
-
-std::string DebuggerOperations::GetErrorMessage() {
-    return m_debuggerParser->GetLastError();
 }
 
 Operations DebuggerOperations::GetOperations() const {
@@ -93,15 +75,8 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
     }
 }
 
-bool DebuggerOperations::ParseFile(const std::string& filename) {
-    m_isValid = m_debuggerParser->ParseFile(filename);
-    if (!m_isValid) {
-        Reset();
-        return false;
-    }
-
-    const auto xmlOperations = m_debuggerParser->GetOperations();
-    for (const auto& operations : xmlOperations) {
+void DebuggerOperations::SetOperations(const XmlOperationsMap& XmlOperations) {
+    for (const auto& operations : XmlOperations) {
         if (operations.first == NormalOperationsKey) {
             for (const auto& operation : operations.second.operations) {
                 ConvertOperation(m_operations.operations, operation.second);
@@ -116,7 +91,6 @@ bool DebuggerOperations::ParseFile(const std::string& filename) {
             m_operations.extendedOperations.emplace(operations.first, operationsMap);
         }
     }
-    m_debuggerParser->Reset();
 
     m_jumpOperations.opcodeLength = m_operations.opcodeLength;
     for (const auto& operation : m_operations.operations) {
@@ -131,8 +105,6 @@ bool DebuggerOperations::ParseFile(const std::string& filename) {
             }
         }
     }
-
-    return m_isValid;
 }
 
 // TODO: clean this up.

@@ -245,7 +245,7 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Interpreter_List_WhenComma
     Rdb::SetReadMemoryCallback([](unsigned int value) { return memoryValues[value % memoryValues.size()]; });
 
     // Fail load a file
-    ASSERT_FALSE(Rdb::ParseXmlFile(""));
+    EXPECT_THROW(Rdb::ParseXmlFile(""), std::exception);
 
     // Try to list
     static constexpr auto listCommand = "list";

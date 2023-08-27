@@ -23,6 +23,7 @@ target_link_libraries(
             RetroDebugger_options
             fmt::fmt
             NamedType)
+set_target_properties(RetroDebuggerStringInterpreter PROPERTIES FOLDER "RetroDebugger Code")
 
 if(ENABLE_TESTING)
     add_subdirectory(tests)

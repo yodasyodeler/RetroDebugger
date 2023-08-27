@@ -5,3 +5,4 @@ target_sources(RetroDebuggerCallbacks PRIVATE include/DebuggerCallbacks.h source
 target_include_directories(RetroDebuggerCallbacks PUBLIC include)
 
 target_link_libraries(RetroDebuggerCallbacks PUBLIC RetroDebuggerCommon RetroDebuggerInternalCommon)
+set_target_properties(RetroDebuggerCallbacks PROPERTIES FOLDER "RetroDebugger Code")

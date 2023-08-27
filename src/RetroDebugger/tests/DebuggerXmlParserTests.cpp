@@ -1,9 +1,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "RetroDebuggerTests_assets.h"
-
 #include "DebuggerXmlParser.h"
+#include "RetroDebuggerTests_assets.h"
+#include "XmlParserException.h"
+
+#include <tinyxml2.h>
+
+#include <string>
 
 /******************************************************************************
  * TODOs
@@ -12,6 +16,17 @@
  *   EmptyFile_ParseFileTest             -   fails gracefully
  *
  ******************************************************************************/
+
+#define ASSERT_THROW_STRING(test, str)                                              \
+    [&](const std::string& errorSubstring) {                                        \
+        try {                                                                       \
+            test;                                                                   \
+            FAIL() << "Expected exception";                                         \
+        }                                                                           \
+        catch (const std::exception& e) {                                           \
+            EXPECT_THAT(std::string(e.what()), testing::HasSubstr(errorSubstring)); \
+        }                                                                           \
+    }(str);
 
 namespace DebuggerXmlParserTests {
 
@@ -32,7 +47,7 @@ TEST_F(DebuggerXmlParserTests, ParseFile_GameboyOperations) {
     const auto expectedNormalOperationsSize = 244U;
     const auto expectedExtendedOperationsSize = 256U;
 
-    ASSERT_TRUE(m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml))) << m_xmlParser.GetLastError();
+    m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
 
     auto operations = m_xmlParser.GetOperations();
     EXPECT_EQ(operations.size(), expectedNumOfOperations);
@@ -51,16 +66,14 @@ TEST_F(DebuggerXmlParserTests, ParseFile_GameboyOperations) {
 }
 
 TEST_F(DebuggerXmlParserTests, ParseFile_ExampleOperations) {
-    ASSERT_TRUE(m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::ExampleOperationsXml))) << m_xmlParser.GetLastError(); // Just checking that example operations are valid
+    m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::ExampleOperationsXml));
 
     const auto operations = m_xmlParser.GetOperations();
     ASSERT_FALSE(operations.empty());
 }
 
 TEST_F(DebuggerXmlParserTests, Invalid_ParseFileTest) {
-    ASSERT_FALSE(m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::InvalidEmptyXml)));
-
-    EXPECT_THAT(m_xmlParser.GetLastError(), testing::HasSubstr("couldn't find the first XML element in the file"));
+    ASSERT_THROW_STRING(m_xmlParser.ParseFile(std::string(RetroDebuggerTests::Assets::InvalidEmptyXml)), "couldn't find the first XML element in the file");
 }
 
 TEST_F(DebuggerXmlParserTests, Invalid_MustStartWith_RetroDebuggerElement) {
@@ -68,10 +81,8 @@ TEST_F(DebuggerXmlParserTests, Invalid_MustStartWith_RetroDebuggerElement) {
 
     tinyxml2::XMLDocument doc;
     doc.Parse(XmlOperations);
-    ASSERT_FALSE(m_xmlParser.ParseXmlDocument(doc));
 
-    const auto errorMsg = m_xmlParser.GetLastError();
-    EXPECT_THAT(errorMsg, testing::HasSubstr("Root XML element must be 'RetroDebugger'"));
+    ASSERT_THROW_STRING(m_xmlParser.ParseXmlDocument(doc), "Root XML element must be 'RetroDebugger'");
 }
 
 }

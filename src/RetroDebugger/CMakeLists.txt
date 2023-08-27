@@ -18,6 +18,7 @@ target_link_libraries(
            RetroDebugger_warnings
            RetroDebugger_options
            fmt::fmt)
+set_target_properties(RetroDebuggerInternal PROPERTIES FOLDER "RetroDebugger Code")
 
 add_subdirectory(Common)
 add_subdirectory(Debugger)

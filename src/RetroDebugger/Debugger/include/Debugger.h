@@ -1,9 +1,6 @@
 #pragma once
 
-#include "DebuggerXmlParser.h"
-
 #include "BreakpointManager.h"
-#include "DebuggerOperations.h"
 
 class Debugger {
 public:
@@ -31,10 +28,11 @@ public:
     BreakList GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
     std::vector<RegisterInfoPtr> GetRegisterInfoList();
 
-    bool ParseXmlFile(const std::string& filename);
+    // bool ParseXmlFile(const std::string& filename);
+    void ResetOperations();
+    void SetOperations(const XmlOperationsMap& operations);
 
 private:
-    std::shared_ptr<DebuggerXmlParser> m_xmlParser;
     std::shared_ptr<DebuggerOperations> m_operations;
     BreakpointManager m_breakManager;
 };

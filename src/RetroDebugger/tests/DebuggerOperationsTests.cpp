@@ -18,8 +18,8 @@ namespace DebuggerXmlParserTests {
 class DebuggerOperationsTests : public ::testing::Test {
 public:
     DebuggerOperationsTests() {
-        m_parser = std::make_shared<DebuggerXmlParser>();
-        m_operations = std::make_unique<DebuggerOperations>(m_parser, std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
+        m_parser->ParseFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
+        m_operations->SetOperations(m_parser->GetOperations());
     }
 
     void SetUp() override {}
@@ -33,8 +33,8 @@ public:
         return m_mockMemory[address];
     };
 
-    std::shared_ptr<DebuggerXmlParser> m_parser;
-    std::unique_ptr<DebuggerOperations> m_operations;
+    std::shared_ptr<DebuggerXmlParser> m_parser = std::make_shared<DebuggerXmlParser>();
+    std::unique_ptr<DebuggerOperations> m_operations = std::make_unique<DebuggerOperations>();
 };
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_ParseFile) {
@@ -42,8 +42,6 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ParseFile) {
     const auto expectedOpcodeLength = 8;
     const auto expectedOperationsSize = 244U;
     const auto expectedExtendedOperationsSize = 256U;
-
-    ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
 
     const auto operationData = m_operations->GetOperations();
     EXPECT_EQ(operationData.opcodeLength, expectedOpcodeLength);
@@ -59,8 +57,6 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_NormalOperationArgumentsMatchE
     const std::array<unsigned int, 2> expectedld16_OpcodeNumArgs = { 0x56, 2 };
     const std::array<unsigned int, 2> expectedCallFlags_OpcodeNumArgs = { 0xC4, 2 };
 
-    ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
-
     const auto operationData = m_operations->GetOperations();
 
     EXPECT_EQ(operationData.operations.at(expectedNop_OpcodeNumArgs[0]).arguments.size(), expectedNop_OpcodeNumArgs[1]);
@@ -75,8 +71,6 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ExtendedOperationArgumentsMatc
     const std::array<unsigned int, 2> expectedIncSwapHlInder_OpcodeNumArgs = { 0x36, 1 };
     const std::array<unsigned int, 2> expectedSet7A_OpcodeNumArgs = { 0xFF, 2 };
 
-    ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
-
     const auto operationData = m_operations->GetOperations();
 
     ASSERT_EQ(operationData.extendedOperations.size(), 1U);
@@ -87,9 +81,6 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ExtendedOperationArgumentsMatc
 }
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_GetOperation) {
-
-    ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
-
     static constexpr auto RetNoCarryOpcode = 0xD0;
     m_mockMemory.push_back(RetNoCarryOpcode);
     DebuggerCallback::SetReadMemoryCallback(MockReadMemory);
@@ -106,8 +97,6 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_GetOperation) {
 }
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_GetExtendedOperation) {
-    ASSERT_TRUE(m_operations->IsValid()) << m_operations->GetErrorMessage();
-
     static constexpr auto extendedOpcode = 0xCB;
     static constexpr auto SraIndirectHlOpcode = 0x2E;
     m_mockMemory.push_back(extendedOpcode);

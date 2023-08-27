@@ -73,8 +73,8 @@ bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo) {
     return m_debugger.GetRegisterInfo(registerInfo);
 }
 
-bool ParseXmlFile(const std::string& filename) {
-    return m_debugger.ParseXmlFile(filename);
+void ParseXmlFile(const std::string& filename) {
+    m_debugger.ParseXmlFile(filename);
 }
 
 // Set Callbacks

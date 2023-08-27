@@ -1,5 +1,7 @@
 #include "DebuggerXmlParser.h"
 
+#include "XmlParserException.h"
+
 #include <fmt/core.h>
 #include <tinyxml2.h>
 
@@ -19,38 +21,46 @@ DebuggerXmlParser::DebuggerXmlParser(const std::string& filename) {
 }
 
 void DebuggerXmlParser::Reset() {
-    m_xmlDocument.Clear();
+    m_isValid = false;
     m_operationMap.clear();
     m_lastError.clear();
 }
 
-bool DebuggerXmlParser::ParseFile(const std::string& filename) {
-    if (m_xmlDocument.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS) {
-        m_lastError = m_xmlDocument.ErrorStr();
-        return false;
-    }
+bool DebuggerXmlParser::IsValid() {
+    return m_isValid;
+}
 
-    return ParseXmlDocument(m_xmlDocument);
+void DebuggerXmlParser::ParseFile(const std::string& filename) {
+    Reset();
+    tinyxml2::XMLDocument document;
+    if (document.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS) {
+        throw XmlParserException::CreateError(document.ErrorStr());
+    }
+    return ParseXmlDocument(document);
 }
 
 XmlOperationsMap DebuggerXmlParser::GetOperations() const {
+    if (!m_isValid) {
+        using namespace std::string_literals;
+        throw XmlParserException::CreateError("Failed to get operations. XML file was not valid."s);
+    }
     return m_operationMap;
 }
 
-bool DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocument) {
-    m_operationMap.clear();
+void DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocument) {
+    Reset();
 
     const auto* element = xmlDocument.FirstChildElement();
-    if (element == nullptr) { return SetLastError("XML file", ErrorEmptyFile); } // if file is empty report an error
+    if (element == nullptr) { throw XmlParserException::CreateError("XML file", ErrorEmptyFile); } // if file is empty report an error
 
     if (const auto* unexpectedSibling = element->NextSiblingElement();
         unexpectedSibling != nullptr) {
-        return SetLastError("XML file", fmt::format("'RetroDebugger' must be the only root element. Found sibling element: '{}'", (unexpectedSibling->Name() == nullptr ? "" : unexpectedSibling->Name())));
+        throw XmlParserException::CreateError("XML file", fmt::format("'RetroDebugger' must be the only root element. Found sibling element: '{}'", (unexpectedSibling->Name() == nullptr ? "" : unexpectedSibling->Name())));
     }
 
     if (const auto* name = element->Name();
         name == nullptr || name != RetroDebuggerStr) {
-        return SetLastError("XML file", fmt::format("Root XML element must be 'RetroDebugger'. Root element found: '{}'", (name == nullptr ? "" : name)));
+        throw XmlParserException::CreateError("XML file", fmt::format("Root XML element must be 'RetroDebugger'. Root element found: '{}'", (name == nullptr ? "" : name)));
     }
 
     element = element->FirstChildElement(); // Go to first element within the 'RetroDebugger' element
@@ -59,24 +69,34 @@ bool DebuggerXmlParser::ParseXmlDocument(const tinyxml2::XMLDocument& xmlDocumen
 
         XmlDebuggerOperations operations;
         if (name == OperationsStr) { // TODO: functionalize this to make it easier to read/maintain
-            if (!ParseOperations(element, operations)) { return SetLastError(OperationsStr, GetLastError()); }
-            else {
-                if (m_operationMap.find(operations.extendedOpcode) != m_operationMap.end()) { return SetLastError(element, fmt::format("Reused extended operation opcode: {}", operations.extendedOpcode)); }
-                m_operationMap.emplace(operations.extendedOpcode, operations);
+            try {
+                ParseOperations(element, operations);
             }
+            catch (const XmlParserException& e) {
+                throw XmlParserException::CreateError(OperationsStr, std::string(e.what()));
+            }
+
+            if (m_operationMap.find(operations.extendedOpcode) != m_operationMap.end()) { throw XmlParserException::CreateError(element, fmt::format("Reused extended operation opcode: {}", operations.extendedOpcode)); }
+            m_operationMap.emplace(operations.extendedOpcode, operations);
         }
         else {
-            return SetLastError(element, ErrorUnknownElementStr);
+            throw XmlParserException::CreateError(element, ErrorUnknownElementStr);
         }
         element = element->NextSiblingElement();
     }
-    return true;
+
+    m_isValid = true;
 }
 
-bool DebuggerXmlParser::ParseOperations(const tinyxml2::XMLElement* operationElements, XmlDebuggerOperations& operations) {
+void DebuggerXmlParser::ParseOperations(const tinyxml2::XMLElement* operationElements, XmlDebuggerOperations& operations) {
     // Parse xmlOperation element
-    if (operationElements == nullptr) { return SetLastError(OperationsStr, ErrorNullptr); }
-    if (!m_parser.ParseXmlElement(operationElements, operations)) { return SetLastError(OperationsStr, m_parser.GetLastError()); }
+    if (operationElements == nullptr) { throw XmlParserException::CreateError(OperationsStr, ErrorNullptr); }
+    try {
+        m_parser.ParseXmlElement(operationElements, operations);
+    }
+    catch (const XmlParserException& e) {
+        throw XmlParserException::CreateError(OperationsStr, std::string(e.what()));
+    }
 
     const auto* element = operationElements->FirstChildElement();
     XmlDebuggerOperation xmlOperation;
@@ -84,26 +104,33 @@ bool DebuggerXmlParser::ParseOperations(const tinyxml2::XMLElement* operationEle
         const std::string_view name = (element->Name() != nullptr) ? element->Name() : "";
 
         if (name == OperationStr) {
-            if (!ParseOperation(element, xmlOperation)) { return SetLastError(OperationStr, m_parser.GetLastError()); }
-            else {
-                if (operations.operations.find(xmlOperation.opcode) != operations.operations.end()) { return SetLastError(element, fmt::format("Reused normal operation opcode: {}", xmlOperation.opcode)); }
-                auto opcode = xmlOperation.opcode;
-                operations.operations.emplace(opcode, xmlOperation);
+            try {
+                ParseOperation(element, xmlOperation);
             }
+            catch (const XmlParserException& e) {
+                throw XmlParserException::CreateError(OperationStr, std::string(e.what()));
+            }
+
+            if (operations.operations.find(xmlOperation.opcode) != operations.operations.end()) { throw XmlParserException::CreateError(element, fmt::format("Reused normal operation opcode: {}", xmlOperation.opcode)); }
+            auto opcode = xmlOperation.opcode;
+            operations.operations.emplace(opcode, xmlOperation);
         }
         else {
-            return SetLastError(element, ErrorUnknownElementStr);
+            throw XmlParserException::CreateError(element, ErrorUnknownElementStr);
         }
         element = element->NextSiblingElement();
     }
-
-    return true;
 }
 
-bool DebuggerXmlParser::ParseOperation(const tinyxml2::XMLElement* operationElement, XmlDebuggerOperation& operation) {
+void DebuggerXmlParser::ParseOperation(const tinyxml2::XMLElement* operationElement, XmlDebuggerOperation& operation) {
     // Parse xmlOperation element
-    if (operationElement == nullptr) { return SetLastError(OperationStr, ErrorNullptr); }
-    if (!m_parser.ParseXmlElement(operationElement, operation)) { return SetLastError(OperationStr, m_parser.GetLastError()); }
+    if (operationElement == nullptr) { throw XmlParserException::CreateError(OperationStr, ErrorNullptr); }
+    try {
+        m_parser.ParseXmlElement(operationElement, operation);
+    }
+    catch (const XmlParserException& e) {
+        throw XmlParserException::CreateError(OperationStr, std::string(e.what()));
+    }
 
     // Parse children elements of xmlOperation
     XmlDebuggerArgument argument;
@@ -112,44 +139,20 @@ bool DebuggerXmlParser::ParseOperation(const tinyxml2::XMLElement* operationElem
         const std::string_view name = (element->Name() != nullptr) ? element->Name() : "";
 
         if (name == ArgStr) {
-            if (!m_parser.ParseXmlElement(element, argument)) { return SetLastError(ArgStr, m_parser.GetLastError()); }
-            else {
-                operation.arguments.emplace_back(argument);
+            try {
+                m_parser.ParseXmlElement(element, argument);
             }
+            catch (const XmlParserException& e) {
+                throw XmlParserException::CreateError(ArgStr, std::string(e.what()));
+            }
+            operation.arguments.emplace_back(argument);
         }
 
         else {
-            return SetLastError(element, ErrorUnknownElementStr);
+            throw XmlParserException::CreateError(element, ErrorUnknownElementStr);
         }
         element = element->NextSiblingElement();
     }
-    return true;
-}
-
-bool DebuggerXmlParser::SetLastError(std::string_view elementName, const std::string& errorMsg) {
-    m_lastError = fmt::format("{}\"{}\", {}", ErrorPreMsg, elementName, errorMsg);
-    return false;
-}
-
-bool DebuggerXmlParser::SetLastError(const tinyxml2::XMLElement* element, const std::string& errorMsg) {
-    const auto* name = (element->Name() != nullptr) ? element->Name() : "UnkownElement";
-    m_lastError = fmt::format("{}\"{}\" at line {}, {}", ErrorPreMsg, name, element->GetLineNum(), errorMsg);
-    return false;
-}
-
-bool DebuggerXmlParser::SetLastError(std::string_view elementName, std::string_view errorMsg) {
-    m_lastError = fmt::format("{}\"{}\", {}", ErrorPreMsg, elementName, errorMsg);
-    return false;
-}
-
-bool DebuggerXmlParser::SetLastError(const tinyxml2::XMLElement* element, std::string_view errorMsg) {
-    const auto* name = (element->Name() != nullptr) ? element->Name() : "UnkownElement";
-    m_lastError = fmt::format("{}\"{}\" at line {}, {}", ErrorPreMsg, name, element->GetLineNum(), errorMsg);
-    return false;
-}
-
-std::string DebuggerXmlParser::GetLastError() const {
-    return m_lastError;
 }
 
 // bool DebuggerXmlParser::ParseCommands() {

@@ -51,7 +51,7 @@ RDB_EXPORT BreakInfo GetBreakpointInfo [[nodiscard]] (unsigned int breakPointNum
 
 RDB_EXPORT bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo);
 
-RDB_EXPORT bool ParseXmlFile(const std::string& filename); // TODO: Should this API be restructured to use exceptions.
+RDB_EXPORT void ParseXmlFile(const std::string& filename); // TODO: Should this API be restructured to use exceptions.
 
 // Callbacks
 RDB_EXPORT void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);

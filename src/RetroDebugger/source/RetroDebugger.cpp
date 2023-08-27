@@ -2,8 +2,11 @@
 
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
+#include "DebuggerXmlParser.h"
 
 #include "BuildInfo.h"
+
+#include <fmt/core.h>
 
 #include <iostream>
 #include <numeric>
@@ -112,8 +115,11 @@ bool RetroDebugger::GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo) 
     return false;
 }
 
-bool RetroDebugger::ParseXmlFile(const std::string& filename) {
-    return m_debugger.ParseXmlFile(filename);
+void RetroDebugger::ParseXmlFile(const std::string& filename) {
+    m_debugger.ResetOperations();
+    DebuggerXmlParser xmlParser;
+    xmlParser.ParseFile(filename);
+    m_debugger.SetOperations(xmlParser.GetOperations());
 }
 
 // Set Callbacks

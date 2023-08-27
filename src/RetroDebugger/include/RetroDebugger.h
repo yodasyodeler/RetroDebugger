@@ -40,7 +40,7 @@ public:
 
     bool GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo);
 
-    bool ParseXmlFile(const std::string& filename);
+    void ParseXmlFile(const std::string& filename);
 
     // Callbacks
     static void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);
