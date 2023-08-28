@@ -25,7 +25,7 @@ static std::string to_string(Value value, Length length, bool isHex) {
     if (isHex) {
         if (length.get() > SizeOfWord) { return fmt::format("0x{:08X}", value.get()); }
         else if (length.get() > SizeOfByte) { return fmt::format("0x{:04X}", value.get()); }
-        else { return fmt::format("0x{:03}", value.get()); }
+        else { return fmt::format("0x{:02X}", value.get()); }
     }
     else {
         if (length.get() > SizeOfWord) { return fmt::format("0d{:010}", value.get()); }
