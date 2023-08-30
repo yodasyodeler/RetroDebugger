@@ -4,6 +4,9 @@ project(RetroDebugPackageTests LANGUAGES CXX)
 
 add_executable(RetroDebuggerIntegrationTests)
 
+# Get CPM and make it available to handle dependencies
+include(../cmake/get_cpm.cmake)
+
 include(CTest)
 include(GoogleTest)
 if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
