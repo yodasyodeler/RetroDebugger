@@ -23,6 +23,10 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 # Check if we are doing an in source build
 include(NoInSourceBuilds)
 
+# Get CPM and make it available to handle dependencies
+include(cmake/get_cpm.cmake)
+
+
 # TODO: The INTERFACE library NAMESPACE ALIAS are missing! See original CMake template for more info (https://github.com/cpp-best-practices/gui_starter_template)
 add_library(RetroDebugger_options INTERFACE IMPORTED)
 add_library(RetroDebugger_warnings INTERFACE IMPORTED)
@@ -42,9 +46,9 @@ target_compile_features(RetroDebugger_options INTERFACE cxx_std_${CMAKE_CXX_STAN
 #     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
 # endif()
 
-include(tinyxml2)
 include(fmt)
 include(NamedType)
+include(tinyxml2)
 
 # Adding the src:
 add_subdirectory(src bin)
