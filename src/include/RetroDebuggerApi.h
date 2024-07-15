@@ -4,7 +4,7 @@
 
 // TODO: Should these APIs support C language. Remove C++ types? Otherwise look at adding nodiscard and noexcept where makes sense.
 // TODO: Research dll best practice, not sure if this should be exposed.
-#include "RetroDebuggerCommon.h"
+#include "RetroDebuggerCallbackDefines.h"
 
 namespace Rdb {
 

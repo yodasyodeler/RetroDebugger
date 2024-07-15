@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RetroDebuggerCommon.h"
+#include "RetroDebuggerCallbackDefines.h"
 
 class DebuggerCallback {
 public:

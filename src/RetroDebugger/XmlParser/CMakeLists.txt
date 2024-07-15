@@ -2,7 +2,8 @@ add_library(RetroDebuggerXmlParser STATIC)
 
 target_sources(
     RetroDebuggerXmlParser
-    PRIVATE include/DebuggerXmlParser.h
+    PRIVATE pch.h
+            include/DebuggerXmlParser.h
             include/XmlElementParser.h
             include/XmlParserException.h
             source/DebuggerXmlParser.cpp
@@ -20,6 +21,7 @@ target_link_libraries(
            fmt::fmt
            tinyxml2::tinyxml2)
 set_target_properties(RetroDebuggerXmlParser PROPERTIES FOLDER "RetroDebugger Code")
+target_precompile_headers(RetroDebuggerXmlParser PRIVATE pch.h)
 
 if(ENABLE_TESTING)
     add_subdirectory(tests)

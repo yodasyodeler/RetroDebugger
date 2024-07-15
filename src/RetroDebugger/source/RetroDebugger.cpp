@@ -1,5 +1,6 @@
 #include "RetroDebugger.h"
 
+#include "DebuggerCallbacks.h"
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
 #include "DebuggerXmlParser.h"

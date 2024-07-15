@@ -1,4 +1,6 @@
 #include "BreakpointManager.h"
+#include "DebuggerCallbacks.h"
+
 #include <gtest/gtest.h>
 
 /******************************************************************************

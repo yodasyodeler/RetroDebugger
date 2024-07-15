@@ -8,5 +8,6 @@ target_sources(RetroDebuggerCommon
         BASE_DIRS
             include
         FILES
+            include/RetroDebuggerCallbackDefines.h
             include/RetroDebuggerCommon.h)
 # cmake-format: on

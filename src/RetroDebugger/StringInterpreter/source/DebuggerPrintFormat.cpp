@@ -17,6 +17,19 @@ using namespace std::literals;
 static constexpr size_t SizeOfByte = 8;
 static constexpr size_t SizeOfWord = 16;
 
+static const std::map<BreakType, std::string> BreakTypeToString = {
+    { BreakType::Watchpoint, "Watchpoint" },
+    { BreakType::Breakpoint, "Breakpoint" },
+    { BreakType::BankBreakpoint, "BankBreakpoint" },
+    { BreakType::Catchpoint, "Catchpoint" },
+};
+
+static const std::map<BreakDisposition, std::string> BreakDispToString = {
+    { BreakDisposition::Keep, "Keep" },
+    { BreakDisposition::Delete, "Del " },
+    { BreakDisposition::Disable, "Dis " },
+};
+
 using Value = fluent::NamedType<int, struct ValueTag>;
 using Length = fluent::NamedType<size_t, struct LengthTag>;
 

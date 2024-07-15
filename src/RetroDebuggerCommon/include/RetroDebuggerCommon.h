@@ -1,5 +1,5 @@
 #pragma once
-#include <functional>
+
 #include <map>
 #include <memory>
 #include <set>
@@ -9,8 +9,8 @@
 // TODO: should there be a common namespace here?
 
 // TODO: should this be unsigned? Linux GDB has uses for internal breakpoints(signed). I don't believe this will though.
-typedef unsigned int BreakNum;
-typedef unsigned int BankNum;
+using BreakNum = unsigned int;
+using BankNum = unsigned int;
 
 enum class BreakType : unsigned int {
     Invalid = static_cast<unsigned int>(-1),
@@ -49,16 +49,3 @@ struct RegisterInfo
 using RegisterInfoPtr = std::shared_ptr<RegisterInfo>;
 
 using RegSet = std::map<std::string, unsigned int>;
-
-
-namespace Rdb {
-typedef std::function<unsigned int()> GetProgramCounterFunc;
-
-typedef std::function<unsigned int(unsigned int)> ReadMemoryFunc;
-
-typedef std::function<unsigned int(BankNum bank, unsigned int)> ReadBankableMemoryFunc;
-
-typedef std::function<bool(BankNum bank, unsigned int address)> CheckBankableMemoryLocationFunc;
-
-typedef std::function<RegSet()> GetRegSetFunc;
-}

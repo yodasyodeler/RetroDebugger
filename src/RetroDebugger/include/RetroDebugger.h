@@ -1,4 +1,4 @@
-#include "RetroDebuggerCommon.h"
+#include "RetroDebuggerCallbackDefines.h"
 
 #include "Debugger.h"
 #include "DebuggerConsole.h"

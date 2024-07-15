@@ -2,8 +2,8 @@ add_library(RetroDebugger SHARED)
 
 target_link_libraries(
     RetroDebugger
-    PUBLIC RetroDebugger_warnings RetroDebugger_options RetroDebuggerCommon
-    PRIVATE RetroDebuggerInternal)
+    PUBLIC RetroDebuggerCommon
+    PRIVATE RetroDebugger_warnings RetroDebugger_options RetroDebuggerInternal)
 
 include(GenerateExportHeader)
 generate_export_header(

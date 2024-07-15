@@ -2,7 +2,8 @@ add_library(RetroDebuggerDebugger STATIC)
 
 target_sources(
     RetroDebuggerDebugger
-    PRIVATE include/BreakpointManager.h
+    PRIVATE pch.h
+            include/BreakpointManager.h
             include/Debugger.h
             include/DebuggerOperations.h
             source/BreakpointManager.cpp
@@ -21,7 +22,4 @@ target_link_libraries(
            fmt::fmt
            NamedType)
 set_target_properties(RetroDebuggerDebugger PROPERTIES FOLDER "RetroDebugger Code")
-
-if(ENABLE_TESTING)
-    add_subdirectory(tests)
-endif()
+target_precompile_headers(RetroDebuggerDebugger PRIVATE pch.h)

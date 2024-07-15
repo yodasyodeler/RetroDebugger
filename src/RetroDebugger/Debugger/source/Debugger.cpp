@@ -1,5 +1,6 @@
 #include "Debugger.h"
 
+#include "DebuggerCallbacks.h"
 #include "DebuggerOperations.h"
 
 Debugger::Debugger() :
@@ -74,6 +75,17 @@ void Debugger::SetOperations(const XmlOperationsMap& operations) {
 CommandList Debugger::GetCommandInfoList(size_t address, const unsigned int numInstructions) {
     CommandList operations;
     for (auto i = 0U; i < numInstructions; ++i) {
+        Operation operation;
+        auto operationAddress = address;
+        address += m_operations->GetOperation(address, operation);
+        operations.emplace(operationAddress, operation);
+    }
+    return operations;
+}
+
+CommandList Debugger::GetCommandInfoList(size_t address, size_t endAddress) {
+    CommandList operations;
+    while (address <= endAddress) {
         Operation operation;
         auto operationAddress = address;
         address += m_operations->GetOperation(address, operation);

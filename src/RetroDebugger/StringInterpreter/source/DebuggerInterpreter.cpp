@@ -244,15 +244,7 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
             return false;
         }
 
-        auto commands = m_debugger->GetCommandInfoList(static_cast<size_t>(number), listSize);
-
-        if (isAddressRange) { // TODO: hack for now. Removes commands that fall outside of the address range. Should rethink to make this simpler and less of a band-aid.
-            for (auto iter = commands.begin(); iter != commands.end(); ++iter) {
-                if (iter->first < number || iter->first > listSize) {
-                    commands.erase(iter);
-                }
-            }
-        }
+        auto commands = isAddressRange ? m_debugger->GetCommandInfoList(static_cast<size_t>(number), static_cast<size_t>(listSize)) : m_debugger->GetCommandInfoList(static_cast<size_t>(number), listSize);
 
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
         if (!commands.empty()) {

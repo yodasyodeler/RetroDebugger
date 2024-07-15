@@ -2,7 +2,8 @@ add_library(RetroDebuggerStringInterpreter STATIC)
 
 target_sources(
     RetroDebuggerStringInterpreter
-    PRIVATE include/DebuggerConsole.h
+    PRIVATE pch.h
+            include/DebuggerConsole.h
             include/DebuggerInterpreter.h
             include/DebuggerPrintFormat.h
             include/DebuggerStringParser.h
@@ -24,6 +25,7 @@ target_link_libraries(
             fmt::fmt
             NamedType)
 set_target_properties(RetroDebuggerStringInterpreter PROPERTIES FOLDER "RetroDebugger Code")
+target_precompile_headers(RetroDebuggerStringInterpreter PRIVATE pch.h)
 
 if(ENABLE_TESTING)
     add_subdirectory(tests)

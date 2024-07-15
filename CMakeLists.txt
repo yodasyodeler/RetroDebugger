@@ -26,7 +26,6 @@ include(NoInSourceBuilds)
 # Get CPM and make it available to handle dependencies
 include(cmake/get_cpm.cmake)
 
-
 # TODO: The INTERFACE library NAMESPACE ALIAS are missing! See original CMake template for more info (https://github.com/cpp-best-practices/gui_starter_template)
 add_library(RetroDebugger_options INTERFACE IMPORTED)
 add_library(RetroDebugger_warnings INTERFACE IMPORTED)

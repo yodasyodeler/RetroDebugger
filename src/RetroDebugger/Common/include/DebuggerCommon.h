@@ -12,20 +12,6 @@ struct RegInfo
     unsigned int value;
 };
 
-// TODO: Look into inline case statement and performance
-static const std::map<BreakType, std::string> BreakTypeToString = {
-    { BreakType::Watchpoint, "Watchpoint" },
-    { BreakType::Breakpoint, "Breakpoint" },
-    { BreakType::BankBreakpoint, "BankBreakpoint" },
-    { BreakType::Catchpoint, "Catchpoint" },
-};
-
-static const std::map<BreakDisposition, std::string> BreakDispToString = {
-    { BreakDisposition::Keep, "Keep" },
-    { BreakDisposition::Delete, "Del " },
-    { BreakDisposition::Disable, "Dis " },
-};
-
 enum OpcodeImmediateType {
     None = 0,
     Immediate8Bit,

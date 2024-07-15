@@ -25,6 +25,7 @@ public:
     static AddrInfo GetRomInfo(unsigned int address);
 
     CommandList GetCommandInfoList(size_t address, unsigned int numInstructions);
+    CommandList GetCommandInfoList(size_t address, size_t endAddress); // TODO: May make sense to use a strongly typed Address type.
     BreakList GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
     std::vector<RegisterInfoPtr> GetRegisterInfoList();
 
