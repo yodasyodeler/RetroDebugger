@@ -28,7 +28,7 @@ install(
     COMPONENT runtime)
 
 # CPack configuration
-set(CPACK_PACKAGE_VENDOR "YodasYodeler")
-set(CPACK_PACKAGE_CONTACT "email@example.com")
-set(CPACK_PACKAGE_DESCRIPTION "Generic emulation debugger library")
-include(CPack)
+#set(CPACK_PACKAGE_VENDOR "YodasYodeler")
+#set(CPACK_PACKAGE_CONTACT "email@example.com")
+#set(CPACK_PACKAGE_DESCRIPTION "")
+#include(CPack)

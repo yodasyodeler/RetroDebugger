@@ -45,9 +45,9 @@ target_compile_features(RetroDebugger_options INTERFACE cxx_std_${CMAKE_CXX_STAN
 #     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
 # endif()
 
-include(fmt)
-include(NamedType)
-include(tinyxml2)
+include(dependencies/fmt)
+include(dependencies/NamedType)
+include(dependencies/tinyxml2)
 
 # Adding the src:
 add_subdirectory(src bin)
@@ -59,7 +59,7 @@ endif()
 
 # Adding the tests:
 include(CTest)
-include(Testing)
+include(dependencies/gtest)
 
 option(ENABLE_TESTING "Enable the tests" ${PROJECT_IS_TOP_LEVEL})
 if(ENABLE_TESTING)
