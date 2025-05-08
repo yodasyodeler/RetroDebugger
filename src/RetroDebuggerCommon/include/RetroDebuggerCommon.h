@@ -9,7 +9,7 @@
 // TODO: should there be a common namespace here?
 
 // TODO: should this be unsigned? Linux GDB has uses for internal breakpoints(signed). I don't believe this will though.
-using BreakNum = unsigned int;
+enum class BreakNum : unsigned int;
 using BankNum = unsigned int;
 
 enum class BreakType : unsigned int {
@@ -18,6 +18,8 @@ enum class BreakType : unsigned int {
     Breakpoint,
     BankBreakpoint,
     Catchpoint,
+    ReadWatchpoint,
+    WriteWatchpoint,
 };
 
 enum class BreakDisposition {

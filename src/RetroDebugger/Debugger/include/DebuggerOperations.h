@@ -7,7 +7,7 @@ public:
     void Reset();
 
     Operations GetOperations() const;
-    Operations GetJumpOpertions() const;
+    Operations GetJumpOperations() const;
     std::vector<RegisterInfoPtr> GetRegisters() const;
 
     size_t GetOperation(size_t address, Operation& operation);

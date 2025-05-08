@@ -3,6 +3,18 @@
 #include "DebuggerCallbacks.h"
 #include "DebuggerOperations.h"
 
+#include <algorithm>
+
+namespace {
+std::vector<BreakNum> ToBreakNumList(const std::vector<unsigned int>& list) {
+    std::vector<BreakNum> breakpoints(list.size());
+    std::ranges::transform(list, breakpoints.begin(), [](unsigned int breakpoint) { return BreakNum{ breakpoint }; });
+
+    return breakpoints;
+}
+}
+
+
 Debugger::Debugger() :
     m_operations(std::make_shared<DebuggerOperations>()), m_breakManager(m_operations) {}
 
@@ -27,9 +39,11 @@ BreakNum Debugger::SetBreakpoint(const unsigned int address) {
     return m_breakManager.SetBreakpoint(address);
 }
 
-BreakNum Debugger::SetBreakpoint(const BankNum bank, const unsigned int address) {
+BreakNum Debugger::SetBreakpoint(unsigned int bank, const unsigned int address) {
     // TODO: should the address be checked?
-    return m_breakManager.SetBreakpoint(bank, address);
+    return m_breakManager.SetBreakpoint(BankNum{ bank }, address);
+}
+
 }
 
 BreakNum Debugger::SetWatchpoint(const unsigned int addressStart, const unsigned int addressEnd) {
@@ -40,20 +54,20 @@ BreakNum Debugger::SetWatchpoint(const unsigned int addressStart, const unsigned
 //     return m_breakManager.SetWatchpoint(bank, addressStart, addressEnd);
 // }
 
-bool Debugger::EnableBreakpoints(const std::vector<BreakNum>& list) {
-    return m_breakManager.EnableBreakpoints(list);
+bool Debugger::EnableBreakpoints(const std::vector<unsigned int>& list) {
+    return m_breakManager.EnableBreakpoints(ToBreakNumList(list));
 }
 
-bool Debugger::DisableBreakpoints(const std::vector<BreakNum>& list) {
-    return m_breakManager.DisableBreakpoints(list);
+bool Debugger::DisableBreakpoints(const std::vector<unsigned int>& list) {
+    return m_breakManager.DisableBreakpoints(ToBreakNumList(list));
 }
 
-bool Debugger::DeleteBreakpoints(const std::vector<BreakNum>& list) {
-    return m_breakManager.DeleteBreakpoints(list);
+bool Debugger::DeleteBreakpoints(const std::vector<unsigned int>& list) {
+    return m_breakManager.DeleteBreakpoints(ToBreakNumList(list));
 }
 
 BreakList Debugger::GetBreakpointInfoList(const std::vector<unsigned int>& list) {
-    return m_breakManager.GetBreakpointInfoList(list);
+    return m_breakManager.GetBreakpointInfoList(ToBreakNumList(list));
 }
 
 // RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } // TODO: need to redo RegInfo

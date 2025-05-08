@@ -37,7 +37,7 @@ protected:
                 output << "Break detected\n";
             }
             else if (auto response = Rdb::GetCommandResponse();
-                     !response.empty()) {
+                !response.empty()) {
                 output << response << "\n";
             }
 
@@ -178,8 +178,8 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_DirectCalls_SetBreakpoint_
     //(rdb) b 0x100
     //(rdb) info break
 
-    auto break1Num = 0U;
-    auto break2Num = 0U;
+    auto break1Num = BreakNum{ 0U };
+    auto break2Num = BreakNum{ 0U };
     {
         Rdb::SetBreakpoint(break1Address);
         auto breakInfoList = Rdb::GetBreakpointInfo();
@@ -198,7 +198,7 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_DirectCalls_SetBreakpoint_
     //(rdb) i breakpoint
     {
         Rdb::SetBreakpoint(break2Address);
-        Rdb::DisableBreakpoints(break1Num, break1Num);
+        Rdb::DisableBreakpoints(static_cast<unsigned int>(break1Num), static_cast<unsigned int>(break1Num));
         auto breakInfoList = Rdb::GetBreakpointInfo();
         ASSERT_EQ(breakInfoList.size(), 2U);
 
@@ -225,7 +225,7 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_DirectCalls_SetBreakpoint_
     //(rdb) d 1
     //(rdb) info breakpoint
     {
-        Rdb::DeleteBreakpoints(break1Num, break1Num);
+        Rdb::DeleteBreakpoints(static_cast<unsigned int>(break1Num), static_cast<unsigned int>(break1Num));
         auto breakInfoList = Rdb::GetBreakpointInfo();
         ASSERT_EQ(breakInfoList.size(), 1U);
 

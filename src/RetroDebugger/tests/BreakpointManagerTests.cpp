@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+
 /******************************************************************************
  * TODOs
  *  AddUnitTests for BreakpointManager with operations
@@ -14,6 +16,14 @@
  *      HandleBreakInfo -   Finish operation, operations [normal jump instructions, extended jump instructions]
  *
  ******************************************************************************/
+
+namespace {
+BreakNum operator++(BreakNum& breakNum, int) {
+    auto num = breakNum;
+    breakNum = BreakNum{ static_cast<unsigned int>(breakNum) + 1u };
+    return num;
+}
+}
 
 namespace DebuggerTests {
 
@@ -121,7 +131,8 @@ TEST_F(BreakpointManagerTests, EnableBreakpoints_DisableBreakpoints_DisableReEna
 
     m_pc = address1;
     const auto breakNum1 = m_breakpointManager.SetBreakpoint(address1);
-    std::vector<BreakNum> breakList = { breakNum1, breakNum1 + 1, breakNum1 + 2, breakNum1 + 3 };
+    auto breakNum = breakNum1;
+    std::vector<BreakNum> breakList = { breakNum++, breakNum++, breakNum++, breakNum };
 
     BreakInfo breakInfo;
     // Doesn't break when between 2 breakpoints

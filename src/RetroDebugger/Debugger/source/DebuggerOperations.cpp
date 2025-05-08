@@ -5,21 +5,18 @@
 
 #include <algorithm>
 #include <memory>
+#include <ranges>
 
 void DebuggerOperations::Reset() {
-    m_operations.operations.clear();
-    m_operations.extendedOperations.clear();
-    m_operations.opcodeLength = 0;
-    m_jumpOperations.operations.clear();
-    m_jumpOperations.extendedOperations.clear();
-    m_jumpOperations.opcodeLength = 0;
+    m_operations = {};
+    m_jumpOperations = {};
 }
 
 Operations DebuggerOperations::GetOperations() const {
     return m_operations;
 }
 
-Operations DebuggerOperations::GetJumpOpertions() const {
+Operations DebuggerOperations::GetJumpOperations() const {
     return m_jumpOperations;
 }
 
@@ -29,20 +26,25 @@ std::vector<RegisterInfoPtr> DebuggerOperations::GetRegisters() const {
 
 // TODO: optimize, there is some repeated stuff here
 size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
-    static constexpr auto byteSize = 8U;
+    // Read the opcode
+    static constexpr auto byteSize =  8U;
     const auto opcode1 = DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++));
 
+    // Check for a bad opcode, "opcode greater than the emulated systems opcode length"
+    // This is likely an error if the set up ReadMemory callback.
+    // For now return the opcode number read and then return the expected size to go to the next address.
     if (opcode1 >= (1U << m_operations.opcodeLength)) {
+        // TODO: add error info, opcode length is too great
         auto name = std::to_string(opcode1);
         operation.info = std::make_shared<OperationInfo>(name, false);
-        return 1;
-    } // TODO: add error info, opcode length is too great
+        return m_operations.opcodeLength;
+    }
 
-    if (m_operations.operations.find(opcode1) != m_operations.operations.end()) {
+    // Check opcodes for the read opcode
+    if (m_operations.operations.contains(opcode1)) {
         operation = m_operations.operations.at(opcode1);
-        auto numOpcodes = (m_operations.opcodeLength / byteSize); // byte length
+        auto numOpcodes = (m_operations.opcodeLength / byteSize); // length in bytes
         for (const auto& arg : operation.arguments) {
-            // TODO: immediate values a bit hacky, assumes a byte being read back
             const auto argLength = GetArgTypeLength(arg->type);
             for (auto i = 0U; i < argLength; ++i) {
                 const auto bitShift = byteSize * i;
@@ -52,13 +54,16 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
         }
         return numOpcodes;
     }
-    else if (m_operations.extendedOperations.find(opcode1) != m_operations.extendedOperations.end()) {
-        const auto extOperations = m_operations.extendedOperations.at(opcode1);
+    else if (m_operations.extendedOperations.contains(opcode1)) {
+        const auto& extOperations = m_operations.extendedOperations.at(opcode1);
         const auto opcode2 = DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++));
-        auto numOpcodes = (m_operations.opcodeLength * 2) / byteSize; // Extended Opcode and Opcode. TODO: this assumes extended opcode is the same size as opcode.
-        operation = extOperations.at(opcode2);
+        auto numOpcodes = (extOperations.opcodeLength * 2) / byteSize; // Extended Opcode and Opcode.
+        operation = extOperations.operations.at(opcode2);
+
+        // TODO: Chained extended Opcodes?
         for (const auto& arg : operation.arguments) {
             // TODO: immediate values a bit hacky, assumes a byte being read back
+            //       Need to add the ability to specify ReadMemory callbacks size.
             const auto argLength = GetArgTypeLength(arg->type);
             for (auto i = 0U; i < argLength; ++i) {
                 const auto bitShift = byteSize * i;
@@ -69,6 +74,8 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
         return numOpcodes;
     }
     else {
+        // Unrecognized opcode, may not be an error. Could be unrelated bytes being read from memory that don't correspond to a command.
+        // Or an undefined command.
         auto name = std::to_string(opcode1);
         operation.info = std::make_shared<OperationInfo>(name, false);
         return 1;
@@ -76,30 +83,34 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
 }
 
 void DebuggerOperations::SetOperations(const XmlOperationsMap& XmlOperations) {
-    for (const auto& operations : XmlOperations) {
-        if (operations.first == NormalOperationsKey) {
-            for (const auto& operation : operations.second.operations) {
-                ConvertOperation(m_operations.operations, operation.second);
+    for (const auto& [extensionOpcode, operationsInfo] : XmlOperations) {
+        if (extensionOpcode == NormalOperationsKey) {
+            for (const auto& operation : operationsInfo.operations | std::views::values) {
+                ConvertOperation(m_operations.operations, operation);
             }
-            m_operations.opcodeLength = operations.second.opcodeLength;
+            m_operations.opcodeLength = operationsInfo.opcodeLength;
         }
         else {
-            OpcodeToOperation operationsMap;
-            for (const auto& operation : operations.second.operations) {
-                ConvertOperation(operationsMap, operation.second);
+            Operations operationsMap;
+            for (const auto& operation : operationsInfo.operations | std::views::values) {
+                ConvertOperation(operationsMap.operations, operation);
             }
-            m_operations.extendedOperations.emplace(operations.first, operationsMap);
+            operationsMap.opcodeLength = operationsInfo.opcodeLength;
+            m_operations.extendedOperations.emplace(extensionOpcode, operationsMap);
+            // TODO: Chained extended Opcodes?
         }
     }
 
+    // Rad through all opcodes and note the Jump opcodes
     m_jumpOperations.opcodeLength = m_operations.opcodeLength;
     for (const auto& operation : m_operations.operations) {
         if (operation.second.info->isJump) {
             m_jumpOperations.operations.emplace(operation);
         }
     }
+    // TODO: Chained extended Opcodes?
     for (const auto& operations : m_operations.extendedOperations) {
-        for (const auto& operation : operations.second) {
+        for (const auto& operation : operations.second.operations) {
             if (operation.second.info->isJump) {
                 m_jumpOperations.extendedOperations.emplace(operations);
             }

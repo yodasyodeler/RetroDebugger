@@ -120,11 +120,11 @@ std::string PrintPpuHelp() { return "TODO: write help\n"; }
 std::string PrintApuHelp() { return "TODO: write help\n"; }
 
 std::string PrintBreakpointHit(BreakInfo breakInfo) {
-    return fmt::format("Breakpoint {} , at 0x{}", breakInfo.breakpointNumber, to_string(static_cast<uint16_t>(breakInfo.address), true));
+    return fmt::format("Breakpoint {} , at 0x{}", static_cast<unsigned int>(breakInfo.breakpointNumber), to_string(static_cast<uint16_t>(breakInfo.address), true));
 }
 
 std::string PrintWatchpointHit(BreakInfo breakInfo) {
-    return fmt::format("Watchpoint {}: at {}\nOld value = {}\nNew value = {}", breakInfo.breakpointNumber, to_string(static_cast<uint16_t>(breakInfo.address), true), breakInfo.oldWatchValue, breakInfo.newWatchValue);
+    return fmt::format("Watchpoint {}: at {}\nOld value = {}\nNew value = {}", static_cast<unsigned int>(breakInfo.breakpointNumber), to_string(static_cast<uint16_t>(breakInfo.address), true), breakInfo.oldWatchValue, breakInfo.newWatchValue);
 }
 
 std::string PrintTimerHelp() { return "TODO: write help\n"; }
@@ -149,7 +149,7 @@ std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
         const auto what = (info.second.type == BreakType::BankBreakpoint) ? "Bank: "s + std::to_string(info.second.bankNumber) : ""s;
         breakInfoStr += fmt::format(
             "{: <8d}{: <15s}{: <5s}{: <4s}0x{:016X} {}\n",
-            info.first,
+            static_cast<unsigned int>(info.first),
             BreakTypeToString.at(info.second.type),
             BreakDispToString.at(info.second.disp),
             (info.second.isEnabled ? "y" : "n"),

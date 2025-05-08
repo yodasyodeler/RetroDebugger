@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-static constexpr BreakNum MaxBreakpointNumber = std::numeric_limits<unsigned int>::max();
+static constexpr BreakNum MaxBreakpointNumber = BreakNum{ std::numeric_limits<unsigned int>::max() };
 static constexpr unsigned int MaxAddress = std::numeric_limits<unsigned int>::max();
 
 class DebuggerOperations;
@@ -48,5 +48,5 @@ private:
     DebugOperation m_debugOp = DebugOperation::RunOp;
     unsigned int m_instructionsToStep = 0;
 
-    BreakNum m_breakPointCounter = 1;
+    BreakNum m_breakPointCounter = BreakNum{ 1 };
 };

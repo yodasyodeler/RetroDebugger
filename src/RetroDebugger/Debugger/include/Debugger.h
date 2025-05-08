@@ -12,21 +12,21 @@ public:
     bool RunTillJump();
 
     BreakNum SetBreakpoint(unsigned int address);
-    BreakNum SetBreakpoint(BankNum bank, unsigned int address);
+    BreakNum SetBreakpoint(unsigned int bank, unsigned int address);
 
     BreakNum SetWatchpoint(unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max());
     // BreakNum SetWatchpoint(BankNum bank, unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max());
 
-    bool EnableBreakpoints(const std::vector<BreakNum>& list);
-    bool DisableBreakpoints(const std::vector<BreakNum>& list);
-    bool DeleteBreakpoints(const std::vector<BreakNum>& list = {});
+    bool EnableBreakpoints(const std::vector<unsigned int>& list);
+    bool DisableBreakpoints(const std::vector<unsigned int>& list);
+    bool DeleteBreakpoints(const std::vector<unsigned int>& list = {});
 
     // RegInfo GetRegInfo(int reg);
     static AddrInfo GetRomInfo(unsigned int address);
 
     CommandList GetCommandInfoList(size_t address, unsigned int numInstructions);
     CommandList GetCommandInfoList(size_t address, size_t endAddress); // TODO: May make sense to use a strongly typed Address type.
-    BreakList GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
+    BreakList GetBreakpointInfoList(const std::vector<unsigned int>& list = {});
     std::vector<RegisterInfoPtr> GetRegisterInfoList();
 
     // bool ParseXmlFile(const std::string& filename);

@@ -48,7 +48,7 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ParseFile) {
     EXPECT_EQ(operationData.operations.size(), expectedOperationsSize);
     ASSERT_EQ(operationData.extendedOperations.size(), 1U);
     ASSERT_TRUE(operationData.extendedOperations.find(gbExtOpcode) != operationData.extendedOperations.end());
-    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).size(), expectedExtendedOperationsSize);
+    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).operations.size(), expectedExtendedOperationsSize);
 }
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_NormalOperationArgumentsMatchExpected) {
@@ -75,9 +75,9 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ExtendedOperationArgumentsMatc
 
     ASSERT_EQ(operationData.extendedOperations.size(), 1U);
     ASSERT_TRUE(operationData.extendedOperations.find(gbExtOpcode) != operationData.extendedOperations.end());
-    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).at(expectedRlcB_OpcodeNumArgs[0]).arguments.size(), expectedRlcB_OpcodeNumArgs[1]);
-    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).at(expectedIncSwapHlInder_OpcodeNumArgs[0]).arguments.size(), expectedIncSwapHlInder_OpcodeNumArgs[1]);
-    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).at(expectedSet7A_OpcodeNumArgs[0]).arguments.size(), expectedSet7A_OpcodeNumArgs[1]);
+    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).operations.at(expectedRlcB_OpcodeNumArgs[0]).arguments.size(), expectedRlcB_OpcodeNumArgs[1]);
+    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).operations.at(expectedIncSwapHlInder_OpcodeNumArgs[0]).arguments.size(), expectedIncSwapHlInder_OpcodeNumArgs[1]);
+    EXPECT_EQ(operationData.extendedOperations.at(gbExtOpcode).operations.at(expectedSet7A_OpcodeNumArgs[0]).arguments.size(), expectedSet7A_OpcodeNumArgs[1]);
 }
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_GetOperation) {

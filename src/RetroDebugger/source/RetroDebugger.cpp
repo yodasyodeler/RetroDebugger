@@ -12,6 +12,16 @@
 #include <iostream>
 #include <numeric>
 
+namespace {
+template<typename DataType>
+std::vector<DataType> CreateRange(DataType rangeStart, DataType rangeEnd) {
+    std::vector<unsigned int> range(static_cast<size_t>(rangeEnd - rangeStart) + 1);
+    std::iota(range.begin(), range.end(), rangeStart);
+
+    return range;
+}
+}
+
 namespace Rdb {
 
 std::string RetroDebugger::GetRdbVersion() {
@@ -68,19 +78,13 @@ bool RetroDebugger::SetBreakpoint(unsigned int address) {
 bool RetroDebugger::EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
 
-    std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
-    std::iota(breakRange.begin(), breakRange.end(), breakRange0);
-
-    return m_debugger.EnableBreakpoints(breakRange);
+    return m_debugger.EnableBreakpoints(CreateRange(breakRange0, breakRange1));
 }
 
 bool RetroDebugger::DisableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
 
-    std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
-    std::iota(breakRange.begin(), breakRange.end(), breakRange0);
-
-    return m_debugger.DisableBreakpoints(breakRange);
+    return m_debugger.DisableBreakpoints(CreateRange(breakRange0, breakRange1));
 }
 
 bool RetroDebugger::DeleteBreakpoints() {
@@ -89,10 +93,8 @@ bool RetroDebugger::DeleteBreakpoints() {
 
 bool RetroDebugger::DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
-    std::vector<unsigned int> breakRange(static_cast<size_t>(breakRange1 - breakRange0) + 1);
-    std::iota(breakRange.begin(), breakRange.end(), breakRange0);
 
-    return m_debugger.DeleteBreakpoints(breakRange);
+    return m_debugger.DeleteBreakpoints(CreateRange(breakRange0, breakRange1));
 }
 
 BreakList RetroDebugger::GetBreakpointInfo() {
@@ -103,8 +105,8 @@ BreakInfo RetroDebugger::GetBreakpointInfo(const unsigned int breakPointNum) {
     auto breakInfo = m_debugger.GetBreakpointInfoList({ breakPointNum });
 
     static constexpr auto maxUInt = std::numeric_limits<unsigned int>::max();
-    const BreakInfo invalidBreakpoint = { maxUInt, maxUInt, maxUInt, maxUInt, 0, 0, BreakType::Invalid, BreakDisposition::Disable, false };
-    return breakInfo.find(breakPointNum) != breakInfo.end() ? breakInfo.at(breakPointNum) : invalidBreakpoint;
+    const BreakInfo invalidBreakpoint = { maxUInt, BreakNum{ maxUInt }, maxUInt, maxUInt, 0, 0, BreakType::Invalid, BreakDisposition::Disable, false };
+    return breakInfo.find(BreakNum{ breakPointNum }) != breakInfo.end() ? breakInfo.at(BreakNum{ breakPointNum }) : invalidBreakpoint;
 }
 
 bool RetroDebugger::GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo) {

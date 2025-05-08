@@ -43,7 +43,7 @@ bool DebuggerInterpreter::Help(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::Continue(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    BreakNum number = 0;
+    auto number = 0u;
 
     if (cmdCount == 1 || (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number))) {
         m_debugger->Run(number);
@@ -56,7 +56,7 @@ bool DebuggerInterpreter::Continue(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::Step(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    BreakNum number = 0;
+    auto number = 0u;
 
     if ((cmdCount == 1) || (cmdCount == 2 && DebuggerStringParser::ParseNumber(words[1], number))) {
         m_debugger->RunInstructions(number);
@@ -86,7 +86,7 @@ bool DebuggerInterpreter::SetBreakpoint(const std::vector<std::string>& words) {
     }
     if (cmdCount == 2) {
         BankNum bankNumber{};
-        BreakNum breakNumber{};
+        unsigned int breakNumber{};
         if (DebuggerStringParser::ParseNumber(words[1], breakNumber)) {
             m_debugger->SetBreakpoint(breakNumber);
             return true;
@@ -102,7 +102,7 @@ bool DebuggerInterpreter::SetBreakpoint(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::EnableBreak(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    std::vector<BreakNum> numbers;
+    std::vector<unsigned int> numbers;
 
     if (cmdCount == 2 && DebuggerStringParser::ParseList(words[1], numbers)) {
         m_debugger->EnableBreakpoints(numbers);
@@ -114,7 +114,7 @@ bool DebuggerInterpreter::EnableBreak(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::DisableBreak(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    std::vector<BreakNum> numbers;
+    std::vector<unsigned int> numbers;
 
     if (cmdCount == 2 && DebuggerStringParser::ParseList(words[1], numbers)) {
         m_debugger->DisableBreakpoints(numbers);
@@ -126,7 +126,7 @@ bool DebuggerInterpreter::DisableBreak(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::DeleteBreakpoints(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    std::vector<BreakNum> numbers;
+    std::vector<unsigned int> numbers;
 
     if (cmdCount == 1) {
         m_debugger->DeleteBreakpoints();
@@ -146,7 +146,7 @@ bool DebuggerInterpreter::GetInfo(const std::vector<std::string>& words) {
     if (cmdCount <= 1) { return false; }
 
     if ((words[1] == "break") || (words[1] == "breakpoint") || (words[1] == "watchpoint")) {
-        std::vector<BreakNum> numbers;
+        std::vector<unsigned int> numbers;
         if (cmdCount == 2) {
             auto info = m_debugger->GetBreakpointInfoList();
             if (!info.empty()) {
@@ -193,7 +193,7 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
     const auto cmdCount = words.size();
 
     if (cmdCount == 2) {
-        BreakNum number{};
+        unsigned int number{};
         const auto regSet = DebuggerCallback::GetRegSet();
         auto reg = regSet.find(words[1]);
         if (reg != regSet.end()) {
@@ -231,7 +231,7 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     if ((cmdCount == 1) || (cmdCount == 2)) {
         if (cmdCount == 1 && m_listNext) { number = static_cast<unsigned int>(m_listAddress); }
         else if (unsigned int number2 = 0;
-                 cmdCount == 2 && DebuggerStringParser::ParseNumberPair(words[1], number, number2, "-")) {
+            cmdCount == 2 && DebuggerStringParser::ParseNumberPair(words[1], number, number2, "-")) {
             if (number > number2) {
                 m_listNext = false;
                 return false;

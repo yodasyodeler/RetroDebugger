@@ -31,7 +31,7 @@ std::string PrintRegister(const std::string& name, unsigned int value);
 std::string PrintMemoryMappedRegInfo(const RegInfo& info);
 std::string PrintAddressInfo(const AddrInfo& info);
 
-// Gameboy Instruction print
+// Opcode Instruction print
 std::string PrintInstructions(const CommandList& commandInfo);
 
 // Set Variable print
