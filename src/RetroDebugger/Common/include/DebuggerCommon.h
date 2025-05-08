@@ -29,15 +29,15 @@ struct AddrInfo
     unsigned int value;
 };
 
-struct CommandInfo
-{
-    unsigned int address;
-    unsigned int commandOp;
-    unsigned int immediate;
-    OpcodeImmediateType immediateType;
-    bool isExtendedCommand;
-    unsigned int sizeOfCmd;
-};
+// struct CommandInfo
+// {
+//     unsigned int address;
+//     unsigned int commandOp;
+//     unsigned int immediate;
+//     OpcodeImmediateType immediateType;
+//     bool isExtendedCommand;
+//     unsigned int sizeOfCmd;
+// };
 
 struct comp
 {
@@ -189,6 +189,7 @@ struct Argument
 };
 using ArgumentPtr = std::shared_ptr<Argument>;
 
+// TODO: Consider adding error info
 struct OperationInfo
 {
     OperationInfo(std::string Name, bool IsJump) :
@@ -205,34 +206,28 @@ struct Operation
 };
 
 typedef std::map<unsigned int, Operation> OpcodeToOperation;
-typedef std::map<unsigned int, OpcodeToOperation> ExtendedOpcodeToOperation;
+typedef std::map<unsigned int, struct Operations> ExtendedOpcodeToOperation;
 struct Operations
 {
-    OpcodeLength opcodeLength;
-    OpcodeToOperation operations;
-    ExtendedOpcodeToOperation extendedOperations;
+    OpcodeLength opcodeLength = 8;
+    OpcodeToOperation operations = {};
+    ExtendedOpcodeToOperation extendedOperations = {};
 };
 
-inline unsigned int GetArgTypeLength(const ArgumentType& argType) {
-    if (argType == ArgumentType::S8BIT) { return 1u; }
-    else if (argType == ArgumentType::U8BIT) {
-        return 1u;
+inline unsigned int GetArgTypeLength(ArgumentType argType) {
+    switch (argType) {
+        case ArgumentType::S8BIT:
+        case ArgumentType::U8BIT:
+            return 1;
+        case ArgumentType::S16BIT:
+        case ArgumentType::U16BIT:
+            return 2;
+        case ArgumentType::S32BIT:
+        case ArgumentType::U32BIT:
+            return 4;
+        default:
+            return 0; // TODO: Should this fail?
     }
-    else if (argType == ArgumentType::S16BIT) {
-        return 2u;
-    }
-    else if (argType == ArgumentType::U16BIT) {
-        return 2u;
-    }
-    else if (argType == ArgumentType::S32BIT) {
-        return 4u;
-    }
-    else if (argType == ArgumentType::U32BIT) {
-        return 4u;
-    }
-    else {
-        return 0u;
-    } // TODO: should this make it fail?
 }
 
 using CommandList = std::map<size_t, Operation>;
