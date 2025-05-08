@@ -85,7 +85,7 @@ bool DebuggerInterpreter::SetBreakpoint(const std::vector<std::string>& words) {
         return true;
     }
     if (cmdCount == 2) {
-        BankNum bankNumber{};
+        unsigned int bankNumber{};
         unsigned int breakNumber{};
         if (DebuggerStringParser::ParseNumber(words[1], breakNumber)) {
             m_debugger->SetBreakpoint(breakNumber);

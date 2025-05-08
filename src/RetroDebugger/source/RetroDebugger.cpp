@@ -105,7 +105,7 @@ BreakInfo RetroDebugger::GetBreakpointInfo(const unsigned int breakPointNum) {
     auto breakInfo = m_debugger.GetBreakpointInfoList({ breakPointNum });
 
     static constexpr auto maxUInt = std::numeric_limits<unsigned int>::max();
-    const BreakInfo invalidBreakpoint = { maxUInt, BreakNum{ maxUInt }, maxUInt, maxUInt, 0, 0, BreakType::Invalid, BreakDisposition::Disable, false };
+    const BreakInfo invalidBreakpoint = { maxUInt, BreakNum{ maxUInt }, BankNum{ maxUInt }, maxUInt, 0, 0, BreakType::Invalid, BreakDisposition::Disable, false };
     return breakInfo.find(BreakNum{ breakPointNum }) != breakInfo.end() ? breakInfo.at(BreakNum{ breakPointNum }) : invalidBreakpoint;
 }
 
@@ -147,5 +147,4 @@ void RetroDebugger::SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBan
 void RetroDebugger::SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
     DebuggerCallback::SetGetRegSetCallback(std::move(getRegSet_cb));
 }
-
 }

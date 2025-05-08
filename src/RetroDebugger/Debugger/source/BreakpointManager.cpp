@@ -44,7 +44,7 @@ BreakNum BreakpointManager::SetBreakpoint(const unsigned int address) {
     const BreakInfo breakpoint = {
         address,
         m_breakPointCounter++,
-        0,
+        AnyBank,
         0,
         // 0, //ignoreCount not implemented yet
         // 0, //enableCount not implemented yet
@@ -87,7 +87,7 @@ BreakNum BreakpointManager::SetWatchpoint(const unsigned int addressStart, unsig
         const BreakInfo breakpoint = {
             address,
             m_breakPointCounter++,
-            0,
+            AnyBank,
             0,
             // 0, //ignoreCount not implemented yet
             // 0, //enableCount not implemented yet

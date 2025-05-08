@@ -10,7 +10,7 @@
 
 // TODO: should this be unsigned? Linux GDB has uses for internal breakpoints(signed). I don't believe this will though.
 enum class BreakNum : unsigned int;
-using BankNum = unsigned int;
+enum class BankNum : unsigned int;
 
 enum class BreakType : unsigned int {
     Invalid = static_cast<unsigned int>(-1),

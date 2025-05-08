@@ -8,6 +8,7 @@
 
 static constexpr BreakNum MaxBreakpointNumber = BreakNum{ std::numeric_limits<unsigned int>::max() };
 static constexpr unsigned int MaxAddress = std::numeric_limits<unsigned int>::max();
+static constexpr BankNum AnyBank = BankNum{ std::numeric_limits<unsigned int>::max() };
 
 class DebuggerOperations;
 

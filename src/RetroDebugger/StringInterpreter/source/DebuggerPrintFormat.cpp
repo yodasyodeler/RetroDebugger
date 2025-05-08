@@ -14,6 +14,8 @@
 
 using namespace std::literals;
 
+namespace {
+
 static constexpr size_t SizeOfByte = 8;
 static constexpr size_t SizeOfWord = 16;
 
@@ -63,6 +65,10 @@ static std::string to_string(uint16_t value, bool isHex = false) {
 //     return to_string(value, 16, isHex);
 // }
 
+std::string to_string(BankNum bankNum) {
+    return std::to_string(static_cast<unsigned int>(bankNum));
+}
+
 // TODO: Command "info line" doesn't have much use right now. Maybe should remove.
 // TODO: Will need to do an optimization pass on string operations later.
 // TODO: Look for a more expandable solution. C++20 std::format may be worth looking at when available.
@@ -100,7 +106,7 @@ static constexpr std::string_view generalHelp =
     "\n"
     "set <debugger variable> <count> -- set the size of list commands output\n"
     "show <debugger variable> -- print debugger variable value\n";
-
+}
 
 namespace DebuggerPrintFormat {
 std::string PrintGeneralHelp() {
@@ -146,7 +152,7 @@ std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
         Address,
         What);
     for (const auto& info : breakInfo) {
-        const auto what = (info.second.type == BreakType::BankBreakpoint) ? "Bank: "s + std::to_string(info.second.bankNumber) : ""s;
+        const auto what = (info.second.type == BreakType::BankBreakpoint) ? "Bank: "s + to_string(info.second.bankNumber) : ""s;
         breakInfoStr += fmt::format(
             "{: <8d}{: <15s}{: <5s}{: <4s}0x{:016X} {}\n",
             static_cast<unsigned int>(info.first),
