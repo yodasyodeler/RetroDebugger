@@ -17,7 +17,7 @@ if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
     endif()
 
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/../cmake")
-    include(Testing)
+    include(dependencies/gtest)
 
     find_package(RetroDebugger CONFIG REQUIRED) # for intro, RetroDebugger_options, ...
 
