@@ -147,4 +147,13 @@ void RetroDebugger::SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBan
 void RetroDebugger::SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
     DebuggerCallback::SetGetRegSetCallback(std::move(getRegSet_cb));
 }
+
+void RetroDebugger::ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+    m_debugger.ReadMemoryHook(bankNum, address, bytes);
+}
+
+void RetroDebugger::WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+    m_debugger.ReadMemoryHook(bankNum, address, bytes);
+}
+
 }

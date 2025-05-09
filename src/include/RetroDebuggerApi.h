@@ -63,4 +63,11 @@ RDB_EXPORT void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocati
 RDB_EXPORT void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb);
 
 RDB_EXPORT void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
+
+// Hooks
+RDB_EXPORT void ReadMemoryHook(unsigned int address, const std::vector<std::byte>& bytes);
+RDB_EXPORT void WriteMemoryHook(unsigned int address, const std::vector<std::byte>& bytes);
+
+RDB_EXPORT void ReadMemoryHook(unsigned int bankNum, unsigned int address, const std::vector<std::byte>& bytes);
+RDB_EXPORT void WriteMemoryHook(unsigned int bankNum, unsigned int address, const std::vector<std::byte>& bytes);
 }

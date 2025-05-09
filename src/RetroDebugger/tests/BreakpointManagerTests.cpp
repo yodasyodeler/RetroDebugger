@@ -303,11 +303,106 @@ TEST_F(BreakpointManagerTests, SetWatchpoint_CheckWhenHit_ValuesAreExpected) {
 
     static constexpr auto newExpectedValue = 7u;
     g_memory = newExpectedValue;
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress, { std::byte{ newExpectedValue } });
+
     ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
     ASSERT_EQ(breakInfo.breakpointNumber, breakNum);
     ASSERT_EQ(breakInfo.oldWatchValue, expectedValue);
     ASSERT_EQ(breakInfo.currentWatchValue, newExpectedValue);
     ASSERT_EQ(breakInfo.timesHit, 1u);
+}
+
+TEST_F(BreakpointManagerTests, SetReadWatchpoint_CheckWhenHit_ValuesAreExpected) {
+    static constexpr auto expectedValue = 5u;
+    g_memory = expectedValue;
+
+    static constexpr auto expectedAddress = 100u;
+    auto breakNum = m_breakpointManager.SetReadWatchpoint(expectedAddress);
+    EXPECT_EQ(breakNum, BreakNum{ 1 });
+    const auto breakInfoList = m_breakpointManager.GetBreakpointInfoList();
+
+    ASSERT_EQ(breakInfoList.size(), 1ul);
+    ASSERT_TRUE(breakInfoList.contains(breakNum));
+
+    auto watchpoint = breakInfoList.at(breakNum);
+    EXPECT_EQ(watchpoint.address, expectedAddress);
+    EXPECT_EQ(watchpoint.breakpointNumber, breakNum);
+    EXPECT_EQ(watchpoint.bankNumber, AnyBank);
+    EXPECT_EQ(watchpoint.timesHit, 0u);
+    EXPECT_EQ(watchpoint.oldWatchValue, 0u);
+    EXPECT_EQ(watchpoint.currentWatchValue, expectedValue);
+    EXPECT_EQ(watchpoint.type, BreakType::ReadWatchpoint);
+    EXPECT_EQ(watchpoint.disp, BreakDisposition::Keep);
+    EXPECT_TRUE(watchpoint.isEnabled);
+    EXPECT_TRUE(watchpoint.regName.empty());
+
+    BreakInfo breakInfo{};
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    EXPECT_EQ(breakInfo.breakpointNumber, BreakNum{ std::numeric_limits<unsigned int>::max() });
+
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    ASSERT_EQ(breakInfo.breakpointNumber, breakNum);
+    ASSERT_EQ(breakInfo.oldWatchValue, expectedValue);
+    ASSERT_EQ(breakInfo.currentWatchValue, expectedValue);
+    ASSERT_EQ(breakInfo.timesHit, 1u);
+    ASSERT_FALSE(breakInfo.externalHit);
+}
+
+
+TEST_F(BreakpointManagerTests, SetWatchpoint_OnlyTriggeredOnWrites) {
+    static constexpr auto expectedValue = 5u;
+    g_memory = expectedValue;
+
+    static constexpr auto expectedAddress = 100u;
+    auto breakNum = m_breakpointManager.SetWatchpoint(expectedAddress);
+
+    // No event - No break
+    BreakInfo breakInfo{};
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Read event - No break
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Write event - on address breaks
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Write event - on different address, No break
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress + 1u, { std::byte{ expectedValue } });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // No event - No break
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
+TEST_F(BreakpointManagerTests, SetReadWatchpoint_OnlyTriggeredOnWrites) {
+    static constexpr auto expectedValue = 5u;
+    g_memory = expectedValue;
+
+    static constexpr auto expectedAddress = 100u;
+    auto breakNum = m_breakpointManager.SetReadWatchpoint(expectedAddress);
+
+    // No event - No break
+    BreakInfo breakInfo{};
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Write event - No break
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Read event - on address breaks
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Read event - on different address, No break
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress + 1u, { std::byte{ expectedValue } });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // No event - No break
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
 }
 
 // TEST_F(BreakpointManagerTests, Debugger_ListDiffrentListSizesOfBootRom) {

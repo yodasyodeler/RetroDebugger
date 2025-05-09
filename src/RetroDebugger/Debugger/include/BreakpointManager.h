@@ -41,7 +41,11 @@ public:
     bool EnableBreakpoints(const std::vector<BreakNum>& list);
     bool DisableBreakpoints(const std::vector<BreakNum>& list);
     bool DeleteBreakpoints(const std::vector<BreakNum>& list = {});
-    std::map<BreakNum, BreakInfo> GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
+    BreakList GetBreakpointInfoList(const std::vector<BreakNum>& list = {});
+
+    // Hooks
+    void ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
+    void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
 
 private:
     BreakInfo CheckBreakInfo();

@@ -35,6 +35,10 @@ public:
     void ResetOperations();
     void SetOperations(const XmlOperationsMap& operations);
 
+    // Hooks
+    void ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
+    void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
+
 private:
     std::shared_ptr<DebuggerOperations> m_operations;
     BreakpointManager m_breakManager;

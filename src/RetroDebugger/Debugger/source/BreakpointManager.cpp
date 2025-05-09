@@ -225,10 +225,10 @@ bool BreakpointManager::DeleteBreakpoints(const std::vector<BreakNum>& list) {
     return breakPointDeleted;
 }
 
-std::map<BreakNum, BreakInfo> BreakpointManager::GetBreakpointInfoList(const std::vector<BreakNum>& list) {
+BreakList BreakpointManager::GetBreakpointInfoList(const std::vector<BreakNum>& list) {
     if (list.empty()) { return m_breakpoints; }
 
-    std::map<BreakNum, BreakInfo> tempMap = {};
+    BreakList tempMap = {};
     for (const auto& breakpointNum : list) {
         if (auto iter = m_breakpoints.find(breakpointNum);
             iter != m_breakpoints.end()) {
@@ -236,6 +236,34 @@ std::map<BreakNum, BreakInfo> BreakpointManager::GetBreakpointInfoList(const std
         }
     }
     return tempMap;
+}
+
+void BreakpointManager::ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+
+    const auto addressEnd = address + bytes.size(); // Note: This goes 1 past the end.
+    for (auto& [breakNum, breakInfo] : m_breakpoints) {
+        if (!breakInfo.isEnabled || (breakInfo.type != BreakType::ReadWatchpoint && breakInfo.type != BreakType::AnyWatchpoint)) {
+            continue;
+        }
+
+        if ((breakInfo.bankNumber == AnyBank || breakInfo.bankNumber == bankNum) && (breakInfo.address >= address && address < addressEnd)) {
+            breakInfo.externalHit = true;
+        }
+    }
+}
+
+void BreakpointManager::WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+
+    const auto addressEnd = address + bytes.size(); // Note: This goes 1 past the end.
+    for (auto& [breakNum, breakInfo] : m_breakpoints) {
+        if (!breakInfo.isEnabled || (breakInfo.type != BreakType::Watchpoint && breakInfo.type != BreakType::AnyWatchpoint)) {
+            continue;
+        }
+
+        if ((breakInfo.bankNumber == AnyBank || breakInfo.bankNumber == bankNum) && (breakInfo.address >= address && address < addressEnd)) {
+            breakInfo.externalHit = true;
+        }
+    }
 }
 
 BreakInfo BreakpointManager::CheckBreakInfo() {
@@ -247,18 +275,20 @@ BreakInfo BreakpointManager::CheckBreakInfo() {
                 ++breakInfo.timesHit;
                 return breakInfo;
             }
-            if (breakInfo.type == BreakType::Watchpoint) {
+            if (breakInfo.type == BreakType::Watchpoint || breakInfo.type == BreakType::ReadWatchpoint || breakInfo.type == BreakType::AnyWatchpoint) {
                 const auto currentWatchValue = breakInfo.bankNumber == AnyBank ? DebuggerCallback::ReadMemory(breakInfo.address) : DebuggerCallback::ReadBankableMemory(breakInfo.bankNumber, breakInfo.address);
 
-                if (breakInfo.currentWatchValue != currentWatchValue) {
+                if (breakInfo.externalHit || breakInfo.currentWatchValue != currentWatchValue) {
                     breakInfo.oldWatchValue = breakInfo.currentWatchValue;
                     breakInfo.currentWatchValue = currentWatchValue;
                     ++breakInfo.timesHit;
+                    breakInfo.externalHit = false; // Clear the external hit
                     return breakInfo;
                 }
             }
         }
     }
+
     return ContinuePoint();
 }
 

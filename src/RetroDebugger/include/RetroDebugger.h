@@ -53,6 +53,11 @@ public:
 
     static void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
 
+    // Hooks
+    void ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
+
+    void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
+
 private:
     Debugger m_debugger;
     DebuggerInterpreter m_interpreter{ &m_debugger };

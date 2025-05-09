@@ -100,4 +100,21 @@ void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
     m_debugger.SetGetRegSetCallback(std::move(getRegSet_cb));
 }
 
+// Hooks
+void ReadMemoryHook(unsigned int address, const std::vector<std::byte>& bytes) {
+    m_debugger.ReadMemoryHook(AnyBank, address, bytes);
+}
+
+void WriteMemoryHook(unsigned int address, const std::vector<std::byte>& bytes) {
+    m_debugger.WriteMemoryHook(AnyBank, address, bytes);
+}
+
+void ReadMemoryHook(unsigned int bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+    return m_debugger.ReadMemoryHook(BankNum{ bankNum }, address, bytes);
+}
+
+void WriteMemoryHook(unsigned int bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+    return m_debugger.WriteMemoryHook(BankNum{ bankNum }, address, bytes);
+}
+
 }

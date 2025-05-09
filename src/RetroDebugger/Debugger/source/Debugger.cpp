@@ -80,6 +80,14 @@ void Debugger::SetOperations(const XmlOperationsMap& operations) {
     m_operations->SetOperations(operations);
 }
 
+void Debugger::ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+    m_breakManager.ReadMemoryHook(bankNum, address, bytes);
+}
+
+void Debugger::WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
+    m_breakManager.WriteMemoryHook(bankNum, address, bytes);
+}
+
 CommandList Debugger::GetCommandInfoList(size_t address, const unsigned int numInstructions) {
     CommandList operations;
     for (auto i = 0U; i < numInstructions; ++i) {
