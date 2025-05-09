@@ -51,13 +51,31 @@ BreakInfo ReadWatchPoint(BreakNum breakNumber, unsigned int address, BankNum ban
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
-        .bankNumber = AnyBank,
+        .bankNumber = bankNumber,
         // 0, //ignoreCount not implemented yet
         // 0, //enableCount not implemented yet
         .timesHit = 0,
         .oldWatchValue = 0,
         .currentWatchValue = DebuggerCallback::ReadMemory(address),
         .type = BreakType::ReadWatchpoint,
+        .disp = BreakDisposition::Keep,
+        .isEnabled = true,
+        .externalHit = false,
+        .regName = {},
+    };
+}
+
+BreakInfo AnyWatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+    return BreakInfo{
+        .address = address,
+        .breakpointNumber = breakNumber,
+        .bankNumber = bankNumber,
+        // 0, //ignoreCount not implemented yet
+        // 0, //enableCount not implemented yet
+        .timesHit = 0,
+        .oldWatchValue = 0,
+        .currentWatchValue = DebuggerCallback::ReadMemory(address),
+        .type = BreakType::AnyWatchpoint,
         .disp = BreakDisposition::Keep,
         .isEnabled = true,
         .externalHit = false,
@@ -192,6 +210,13 @@ BreakNum BreakpointManager::SetReadWatchpoint(unsigned int address, BankNum bank
     return breakpoint.breakpointNumber;
 }
 
+BreakNum BreakpointManager::SetAnyWatchpoint(unsigned int address, BankNum bank) {
+    const BreakInfo breakpoint = AnyWatchPoint(m_breakPointCounter++, address, bank);
+    m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
+
+    return breakpoint.breakpointNumber;
+}
+
 BreakNum BreakpointManager::SetWatchpoint(const std::string& registerName) {
     const BreakInfo breakpoint = WatchPoint(m_breakPointCounter++, registerName);
     if (breakpoint.breakpointNumber == MaxBreakpointNumber) { return MaxBreakpointNumber; }
@@ -278,7 +303,7 @@ BreakInfo BreakpointManager::CheckBreakInfo() {
             if (breakInfo.type == BreakType::Watchpoint || breakInfo.type == BreakType::ReadWatchpoint || breakInfo.type == BreakType::AnyWatchpoint) {
                 const auto currentWatchValue = breakInfo.bankNumber == AnyBank ? DebuggerCallback::ReadMemory(breakInfo.address) : DebuggerCallback::ReadBankableMemory(breakInfo.bankNumber, breakInfo.address);
 
-                if (breakInfo.externalHit || breakInfo.currentWatchValue != currentWatchValue) {
+                if (breakInfo.externalHit || (breakInfo.type != BreakType::ReadWatchpoint && breakInfo.currentWatchValue != currentWatchValue)) {
                     breakInfo.oldWatchValue = breakInfo.currentWatchValue;
                     breakInfo.currentWatchValue = currentWatchValue;
                     ++breakInfo.timesHit;

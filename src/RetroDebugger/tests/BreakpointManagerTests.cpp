@@ -33,12 +33,14 @@ public:
     void SetUp() override {
         DebuggerCallback::SetGetPcRegCallback([this]() { return GetPcRegMock(); });
         DebuggerCallback::SetReadMemoryCallback([this](unsigned int address) { return ReadRomMemory(address); });
+        DebuggerCallback::SetReadBankableMemoryCallback([this](BankNum bankNum, unsigned int address) { return ReadBankableMemory(bankNum, address); });
     }
 
     void TearDown() override {}
 
     unsigned int GetPcRegMock() { return m_pc; }
     unsigned int ReadRomMemory(unsigned int /*address*/) { return g_memory; }
+    unsigned int ReadBankableMemory(BankNum, unsigned int) { return g_memory; }
 
     BreakpointManager m_breakpointManager;
 
@@ -404,6 +406,75 @@ TEST_F(BreakpointManagerTests, SetReadWatchpoint_OnlyTriggeredOnWrites) {
     // No event - No break
     ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
 }
+
+TEST_F(BreakpointManagerTests, SetAnyWatchpoint_OnlyTriggersOnlyReadsAndWrites) {
+    static constexpr auto expectedValue = 5u;
+    g_memory = expectedValue;
+
+    static constexpr auto expectedAddress = 100u;
+    auto breakNum = m_breakpointManager.SetAnyWatchpoint(expectedAddress);
+
+    // No event - No break
+    BreakInfo breakInfo{};
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Write event - No break
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Read event - on address breaks
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress, { std::byte{ expectedValue } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Read event - on different address, No break
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress + 1u, { std::byte{ expectedValue } });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // No event - No break
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
+TEST_F(BreakpointManagerTests, Watchpoints_TestMemoryBankChecks) {
+    static constexpr auto expectedAddress_0 = 100u;
+    static constexpr auto expectedBank_0 = BankNum{ 1 };
+
+    static constexpr auto expectedAddress_1 = 101u;
+    static constexpr auto expectedBank_1 = BankNum{ 2 };
+
+    static constexpr auto expectedAddress_2 = 102u;
+    static constexpr auto expectedBank_2 = BankNum{ 3 };
+    const auto breakNum_0 = m_breakpointManager.SetWatchpoint(expectedAddress_0, expectedBank_0);
+    const auto breakNum_1 = m_breakpointManager.SetReadWatchpoint(expectedAddress_1, expectedBank_1);
+    const auto breakNum_2 = m_breakpointManager.SetAnyWatchpoint(expectedAddress_2, expectedBank_2);
+
+    // Doesn't hit, 'AnyBank' but bank doesn't match the expected bank.
+    BreakInfo breakInfo{};
+    const auto expectedValue = std::byte{ static_cast<unsigned char>(g_memory) };
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress_0, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    m_breakpointManager.ReadMemoryHook(AnyBank, expectedAddress_1, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    m_breakpointManager.WriteMemoryHook(AnyBank, expectedAddress_2, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Doesn't hit, specific bank outside of the one in the
+    BankNum testBank = BankNum{ 9u };
+    m_breakpointManager.WriteMemoryHook(testBank, expectedAddress_0, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    m_breakpointManager.ReadMemoryHook(testBank, expectedAddress_1, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    m_breakpointManager.WriteMemoryHook(testBank, expectedAddress_2, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Correct bank & address, triggers the watchpoints
+    m_breakpointManager.WriteMemoryHook(expectedBank_0, expectedAddress_0, { expectedValue });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    m_breakpointManager.ReadMemoryHook(expectedBank_1, expectedAddress_1, { expectedValue });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    m_breakpointManager.WriteMemoryHook(expectedBank_2, expectedAddress_2, { expectedValue });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
 
 // TEST_F(BreakpointManagerTests, Debugger_ListDiffrentListSizesOfBootRom) {
 //     const auto expectedSize = 5;
