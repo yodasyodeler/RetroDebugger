@@ -273,6 +273,43 @@ TEST_F(BreakpointManagerTests, Debugger_InfoCheckSize) {
     EXPECT_EQ(breakInfo.size(), 0);
 }
 
+TEST_F(BreakpointManagerTests, SetWatchpoint_CheckWhenHit_ValuesAreExpected) {
+    static constexpr auto expectedValue = 5u;
+    g_memory = expectedValue;
+
+    static constexpr auto expectedAddress = 100u;
+    auto breakNum = m_breakpointManager.SetWatchpoint(expectedAddress);
+    EXPECT_EQ(breakNum, BreakNum{ 1 });
+    const auto breakInfoList = m_breakpointManager.GetBreakpointInfoList();
+
+    ASSERT_EQ(breakInfoList.size(), 1ul);
+    ASSERT_TRUE(breakInfoList.contains(breakNum));
+
+    auto watchpoint = breakInfoList.at(breakNum);
+    EXPECT_EQ(watchpoint.address, expectedAddress);
+    EXPECT_EQ(watchpoint.breakpointNumber, breakNum);
+    EXPECT_EQ(watchpoint.bankNumber, AnyBank);
+    EXPECT_EQ(watchpoint.timesHit, 0u);
+    EXPECT_EQ(watchpoint.oldWatchValue, 0u);
+    EXPECT_EQ(watchpoint.currentWatchValue, expectedValue);
+    EXPECT_EQ(watchpoint.type, BreakType::Watchpoint);
+    EXPECT_EQ(watchpoint.disp, BreakDisposition::Keep);
+    EXPECT_TRUE(watchpoint.isEnabled);
+    EXPECT_TRUE(watchpoint.regName.empty());
+
+    BreakInfo breakInfo{};
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    EXPECT_EQ(breakInfo.breakpointNumber, BreakNum{ std::numeric_limits<unsigned int>::max() });
+
+    static constexpr auto newExpectedValue = 7u;
+    g_memory = newExpectedValue;
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    ASSERT_EQ(breakInfo.breakpointNumber, breakNum);
+    ASSERT_EQ(breakInfo.oldWatchValue, expectedValue);
+    ASSERT_EQ(breakInfo.currentWatchValue, newExpectedValue);
+    ASSERT_EQ(breakInfo.timesHit, 1u);
+}
+
 // TEST_F(BreakpointManagerTests, Debugger_ListDiffrentListSizesOfBootRom) {
 //     const auto expectedSize = 5;
 //     const auto cmds = m_breakpointManager.GetCommandInfoList(0, expectedSize);

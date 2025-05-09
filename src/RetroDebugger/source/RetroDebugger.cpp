@@ -48,7 +48,7 @@ bool RetroDebugger::CheckBreakpoints(BreakInfo* breakInfo) {
 
     const auto hitBreakpoint = m_debugger.CheckBreakpoints(infoRef);
     if (hitBreakpoint) {
-        if (infoRef.type == BreakType::Breakpoint || infoRef.type == BreakType::BankBreakpoint) {
+        if (infoRef.type == BreakType::Breakpoint) {
             m_interpreter.SetCommandResponse(DebuggerPrintFormat::PrintBreakpointHit(infoRef));
         }
         else if (infoRef.type == BreakType::Watchpoint) {

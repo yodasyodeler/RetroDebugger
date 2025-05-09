@@ -22,7 +22,6 @@ static constexpr size_t SizeOfWord = 16;
 static const std::map<BreakType, std::string> BreakTypeToString = {
     { BreakType::Watchpoint, "Watchpoint" },
     { BreakType::Breakpoint, "Breakpoint" },
-    { BreakType::BankBreakpoint, "BankBreakpoint" },
     { BreakType::Catchpoint, "Catchpoint" },
 };
 
@@ -74,35 +73,42 @@ std::string to_string(BankNum bankNum) {
 // TODO: Look for a more expandable solution. C++20 std::format may be worth looking at when available.
 
 static constexpr std::string_view generalHelp =
-    "[h]elp <cmd> -- display help for specific command\n"
+    "(h)elp <cmd> -- display help for specific command\n"
     "\n"
-    "[c]ontinue -- continue execution of code till a break\n"
-    "[c]ontinue <count> -- continue execution of code ignore breakpoints till count breakpoints have been encountered\n"
-    "[s]tep -- execute one instruction then break\n"
-    "[s]tep <count> -- execute count of instructions then break\n"
-    "[f]inish -- continue execution till a jump instruction\n"
+    "(c)ontinue -- continue execution of code till a break\n"
+    "(c)ontinue <count> -- continue execution of code ignore breakpoints till count breakpoints have been encountered\n"
+    "(s)tep -- execute one instruction then break\n"
+    "(s)tep <count> -- execute count of instructions then break\n"
+    "(f)inish -- continue execution till a jump instruction\n"
     "\n"
-    "[b]reak -- set a breakpoint at current instruction\n"
-    "[b]reak <address> -- set breakpoint at address\n"
+    "(b)reak -- set a breakpoint at current instruction\n"
+    "(b)reak <address> -- set breakpoint at address\n"
     "enable <number>-- enable breakpoint number\n"
     "enable <number-number>-- enable breakpoint number range\n"
     "disable <number>-- disable breakpoint number\n"
     "disable <number-number>-- disable breakpoint number range\n"
-    "[d]elete -- delete all breakpoints\n"
-    "[d]elete <number> -- delete breakpoint number\n"
-    "[d]elete <number-number> -- delete breakpoint number range\n"
-    "[i]nfo break -- list breakpoints\n"
-    "[i]nfo breakpoints -- list breakpoints\n"
-    "[i]nfo line -- prints the current line number and its associated address\n"
+    "(d)elete -- delete all breakpoints\n"
+    "(d)elete <number> -- delete breakpoint number\n"
+    "(d)elete <number-number> -- delete breakpoint number range\n"
+    "(i)nfo break -- list breakpoints\n"
+    "(i)nfo breakpoints -- list breakpoints\n"
+    "(i)nfo line -- prints the current line number and its associated address\n"
     "\n"
-    "[w]atch <reg> -- break on next instruction that writes to the specified reg and its value changes\n"
-    "[w]atch <address> -- break on next instruction that writes to the specified address and its value changes\n"
-    "[w]atch <address-address> -- break on next instruction that writes to the specified address and its value changes\n"
+    "(w)atch <reg> -- break on next instruction that writes to the specified reg and its value changes\n"
+    "rwatch <reg> -- break on next instruction that reads from the specified reg and its value changes\n"
+    "awatch <reg> -- break on next instruction that either reads from or writes to the specified reg and its value changes\n"
+    "(w)atch <address> -- break on next instruction that writes to the specified address and its value changes\n"
+    "rwatch <address> -- break on next instruction that reads from the specified address and its value changes\n"
+    "awatch <address> -- break on next instruction that either reads from or writes to the specified address and its value changes\n"
+    "(w)atch <address-address> -- break on next instruction that writes to the specified address and its value changes\n"
+    "rwatch <address-address> -- break on next instruction that reads from the specified address and its value changes\n"
+    "awatch <address-address> -- break on next instruction that reads from or writes to the specified address and its value changes\n"
+    ""
     "\n"
-    "[p]rint <address> -- print value at address\n"
-    "[l]ist -- print instructions at current address\n"
-    "[l]ist <address> -- print instructions at address\n"
-    "[l]ist <address-address> -- print instructions from range of addresses\n"
+    "(p)rint <address> -- print value at address\n"
+    "(l)ist -- print instructions at current address\n"
+    "(l)ist <address> -- print instructions at address\n"
+    "(l)ist <address-address> -- print instructions from range of addresses\n"
     "\n"
     "set <debugger variable> <count> -- set the size of list commands output\n"
     "show <debugger variable> -- print debugger variable value\n";
@@ -130,12 +136,12 @@ std::string PrintBreakpointHit(BreakInfo breakInfo) {
 }
 
 std::string PrintWatchpointHit(BreakInfo breakInfo) {
-    return fmt::format("Watchpoint {}: at {}\nOld value = {}\nNew value = {}", static_cast<unsigned int>(breakInfo.breakpointNumber), to_string(static_cast<uint16_t>(breakInfo.address), true), breakInfo.oldWatchValue, breakInfo.newWatchValue);
+    return fmt::format("Watchpoint {}: at {}\nOld value = {}\nNew value = {}", static_cast<unsigned int>(breakInfo.breakpointNumber), to_string(static_cast<uint16_t>(breakInfo.address), true), breakInfo.oldWatchValue, breakInfo.currentWatchValue);
 }
 
 std::string PrintTimerHelp() { return "TODO: write help\n"; }
 
-std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
+std::string PrintBreakInfo(const BreakList& breakInfo) {
     static constexpr auto Num = "Num";
     static constexpr auto Type = "Type";
     static constexpr auto Disp = "Disp";
@@ -152,7 +158,7 @@ std::string PrintBreakInfo(const std::map<BreakNum, BreakInfo>& breakInfo) {
         Address,
         What);
     for (const auto& info : breakInfo) {
-        const auto what = (info.second.type == BreakType::BankBreakpoint) ? "Bank: "s + to_string(info.second.bankNumber) : ""s;
+        const auto what = (info.second.bankNumber != AnyBank) ? "Bank: "s + to_string(info.second.bankNumber) : ""s;
         breakInfoStr += fmt::format(
             "{: <8d}{: <15s}{: <5s}{: <4s}0x{:016X} {}\n",
             static_cast<unsigned int>(info.first),

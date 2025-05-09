@@ -2,6 +2,7 @@
 
 #include "RetroDebuggerCallbackDefines.h"
 
+// TODO: Probably should just make this non-static methods
 class DebuggerCallback {
 public:
     static unsigned int GetPcReg();

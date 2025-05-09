@@ -12,14 +12,16 @@
 enum class BreakNum : unsigned int;
 enum class BankNum : unsigned int;
 
+static constexpr BankNum AnyBank = BankNum{ std::numeric_limits<unsigned int>::max() };
+
+
 enum class BreakType : unsigned int {
     Invalid = static_cast<unsigned int>(-1),
     Watchpoint = 0,
     Breakpoint,
-    BankBreakpoint,
     Catchpoint,
     ReadWatchpoint,
-    WriteWatchpoint,
+    AnyWatchpoint,
 };
 
 enum class BreakDisposition {
@@ -37,10 +39,12 @@ struct BreakInfo
     // unsigned int enableCount; //TODO: unimplemented
     unsigned int timesHit{};
     unsigned int oldWatchValue{};
-    unsigned int newWatchValue{};
+    unsigned int currentWatchValue{};
     BreakType type = BreakType::Invalid;
     BreakDisposition disp = BreakDisposition::Disable; // TODO: no way to use, is implemented though
     bool isEnabled = false;
+    bool externalHit = false;
+    std::string regName = {};
 };
 using BreakList = std::map<BreakNum, BreakInfo>;
 

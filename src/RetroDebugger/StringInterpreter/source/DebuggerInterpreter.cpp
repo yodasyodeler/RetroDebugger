@@ -176,14 +176,13 @@ bool DebuggerInterpreter::SetWatch(const std::vector<std::string>& words) {
     const auto cmdCount = words.size();
 
     if (cmdCount == 2) {
-        unsigned int addressStart{};
-        unsigned int addressEnd{};
-        if (DebuggerStringParser::ParseNumber(words[1], addressStart)) {
+        unsigned int address{};
+        if (DebuggerStringParser::ParseNumber(words[1], address)) {
+            return m_debugger->SetWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+        }
+        /*else if (DebuggerStringParser::ParseNumberPair(words[1], addressStart, addressEnd, "-")) {
             return m_debugger->SetWatchpoint(addressStart) != std::numeric_limits<BreakNum>::max();
-        }
-        else if (DebuggerStringParser::ParseNumberPair(words[1], addressStart, addressEnd, "-")) {
-            return m_debugger->SetWatchpoint(addressStart, addressEnd) != std::numeric_limits<BreakNum>::max();
-        }
+        }*/
     }
     return false;
 }

@@ -10,6 +10,132 @@ BreakNum operator++(BreakNum& breakNum, int) {
     breakNum = BreakNum{ static_cast<unsigned int>(breakNum) + 1u };
     return num;
 }
+
+BreakInfo BreakPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+    return BreakInfo{
+        .address = address,
+        .breakpointNumber = breakNumber,
+        .bankNumber = bankNumber,
+        // 0, //ignoreCount not implemented yet
+        // 0, //enableCount not implemented yet
+        .timesHit = 0,
+        .oldWatchValue = 0,
+        .currentWatchValue = 0,
+        .type = BreakType::Breakpoint,
+        .disp = BreakDisposition::Keep,
+        .isEnabled = true,
+        .externalHit = false,
+        .regName = {},
+    };
+}
+
+BreakInfo WatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+    return BreakInfo{
+        .address = address,
+        .breakpointNumber = breakNumber,
+        .bankNumber = bankNumber,
+        // 0, //ignoreCount not implemented yet
+        // 0, //enableCount not implemented yet
+        .timesHit = 0,
+        .oldWatchValue = 0,
+        .currentWatchValue = DebuggerCallback::ReadMemory(address),
+        .type = BreakType::Watchpoint,
+        .disp = BreakDisposition::Keep,
+        .isEnabled = true,
+        .externalHit = false,
+        .regName = {},
+    };
+}
+
+BreakInfo ReadWatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+    return BreakInfo{
+        .address = address,
+        .breakpointNumber = breakNumber,
+        .bankNumber = AnyBank,
+        // 0, //ignoreCount not implemented yet
+        // 0, //enableCount not implemented yet
+        .timesHit = 0,
+        .oldWatchValue = 0,
+        .currentWatchValue = DebuggerCallback::ReadMemory(address),
+        .type = BreakType::ReadWatchpoint,
+        .disp = BreakDisposition::Keep,
+        .isEnabled = true,
+        .externalHit = false,
+        .regName = {},
+    };
+}
+
+// TODO: May want to consider redoing design so we return the BreakInfo instead of tunneling a BreakInfo object.
+// Current design has breakpoint info passed in as ref so it can be assigned, this represents an invalid or uninteresting breakpoint.
+BreakInfo ContinuePoint() {
+    return BreakInfo{
+        .address = std::numeric_limits<unsigned int>::max(),
+        .breakpointNumber = MaxBreakpointNumber,
+        .bankNumber = AnyBank,
+        // 0, //ignoreCount not implemented yet
+        // 0, //enableCount not implemented yet
+        .timesHit = 0,
+        .oldWatchValue = 0,
+        .currentWatchValue = 0,
+        .type = BreakType::Invalid,
+        .disp = BreakDisposition::Delete,
+        .isEnabled = false,
+        .externalHit = false,
+        .regName = {},
+    };
+}
+
+// Watch a register
+BreakInfo WatchPoint(BreakNum breakNumber, const std::string& registerName) {
+    const auto regset = DebuggerCallback::GetRegSet();
+    if (const auto iter = regset.find(registerName);
+        iter != regset.end()) {
+        return BreakInfo{
+            .address = std::numeric_limits<unsigned int>::max(),
+            .breakpointNumber = breakNumber,
+            .bankNumber = AnyBank,
+            // 0, //ignoreCount not implemented yet
+            // 0, //enableCount not implemented yet
+            .timesHit = 0,
+            .oldWatchValue = 0,
+            .currentWatchValue = iter->second,
+            .type = BreakType::Watchpoint,
+            .disp = BreakDisposition::Keep,
+            .isEnabled = true,
+            .externalHit = false,
+            .regName = registerName,
+        };
+    }
+
+    // TODO: error handling
+    return ContinuePoint();
+}
+
+BreakInfo ReadWatchPoint(BreakNum breakNumber, const std::string& registerName) {
+    const auto regset = DebuggerCallback::GetRegSet();
+    if (const auto iter = regset.find(registerName);
+        iter != regset.end()) {
+        return BreakInfo{
+            .address = std::numeric_limits<unsigned int>::max(),
+            .breakpointNumber = breakNumber,
+            .bankNumber = AnyBank,
+            // 0, //ignoreCount not implemented yet
+            // 0, //enableCount not implemented yet
+            .timesHit = 0,
+            .oldWatchValue = 0,
+            .currentWatchValue = iter->second,
+            .type = BreakType::ReadWatchpoint,
+            .disp = BreakDisposition::Keep,
+            .isEnabled = true,
+            .externalHit = false,
+            .regName = {},
+        };
+    }
+
+    // TODO: error handling
+    return ContinuePoint();
+}
+
 }
 
 
@@ -17,9 +143,7 @@ BreakpointManager::BreakpointManager(std::shared_ptr<DebuggerOperations> operati
     m_operations(std::move(operations)) {}
 
 bool BreakpointManager::CheckBreakpoints(BreakInfo& breakInfo) {
-    breakInfo.breakpointNumber = MaxBreakpointNumber;
-    CheckBreakInfo(breakInfo); //
-
+    breakInfo = CheckBreakInfo();
     return HandleBreakInfo(breakInfo);
 }
 
@@ -41,71 +165,40 @@ bool BreakpointManager::RunTillJump() {
 }
 
 BreakNum BreakpointManager::SetBreakpoint(const unsigned int address) {
-    const BreakInfo breakpoint = {
-        address,
-        m_breakPointCounter++,
-        AnyBank,
-        0,
-        // 0, //ignoreCount not implemented yet
-        // 0, //enableCount not implemented yet
-        0,
-        0,
-        BreakType::Breakpoint,
-        BreakDisposition::Keep,
-        true
-    };
+    const BreakInfo breakpoint = BreakPoint(m_breakPointCounter++, address);
     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
 
     return breakpoint.breakpointNumber;
 }
 
 BreakNum BreakpointManager::SetBreakpoint(const BankNum bank, const unsigned int address) {
-    const BreakInfo breakpoint = {
-        address,
-        m_breakPointCounter++,
-        bank,
-        0,
-        // 0, //ignoreCount not implemented yet
-        // 0, //enableCount not implemented yet
-        0,
-        0,
-        BreakType::BankBreakpoint,
-        BreakDisposition::Keep,
-        true
-    };
+    const BreakInfo breakpoint = BreakPoint(m_breakPointCounter++, address, bank);
     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
 
     return breakpoint.breakpointNumber;
 }
 
-BreakNum BreakpointManager::SetWatchpoint(const unsigned int addressStart, unsigned int addressEnd) {
-    if (addressStart > addressEnd) { return std::numeric_limits<BreakNum>::max(); }
-    if (addressEnd == std::numeric_limits<unsigned int>::max()) { addressEnd = addressStart; }
+BreakNum BreakpointManager::SetWatchpoint(const unsigned int address, BankNum bankNum) {
+    const BreakInfo breakpoint = WatchPoint(m_breakPointCounter++, address, bankNum);
+    m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
 
-    // TODO: this is experimental, but could be optimized by adding a range breakpoint. Also may make sense to make BreakInfo a polymorphed class to make it easier to read and maintain
-    for (auto address = addressStart; address <= addressEnd; ++address) {
-        const BreakInfo breakpoint = {
-            address,
-            m_breakPointCounter++,
-            AnyBank,
-            0,
-            // 0, //ignoreCount not implemented yet
-            // 0, //enableCount not implemented yet
-            0,
-            DebuggerCallback::ReadMemory(address),
-            BreakType::Watchpoint,
-            BreakDisposition::Keep,
-            true
-        };
-        m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
-    }
-
-    return m_breakPointCounter;
+    return breakpoint.breakpointNumber;
 }
 
-// BreakNum BreakpointManager::SetWatchpoint(BankNum /*bank*/, unsigned int /*addressStart*/, unsigned int /*addressEnd*/) {
-//     return std::numeric_limits<BreakNum>::max();
-// }
+BreakNum BreakpointManager::SetReadWatchpoint(unsigned int address, BankNum bank) {
+    const BreakInfo breakpoint = ReadWatchPoint(m_breakPointCounter++, address, bank);
+    m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
+
+    return breakpoint.breakpointNumber;
+}
+
+BreakNum BreakpointManager::SetWatchpoint(const std::string& registerName) {
+    const BreakInfo breakpoint = WatchPoint(m_breakPointCounter++, registerName);
+    if (breakpoint.breakpointNumber == MaxBreakpointNumber) { return MaxBreakpointNumber; }
+
+    m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
+    return breakpoint.breakpointNumber;
+}
 
 bool BreakpointManager::EnableBreakpoints(const std::vector<BreakNum>& list) {
     return ModifyBreak(list, true);
@@ -145,37 +238,36 @@ std::map<BreakNum, BreakInfo> BreakpointManager::GetBreakpointInfoList(const std
     return tempMap;
 }
 
-void BreakpointManager::CheckBreakInfo(BreakInfo& info) {
-    const auto pcReg = DebuggerCallback::GetPcReg();
-    for (auto& breakpoint : m_breakpoints) {
-        auto& breakInfo = breakpoint.second;
+BreakInfo BreakpointManager::CheckBreakInfo() {
+    for (auto& [breakNum, breakInfo] : m_breakpoints) {
         if (breakInfo.isEnabled) {
-            if ((breakInfo.type == BreakType::Breakpoint) && (breakInfo.address == pcReg)) {
+            if (breakInfo.type == BreakType::Breakpoint && (breakInfo.bankNumber == AnyBank && breakInfo.address == DebuggerCallback::GetPcReg()) || // NON-Bank Breakpoint
+                (breakInfo.bankNumber != AnyBank && DebuggerCallback::CheckBankableMemoryLocation(breakInfo.bankNumber, breakInfo.address))) { // Bank Breakpoint
+
                 ++breakInfo.timesHit;
-                info = breakInfo;
-                break;
-            }
-            if ((breakInfo.type == BreakType::BankBreakpoint) && DebuggerCallback::CheckBankableMemoryLocation(info.bankNumber, info.address)) {
-                ++breakInfo.timesHit;
-                info = breakInfo;
-                break;
+                return breakInfo;
             }
             if (breakInfo.type == BreakType::Watchpoint) {
-                const auto newWatchValue = DebuggerCallback::ReadMemory(info.address);
-                if (breakInfo.newWatchValue != newWatchValue) {
-                    breakInfo.oldWatchValue = breakInfo.newWatchValue;
-                    breakInfo.newWatchValue = newWatchValue;
+                const auto currentWatchValue = breakInfo.bankNumber == AnyBank ? DebuggerCallback::ReadMemory(breakInfo.address) : DebuggerCallback::ReadBankableMemory(breakInfo.bankNumber, breakInfo.address);
+
+                if (breakInfo.currentWatchValue != currentWatchValue) {
+                    breakInfo.oldWatchValue = breakInfo.currentWatchValue;
+                    breakInfo.currentWatchValue = currentWatchValue;
                     ++breakInfo.timesHit;
-                    info = breakInfo;
-                    break;
+                    return breakInfo;
                 }
             }
         }
     }
+    return ContinuePoint();
 }
 
 bool BreakpointManager::HandleBreakInfo(const BreakInfo& info) {
-    const auto breakpointHit = (info.breakpointNumber != MaxBreakpointNumber);
+    // TODO: Need to know how this should interact with continue like operations, for now always break on valid non-standard breakpoints.
+    if (info.type != BreakType::Breakpoint && info.breakpointNumber != MaxBreakpointNumber) { return true; }
+
+    // Check if we should actually break the program, run/step operations can ignore breaks.
+    const auto breakpointHit = (info.type == BreakType::Breakpoint && info.breakpointNumber != MaxBreakpointNumber);
     switch (m_debugOp) {
         case DebugOperation::RunOp:
             if ((m_instructionsToStep == 0) && breakpointHit) {
@@ -208,8 +300,6 @@ bool BreakpointManager::HandleBreakInfo(const BreakInfo& info) {
                     return true;
                 }
             }
-            break;
-        case DebugOperation::WatchOp: // TODO:
             break;
     };
     return false;
