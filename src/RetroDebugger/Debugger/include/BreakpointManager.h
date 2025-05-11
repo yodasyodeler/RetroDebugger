@@ -34,7 +34,7 @@ public:
     BreakNum SetReadWatchpoint(unsigned int address, BankNum bank = AnyBank);
     BreakNum SetAnyWatchpoint(unsigned int address, BankNum bank = AnyBank);
 
-    BreakNum SetWatchpoint(const std::string& registerName);
+    // BreakNum SetWatchpoint(const std::string& registerName);
     // BreakNum SetReadWatchpoint(const std::string& registerName);
     // BreakNum SetAnyWatchpoint(const std::string& registerName);
 

@@ -23,6 +23,8 @@ public:
     bool DeleteBreakpoints(const std::vector<std::string>& words);
     bool GetInfo(const std::vector<std::string>& words);
     bool SetWatch(const std::vector<std::string>& words);
+    bool SetReadWatch(const std::vector<std::string>& words);
+    bool SetAnyWatch(const std::vector<std::string>& words);
     bool Print(const std::vector<std::string>& words);
     bool List(const std::vector<std::string>& words);
     bool Set(const std::vector<std::string>& words);

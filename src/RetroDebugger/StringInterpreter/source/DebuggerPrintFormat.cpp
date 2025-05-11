@@ -19,8 +19,11 @@ namespace {
 static constexpr size_t SizeOfByte = 8;
 static constexpr size_t SizeOfWord = 16;
 
+// TODO: make to_string operations to prevent out of map errors
 static const std::map<BreakType, std::string> BreakTypeToString = {
     { BreakType::Watchpoint, "Watchpoint" },
+    { BreakType::ReadWatchpoint, "ReadWatchpoint" },
+    { BreakType::AnyWatchpoint, "AnyWatchpoint" },
     { BreakType::Breakpoint, "Breakpoint" },
     { BreakType::Catchpoint, "Catchpoint" },
 };

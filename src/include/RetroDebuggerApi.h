@@ -33,6 +33,12 @@ RDB_EXPORT bool RunTillJump();
 
 RDB_EXPORT bool SetBreakpoint(unsigned int address);
 
+RDB_EXPORT bool SetWatchpoint(unsigned int address);
+
+RDB_EXPORT bool SetReadWatchpoint(unsigned int address);
+
+RDB_EXPORT bool SetAnyWatchpoint(unsigned int address);
+
 RDB_EXPORT bool EnableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
 RDB_EXPORT bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);

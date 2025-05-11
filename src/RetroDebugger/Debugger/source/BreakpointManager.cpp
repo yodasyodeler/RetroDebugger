@@ -217,13 +217,13 @@ BreakNum BreakpointManager::SetAnyWatchpoint(unsigned int address, BankNum bank)
     return breakpoint.breakpointNumber;
 }
 
-BreakNum BreakpointManager::SetWatchpoint(const std::string& registerName) {
-    const BreakInfo breakpoint = WatchPoint(m_breakPointCounter++, registerName);
-    if (breakpoint.breakpointNumber == MaxBreakpointNumber) { return MaxBreakpointNumber; }
-
-    m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
-    return breakpoint.breakpointNumber;
-}
+// BreakNum BreakpointManager::SetWatchpoint(const std::string& registerName) {
+//     const BreakInfo breakpoint = WatchPoint(m_breakPointCounter++, registerName);
+//     if (breakpoint.breakpointNumber == MaxBreakpointNumber) { return MaxBreakpointNumber; }
+//
+//     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
+//     return breakpoint.breakpointNumber;
+// }
 
 bool BreakpointManager::EnableBreakpoints(const std::vector<BreakNum>& list) {
     return ModifyBreak(list, true);
@@ -237,6 +237,7 @@ bool BreakpointManager::DeleteBreakpoints(const std::vector<BreakNum>& list) {
     // If no breakpoints are specified, delete them all
     if (list.empty()) {
         m_breakpoints.clear();
+        m_breakPointCounter = BreakNum{ 1u };
     }
 
     // Delete breakpoints from list

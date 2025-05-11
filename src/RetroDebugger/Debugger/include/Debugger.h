@@ -15,9 +15,8 @@ public:
     BreakNum SetBreakpoint(unsigned int bank, unsigned int address);
 
     BreakNum SetWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
-    /*BreakNum SetReadWatchpoint(unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max(), BankNum bankNumber = AnyBank);
-    BreakNum SetAnyWatchpoint(unsigned int addressStart, unsigned int addressEnd = std::numeric_limits<unsigned int>::max(), BankNum bankNumber = AnyBank);*/
-
+    BreakNum SetReadWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
+    BreakNum SetAnyWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
 
     bool EnableBreakpoints(const std::vector<unsigned int>& list);
     bool DisableBreakpoints(const std::vector<unsigned int>& list);

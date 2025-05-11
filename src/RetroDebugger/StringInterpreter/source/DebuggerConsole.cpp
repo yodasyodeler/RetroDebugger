@@ -73,6 +73,12 @@ bool DebuggerConsole::ParseCommand(std::vector<std::string>& words) { // NOLINT 
     else if ((cmd == "w") || (cmd == "watch")) {
         if (m_interpreter->SetWatch(words)) { return false; }
     }
+    else if (cmd == "rwatch") {
+        if (m_interpreter->SetReadWatch(words)) { return false; }
+    }
+    else if (cmd == "awatch") {
+        if (m_interpreter->SetAnyWatch(words)) { return false; }
+    }
     else if ((cmd == "p") || (cmd == "print")) {
         if (m_interpreter->Print(words)) { return false; }
     }

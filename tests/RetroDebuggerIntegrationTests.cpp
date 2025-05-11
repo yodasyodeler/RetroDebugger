@@ -259,4 +259,49 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Interpreter_List_WhenComma
     EXPECT_EQ(response, expectedResponse);
 }
 
+TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Commandline_SetWatchpoint_GetBreakpointInfo_HappyPath) {
+
+    //(rdb) w 0x100
+    //(rdb) info break
+    std::stringstream input;
+    input << "w 0x100\ninfo break"; // Not ending with '/n' so GetLine will return immediately on last command
+    Rdb::ParseXmlFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
+    auto output = TestCommandPrompt(input);
+
+    auto expectedOutput = std::string(MessageWhenEnteringDebugLoop) + ConsolePrompt + // No return, in command prompt it would come from the input.
+                          "Num     Type           Disp Enb Address            What\n"
+                          "1       Watchpoint     Keep y   0x0000000000000100 \n";
+    ASSERT_EQ(expectedOutput, output.str()); // Doing one full check.
+}
+
+TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Commandline_SetReadWatchpoint_GetBreakpointInfo_HappyPath) {
+
+    //(rdb) rwatch 0x100
+    //(rdb) info break
+    std::stringstream input;
+    input << "rwatch 0x100\ninfo break"; // Not ending with '/n' so GetLine will return immediately on last command
+    Rdb::ParseXmlFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
+    auto output = TestCommandPrompt(input);
+
+    auto expectedOutput = std::string(MessageWhenEnteringDebugLoop) + ConsolePrompt + // No return, in command prompt it would come from the input.
+                          "Num     Type           Disp Enb Address            What\n"
+                          "1       ReadWatchpoint Keep y   0x0000000000000100 \n";
+    ASSERT_EQ(expectedOutput, output.str()); // Doing one full check.
+}
+
+TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Commandline_SetAnyWatchpoint_GetBreakpointInfo_HappyPath) {
+
+    //(rdb) awatch 0x100
+    //(rdb) info break
+    std::stringstream input;
+    input << "awatch 0x100\ninfo break"; // Not ending with '/n' so GetLine will return immediately on last command
+    Rdb::ParseXmlFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
+    auto output = TestCommandPrompt(input);
+
+    auto expectedOutput = std::string(MessageWhenEnteringDebugLoop) + ConsolePrompt + // No return, in command prompt it would come from the input.
+                          "Num     Type           Disp Enb Address            What\n"
+                          "1       AnyWatchpoint  Keep y   0x0000000000000100 \n";
+    ASSERT_EQ(expectedOutput, output.str()); // Doing one full check.
+}
+
 }

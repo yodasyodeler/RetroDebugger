@@ -44,6 +44,18 @@ bool SetBreakpoint(unsigned int address) {
     return m_debugger.SetBreakpoint(address);
 }
 
+bool SetWatchpoint(unsigned int address) {
+    return m_debugger.SetWatchpoint(address);
+}
+
+bool SetReadWatchpoint(unsigned int address) {
+    return m_debugger.SetReadWatchpoint(address);
+}
+
+bool SetAnyWatchpoint(unsigned int address) {
+    return m_debugger.SetAnyWatchpoint(address);
+}
+
 bool EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     return m_debugger.EnableBreakpoints(breakRange0, breakRange1);
 }

@@ -26,6 +26,12 @@ public:
 
     bool SetBreakpoint(unsigned int address);
 
+    bool SetWatchpoint(unsigned int address);
+
+    bool SetReadWatchpoint(unsigned int address);
+
+    bool SetAnyWatchpoint(unsigned int address);
+
     bool EnableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
     bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);

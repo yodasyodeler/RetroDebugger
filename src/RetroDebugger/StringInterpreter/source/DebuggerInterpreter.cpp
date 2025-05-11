@@ -187,6 +187,32 @@ bool DebuggerInterpreter::SetWatch(const std::vector<std::string>& words) {
     return false;
 }
 
+bool DebuggerInterpreter::SetReadWatch(const std::vector<std::string>& words) {
+    m_commandResponse.clear();
+    const auto cmdCount = words.size();
+
+    if (cmdCount == 2) {
+        unsigned int address{};
+        if (DebuggerStringParser::ParseNumber(words[1], address)) {
+            return m_debugger->SetReadWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+        }
+    }
+    return false;
+}
+
+bool DebuggerInterpreter::SetAnyWatch(const std::vector<std::string>& words) {
+    m_commandResponse.clear();
+    const auto cmdCount = words.size();
+
+    if (cmdCount == 2) {
+        unsigned int address{};
+        if (DebuggerStringParser::ParseNumber(words[1], address)) {
+            return m_debugger->SetAnyWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+        }
+    }
+    return false;
+}
+
 bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();

@@ -71,8 +71,19 @@ bool RetroDebugger::RunTillJump() {
 }
 
 bool RetroDebugger::SetBreakpoint(unsigned int address) {
-    m_debugger.SetBreakpoint(address);
-    return true; // TODO: this doesn't mean anything
+    return m_debugger.SetBreakpoint(address) != std::numeric_limits<BreakNum>::max();
+}
+
+bool RetroDebugger::SetWatchpoint(unsigned int address) {
+    return m_debugger.SetWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+}
+
+bool RetroDebugger::SetReadWatchpoint(unsigned int address) {
+    return m_debugger.SetReadWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+}
+
+bool RetroDebugger::SetAnyWatchpoint(unsigned int address) {
+    return m_debugger.SetAnyWatchpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
 bool RetroDebugger::EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {

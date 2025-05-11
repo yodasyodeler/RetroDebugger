@@ -48,6 +48,14 @@ BreakNum Debugger::SetWatchpoint(const unsigned int address, BankNum bankNumber)
     return m_breakManager.SetWatchpoint(address, bankNumber);
 }
 
+BreakNum Debugger::SetReadWatchpoint(unsigned int address, BankNum bankNumber) {
+    return m_breakManager.SetReadWatchpoint(address, bankNumber);
+}
+
+BreakNum Debugger::SetAnyWatchpoint(unsigned int address, BankNum bankNumber) {
+    return m_breakManager.SetAnyWatchpoint(address, bankNumber);
+}
+
 bool Debugger::EnableBreakpoints(const std::vector<unsigned int>& list) {
     return m_breakManager.EnableBreakpoints(ToBreakNumList(list));
 }
