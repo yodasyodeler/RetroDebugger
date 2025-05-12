@@ -272,7 +272,7 @@ void BreakpointManager::ReadMemoryHook(BankNum bankNum, unsigned int address, co
             continue;
         }
 
-        if ((breakInfo.bankNumber == AnyBank || breakInfo.bankNumber == bankNum) && (breakInfo.address >= address && address < addressEnd)) {
+        if ((breakInfo.bankNumber == AnyBank || breakInfo.bankNumber == bankNum) && (address <= breakInfo.address && breakInfo.address < addressEnd)) {
             breakInfo.externalHit = true;
         }
     }
@@ -286,7 +286,7 @@ void BreakpointManager::WriteMemoryHook(BankNum bankNum, unsigned int address, c
             continue;
         }
 
-        if ((breakInfo.bankNumber == AnyBank || breakInfo.bankNumber == bankNum) && (breakInfo.address >= address && address < addressEnd)) {
+        if ((breakInfo.bankNumber == AnyBank || breakInfo.bankNumber == bankNum) && (address <= breakInfo.address && breakInfo.address < addressEnd)) {
             breakInfo.externalHit = true;
         }
     }

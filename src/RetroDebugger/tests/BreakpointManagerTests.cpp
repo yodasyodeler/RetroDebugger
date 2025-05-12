@@ -476,6 +476,70 @@ TEST_F(BreakpointManagerTests, Watchpoints_TestMemoryBankChecks) {
 }
 
 
+TEST_F(BreakpointManagerTests, Readwatchpoint_bugFix_WatchpointAddressIsWithInHitAddress) {
+    static constexpr auto expectedAddress_0 = 100u;
+
+    const auto breakNum_0 = m_breakpointManager.SetReadWatchpoint(expectedAddress_0);
+
+    // No hit, goes before 1
+    BreakInfo breakInfo{};
+    const auto expectedValue = std::byte{ static_cast<unsigned char>(g_memory) };
+    m_breakpointManager.ReadMemoryHook(AnyBank, 99u, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Hits, 2 byte read to both 99 & 100
+    m_breakpointManager.ReadMemoryHook(AnyBank, 99u, { expectedValue, std::byte{ 1u } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // No hit, goes past by 1
+    m_breakpointManager.ReadMemoryHook(AnyBank, 101u, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
+TEST_F(BreakpointManagerTests, Watchpoint_bugFix_WatchpointAddressIsWithInHitAddress) {
+    static constexpr auto expectedAddress_0 = 100u;
+
+    const auto breakNum_0 = m_breakpointManager.SetWatchpoint(expectedAddress_0);
+
+    // No hit, goes before 1
+    BreakInfo breakInfo{};
+    const auto expectedValue = std::byte{ static_cast<unsigned char>(g_memory) };
+    m_breakpointManager.WriteMemoryHook(AnyBank, 99u, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Hits, 2 byte read to both 99 & 100
+    m_breakpointManager.WriteMemoryHook(AnyBank, 99u, { expectedValue, std::byte{ 1u } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // No hit, goes past by 1
+    m_breakpointManager.WriteMemoryHook(AnyBank, 101u, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
+TEST_F(BreakpointManagerTests, AnyWatchpoint_bugFix_WatchpointAddressIsWithInHitAddress) {
+    static constexpr auto expectedAddress_0 = 100u;
+
+    const auto breakNum_0 = m_breakpointManager.SetAnyWatchpoint(expectedAddress_0);
+
+    // No hit, goes before 1
+    BreakInfo breakInfo{};
+    const auto expectedValue = std::byte{ static_cast<unsigned char>(g_memory) };
+    m_breakpointManager.WriteMemoryHook(AnyBank, 99u, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Hits, 2 byte read to both 99 & 100
+    m_breakpointManager.WriteMemoryHook(AnyBank, 99u, { expectedValue, std::byte{ 1u } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Hits, 2 byte read to both 99 & 100
+    m_breakpointManager.ReadMemoryHook(AnyBank, 99u, { expectedValue, std::byte{ 1u } });
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // No hit, goes past by 1
+    m_breakpointManager.ReadMemoryHook(AnyBank, 101u, { expectedValue });
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
 // TEST_F(BreakpointManagerTests, Debugger_ListDiffrentListSizesOfBootRom) {
 //     const auto expectedSize = 5;
 //     const auto cmds = m_breakpointManager.GetCommandInfoList(0, expectedSize);
