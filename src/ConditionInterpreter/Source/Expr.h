@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Token/Token.h"
+#include "Token.h"
 
 #include "IExpr.h"
 

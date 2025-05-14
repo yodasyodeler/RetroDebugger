@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Token/Token.h"
+#include "Token.h"
 
 #include "Report.h"
-#include "Scanner/Expr.h"
+#include "Expr.h"
 
 #include <stdexcept>
 

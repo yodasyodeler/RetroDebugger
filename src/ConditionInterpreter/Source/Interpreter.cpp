@@ -1,6 +1,6 @@
 #include "Interpreter.h"
 
-#include "Scanner/Expr.h"
+#include "Expr.h"
 
 #include <algorithm>
 #include <array>

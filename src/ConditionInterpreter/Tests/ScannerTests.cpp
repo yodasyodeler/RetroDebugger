@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "Report.h"
-#include "Scanner/Scanner.h"
+#include "Scanner.h"
 
 #include <array>
 #include <stdexcept>

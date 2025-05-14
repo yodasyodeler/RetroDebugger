@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
 
-#include "Scanner/Expr.h"
-#include "Scanner/StringVisitor.h"
-#include "Token/Token.h"
+#include "Expr.h"
+#include "StringVisitor.h"
+#include "Token.h"
 
 /* TODO:
 

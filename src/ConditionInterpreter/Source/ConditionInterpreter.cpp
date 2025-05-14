@@ -1,9 +1,9 @@
 #include "ConditionInterpreter.h"
 
-#include "Interpreter/Interpreter.h"
-#include "Parser/Parser.h"
+#include "Interpreter.h"
+#include "Parser.h"
 #include "Report.h"
-#include "Scanner/Scanner.h"
+#include "Scanner.h"
 
 namespace Rdb {
 

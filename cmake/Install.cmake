@@ -3,7 +3,7 @@ include(GNUInstallDirs)
 
 # cmake-format: off
 install(
-    TARGETS RetroDebugger RetroDebuggerCommon
+    TARGETS RetroDebugger RetroDebuggerInterfaces
     EXPORT RetroDebuggerLib
     ARCHIVE COMPONENT runtime
     LIBRARY COMPONENT runtime

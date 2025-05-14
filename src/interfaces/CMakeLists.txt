@@ -1,7 +1,7 @@
-add_library(RetroDebuggerCommon INTERFACE)
+add_library(RetroDebuggerInterfaces INTERFACE)
 
 # cmake-format: off
-target_sources(RetroDebuggerCommon 
+target_sources(RetroDebuggerInterfaces 
     INTERFACE
         FILE_SET 
             HEADERS

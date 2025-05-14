@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scanner/IExpr.h"
+#include "IExpr.h"
 
 #include "Report.h"
 

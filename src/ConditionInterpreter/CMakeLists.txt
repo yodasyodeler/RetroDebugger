@@ -1,46 +1,44 @@
 # ######################################################################################################################
 # Setup build options
 # ######################################################################################################################
-add_library(ConditionInterpreter STATIC)
+add_library(ConditionInterpreterLib STATIC)
 
-target_include_directories(
-    ConditionInterpreter
-    PUBLIC "Include" "Source")
+target_include_directories(ConditionInterpreterLib PUBLIC "source")
 
 target_link_libraries(
-    ConditionInterpreter
+    ConditionInterpreterLib
     PRIVATE RetroDebugger_options
             RetroDebugger_warnings
-            RetroDebuggerCommon
+            RetroDebuggerInterfaces
             magic_enum
-            fmt::fmt)
+            fmt::fmt
+)
 
 target_sources(
-    ConditionInterpreter
-    PRIVATE "Include/ConditionInterpreter.h"
-            "Source/ConditionInterpreter.cpp"
-            "Source/Interpreter/Interpreter.cpp"
-            "Source/Interpreter/Interpreter.h"
-            "Source/Types.h"
-            "Source/Parser/Parser.cpp"
-            "Source/Parser/Parser.h"
+    ConditionInterpreterLib
+    PRIVATE "Source/ConditionInterpreter.cpp"
+            "source/ConditionInterpreter.h"
+            "Source/Expr.cpp"
+            "Source/Expr.h"
+            "Source/IAstVisitor.h"
+            "Source/IExpr.h"
+            "Source/Interpreter.cpp"
+            "Source/Interpreter.h"
+            "Source/Parser.cpp"
+            "Source/Parser.h"
             "Source/Report.cpp"
             "Source/Report.h"
             "Source/RuntimeError.h"
-            "Source/Scanner/Expr.h"
-            "Source/Scanner/Expr.cpp"
-            "Source/Scanner/IExpr.h"
-            "Source/Scanner/IAstVisitor.h"
-            "Source/Scanner/Scanner.cpp"
-            "Source/Scanner/Scanner.h"
-            "Source/Scanner/StringVisitor.h"
-            "Source/Token/Token.cpp"
-            "Source/Token/Token.h"
-            "Source/Token/TokenType.cpp"
-            "Source/Token/TokenType.h")
-
-target_include_directories(ConditionInterpreter PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_BINARY_DIR}/include)
+            "Source/Scanner.cpp"
+            "Source/Scanner.h"
+            "Source/StringVisitor.h"
+            "Source/Token.cpp"
+            "Source/Token.h"
+            "Source/TokenType.cpp"
+            "Source/TokenType.h"
+            "Source/Types.h"
+)
 
 if(ENABLE_TESTING)
-    add_subdirectory(Tests)
+    add_subdirectory(tests)
 endif()

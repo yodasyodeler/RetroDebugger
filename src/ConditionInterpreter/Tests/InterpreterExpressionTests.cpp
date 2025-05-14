@@ -1,7 +1,7 @@
-#include "Interpreter/Interpreter.h"
+#include "Interpreter.h"
 
-#include "Parser/Parser.h"
-#include "Scanner/Scanner.h"
+#include "Parser.h"
+#include "Scanner.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

@@ -1,7 +1,7 @@
-#include "Parser/Parser.h"
+#include "Parser.h"
 #include "Report.h"
-#include "Scanner/Scanner.h"
-#include "Scanner/StringVisitor.h"
+#include "Scanner.h"
+#include "StringVisitor.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"

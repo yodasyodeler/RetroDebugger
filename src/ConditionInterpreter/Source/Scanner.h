@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Report.h"
-#include "Token/Token.h"
+#include "Token.h"
 
 #include <string_view>
 #include <vector>

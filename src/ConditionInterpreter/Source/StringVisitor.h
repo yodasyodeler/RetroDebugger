@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Expr.h"
 #include "IAstVisitor.h"
-#include "Scanner/Expr.h"
 
-#include "Token/Token.h" // TODO: may want to move this into a cpp file.
+#include "Token.h" // TODO: may want to move this into a cpp file.
 
 using namespace std::literals::string_literals;
 
