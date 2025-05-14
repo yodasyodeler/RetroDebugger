@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "DebuggerCallbacks.h"
 #include "DebuggerCommon.h"
 
 namespace DebuggerPrintFormat {
@@ -32,7 +33,7 @@ std::string PrintMemoryMappedRegInfo(const RegInfo& info);
 std::string PrintAddressInfo(const AddrInfo& info);
 
 // Opcode Instruction print
-std::string PrintInstructions(const CommandList& commandInfo);
+std::string PrintInstructions(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, const CommandList& commandInfo);
 
 // Set Variable print
 std::string PrintListsize(unsigned int listsize);

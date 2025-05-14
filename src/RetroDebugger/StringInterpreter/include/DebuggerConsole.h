@@ -2,6 +2,8 @@
 
 #include "DebuggerInterpreter.h"
 
+namespace Rdb {
+
 class DebuggerConsole {
 public:
     explicit DebuggerConsole(DebuggerInterpreter* interpreter);
@@ -20,3 +22,5 @@ private:
     DebuggerInterpreter* m_interpreter;
     std::vector<std::string> m_prevWords = { "" };
 };
+
+}

@@ -29,7 +29,7 @@ BreakInfo BreakPoint(BreakNum breakNumber, unsigned int address, BankNum bankNum
     };
 }
 
-BreakInfo WatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+BreakInfo WatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
@@ -38,7 +38,7 @@ BreakInfo WatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNum
         // 0, //enableCount not implemented yet
         .timesHit = 0,
         .oldWatchValue = 0,
-        .currentWatchValue = DebuggerCallback::ReadMemory(address),
+        .currentWatchValue = callbacks->ReadMemory(address),
         .type = BreakType::Watchpoint,
         .disp = BreakDisposition::Keep,
         .isEnabled = true,
@@ -47,7 +47,7 @@ BreakInfo WatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNum
     };
 }
 
-BreakInfo ReadWatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
@@ -56,7 +56,7 @@ BreakInfo ReadWatchPoint(BreakNum breakNumber, unsigned int address, BankNum ban
         // 0, //enableCount not implemented yet
         .timesHit = 0,
         .oldWatchValue = 0,
-        .currentWatchValue = DebuggerCallback::ReadMemory(address),
+        .currentWatchValue = callbacks->ReadMemory(address),
         .type = BreakType::ReadWatchpoint,
         .disp = BreakDisposition::Keep,
         .isEnabled = true,
@@ -65,7 +65,7 @@ BreakInfo ReadWatchPoint(BreakNum breakNumber, unsigned int address, BankNum ban
     };
 }
 
-BreakInfo AnyWatchPoint(BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+BreakInfo AnyWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
@@ -74,7 +74,7 @@ BreakInfo AnyWatchPoint(BreakNum breakNumber, unsigned int address, BankNum bank
         // 0, //enableCount not implemented yet
         .timesHit = 0,
         .oldWatchValue = 0,
-        .currentWatchValue = DebuggerCallback::ReadMemory(address),
+        .currentWatchValue = callbacks->ReadMemory(address),
         .type = BreakType::AnyWatchpoint,
         .disp = BreakDisposition::Keep,
         .isEnabled = true,
@@ -88,7 +88,7 @@ BreakInfo AnyWatchPoint(BreakNum breakNumber, unsigned int address, BankNum bank
 BreakInfo ContinuePoint() {
     return BreakInfo{
         .address = std::numeric_limits<unsigned int>::max(),
-        .breakpointNumber = MaxBreakpointNumber,
+        .breakpointNumber = Rdb::MaxBreakpointNumber,
         .bankNumber = AnyBank,
         // 0, //ignoreCount not implemented yet
         // 0, //enableCount not implemented yet
@@ -104,8 +104,8 @@ BreakInfo ContinuePoint() {
 }
 
 // Watch a register
-BreakInfo WatchPoint(BreakNum breakNumber, const std::string& registerName) {
-    const auto regset = DebuggerCallback::GetRegSet();
+BreakInfo WatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, const std::string& registerName) {
+    const auto regset = callbacks->GetRegSet();
     if (const auto iter = regset.find(registerName);
         iter != regset.end()) {
         return BreakInfo{
@@ -129,8 +129,8 @@ BreakInfo WatchPoint(BreakNum breakNumber, const std::string& registerName) {
     return ContinuePoint();
 }
 
-BreakInfo ReadWatchPoint(BreakNum breakNumber, const std::string& registerName) {
-    const auto regset = DebuggerCallback::GetRegSet();
+BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, const std::string& registerName) {
+    const auto regset = callbacks->GetRegSet();
     if (const auto iter = regset.find(registerName);
         iter != regset.end()) {
         return BreakInfo{
@@ -157,8 +157,11 @@ BreakInfo ReadWatchPoint(BreakNum breakNumber, const std::string& registerName) 
 }
 
 
-BreakpointManager::BreakpointManager(std::shared_ptr<DebuggerOperations> operations) :
-    m_operations(std::move(operations)) {}
+namespace Rdb {
+
+BreakpointManager::BreakpointManager(std::shared_ptr<DebuggerOperations> operations, std::shared_ptr<DebuggerCallback> callbacks) :
+    m_operations(std::move(operations)),
+    m_callbacks(std::move(callbacks)) {}
 
 bool BreakpointManager::CheckBreakpoints(BreakInfo& breakInfo) {
     breakInfo = CheckBreakInfo();
@@ -197,21 +200,21 @@ BreakNum BreakpointManager::SetBreakpoint(const BankNum bank, const unsigned int
 }
 
 BreakNum BreakpointManager::SetWatchpoint(const unsigned int address, BankNum bankNum) {
-    const BreakInfo breakpoint = WatchPoint(m_breakPointCounter++, address, bankNum);
+    const BreakInfo breakpoint = WatchPoint(m_callbacks, m_breakPointCounter++, address, bankNum);
     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
 
     return breakpoint.breakpointNumber;
 }
 
 BreakNum BreakpointManager::SetReadWatchpoint(unsigned int address, BankNum bank) {
-    const BreakInfo breakpoint = ReadWatchPoint(m_breakPointCounter++, address, bank);
+    const BreakInfo breakpoint = ReadWatchPoint(m_callbacks, m_breakPointCounter++, address, bank);
     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
 
     return breakpoint.breakpointNumber;
 }
 
 BreakNum BreakpointManager::SetAnyWatchpoint(unsigned int address, BankNum bank) {
-    const BreakInfo breakpoint = AnyWatchPoint(m_breakPointCounter++, address, bank);
+    const BreakInfo breakpoint = AnyWatchPoint(m_callbacks, m_breakPointCounter++, address, bank);
     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
 
     return breakpoint.breakpointNumber;
@@ -295,14 +298,14 @@ void BreakpointManager::WriteMemoryHook(BankNum bankNum, unsigned int address, c
 BreakInfo BreakpointManager::CheckBreakInfo() {
     for (auto& [breakNum, breakInfo] : m_breakpoints) {
         if (breakInfo.isEnabled) {
-            if (breakInfo.type == BreakType::Breakpoint && (breakInfo.bankNumber == AnyBank && breakInfo.address == DebuggerCallback::GetPcReg()) || // NON-Bank Breakpoint
-                (breakInfo.bankNumber != AnyBank && DebuggerCallback::CheckBankableMemoryLocation(breakInfo.bankNumber, breakInfo.address))) { // Bank Breakpoint
+            if (breakInfo.type == BreakType::Breakpoint && (breakInfo.bankNumber == AnyBank && breakInfo.address == m_callbacks->GetPcReg()) || // NON-Bank Breakpoint
+                (breakInfo.bankNumber != AnyBank && m_callbacks->CheckBankableMemoryLocation(breakInfo.bankNumber, breakInfo.address))) { // Bank Breakpoint
 
                 ++breakInfo.timesHit;
                 return breakInfo;
             }
             if (breakInfo.type == BreakType::Watchpoint || breakInfo.type == BreakType::ReadWatchpoint || breakInfo.type == BreakType::AnyWatchpoint) {
-                const auto currentWatchValue = breakInfo.bankNumber == AnyBank ? DebuggerCallback::ReadMemory(breakInfo.address) : DebuggerCallback::ReadBankableMemory(breakInfo.bankNumber, breakInfo.address);
+                const auto currentWatchValue = breakInfo.bankNumber == AnyBank ? m_callbacks->ReadMemory(breakInfo.address) : m_callbacks->ReadBankableMemory(breakInfo.bankNumber, breakInfo.address);
 
                 if (breakInfo.externalHit || (breakInfo.type != BreakType::ReadWatchpoint && breakInfo.currentWatchValue != currentWatchValue)) {
                     breakInfo.oldWatchValue = breakInfo.currentWatchValue;
@@ -341,13 +344,13 @@ bool BreakpointManager::HandleBreakInfo(const BreakInfo& info) {
             break;
         case DebugOperation::FinishOp:
             if (m_operations) {
-                const auto pcReg = DebuggerCallback::GetPcReg();
-                const auto cmd = DebuggerCallback::ReadMemory(pcReg);
+                const auto pcReg = m_callbacks->GetPcReg();
+                const auto cmd = m_callbacks->ReadMemory(pcReg);
                 const auto jumpInstructions = m_operations->GetJumpOperations();
 
                 const auto extendedOperation = jumpInstructions.extendedOperations.find(cmd);
                 if (extendedOperation != jumpInstructions.extendedOperations.end()) {
-                    const auto extendedCommand = DebuggerCallback::ReadMemory(pcReg + jumpInstructions.opcodeLength);
+                    const auto extendedCommand = m_callbacks->ReadMemory(pcReg + jumpInstructions.opcodeLength);
                     if (extendedOperation->second.operations.contains(extendedCommand)) {
                         return true;
                     }
@@ -371,4 +374,6 @@ bool BreakpointManager::ModifyBreak(const std::vector<BreakNum>& list, bool isEn
         }
     }
     return foundBreakpoint;
+}
+
 }

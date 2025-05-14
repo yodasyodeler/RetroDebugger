@@ -4,6 +4,8 @@
 
 #include <fmt/format.h>
 
+namespace Rdb {
+
 DebuggerConsole::DebuggerConsole(DebuggerInterpreter* interpreter) :
     m_interpreter(interpreter) {}
 
@@ -101,4 +103,6 @@ bool DebuggerConsole::ParseCommand(std::vector<std::string>& words) { // NOLINT 
 
     m_interpreter->SetCommandResponse(fmt::format("Invalid arg, \"help {}\" for info on command and args\n", cmd));
     return false;
+}
+
 }

@@ -7,6 +7,11 @@
 #include <memory>
 #include <ranges>
 
+namespace Rdb {
+
+Rdb::DebuggerOperations::DebuggerOperations(std::shared_ptr<DebuggerCallback> callbacks) :
+    m_callbacks(std::move(callbacks)) {}
+
 void DebuggerOperations::Reset() {
     m_operations = {};
     m_jumpOperations = {};
@@ -27,8 +32,8 @@ std::vector<RegisterInfoPtr> DebuggerOperations::GetRegisters() const {
 // TODO: optimize, there is some repeated stuff here
 size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
     // Read the opcode
-    static constexpr auto byteSize =  8U;
-    const auto opcode1 = DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++));
+    static constexpr auto byteSize = 8U;
+    const auto opcode1 = m_callbacks->ReadMemory(static_cast<unsigned int>(address++));
 
     // Check for a bad opcode, "opcode greater than the emulated systems opcode length"
     // This is likely an error if the set up ReadMemory callback.
@@ -48,7 +53,7 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
             const auto argLength = GetArgTypeLength(arg->type);
             for (auto i = 0U; i < argLength; ++i) {
                 const auto bitShift = byteSize * i;
-                arg->operationValue |= DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++)) << bitShift;
+                arg->operationValue |= m_callbacks->ReadMemory(static_cast<unsigned int>(address++)) << bitShift;
             }
             numOpcodes += argLength;
         }
@@ -56,7 +61,7 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
     }
     else if (m_operations.extendedOperations.contains(opcode1)) {
         const auto& extOperations = m_operations.extendedOperations.at(opcode1);
-        const auto opcode2 = DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++));
+        const auto opcode2 = m_callbacks->ReadMemory(static_cast<unsigned int>(address++));
         auto numOpcodes = (extOperations.opcodeLength * 2) / byteSize; // Extended Opcode and Opcode.
         operation = extOperations.operations.at(opcode2);
 
@@ -67,7 +72,7 @@ size_t DebuggerOperations::GetOperation(size_t address, Operation& operation) {
             const auto argLength = GetArgTypeLength(arg->type);
             for (auto i = 0U; i < argLength; ++i) {
                 const auto bitShift = byteSize * i;
-                arg->operationValue |= DebuggerCallback::ReadMemory(static_cast<unsigned int>(address++)) << bitShift;
+                arg->operationValue |= m_callbacks->ReadMemory(static_cast<unsigned int>(address++)) << bitShift;
             }
             numOpcodes += argLength;
         }
@@ -157,4 +162,6 @@ void DebuggerOperations::ConvertOperation(OpcodeToOperation& operationMap, const
     auto opcode = xmlOperation.opcode;
     const Operation operation = { operationInfoPtr, operationArguments };
     operationMap.emplace(opcode, operation);
+}
+
 }

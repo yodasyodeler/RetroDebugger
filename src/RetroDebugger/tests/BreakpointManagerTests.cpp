@@ -31,9 +31,9 @@ namespace DebuggerTests {
 class BreakpointManagerTests : public ::testing::Test {
 public:
     void SetUp() override {
-        DebuggerCallback::SetGetPcRegCallback([this]() { return GetPcRegMock(); });
-        DebuggerCallback::SetReadMemoryCallback([this](unsigned int address) { return ReadRomMemory(address); });
-        DebuggerCallback::SetReadBankableMemoryCallback([this](BankNum bankNum, unsigned int address) { return ReadBankableMemory(bankNum, address); });
+        m_callbacks->SetGetPcRegCallback([this]() { return GetPcRegMock(); });
+        m_callbacks->SetReadMemoryCallback([this](unsigned int address) { return ReadRomMemory(address); });
+        m_callbacks->SetReadBankableMemoryCallback([this](BankNum bankNum, unsigned int address) { return ReadBankableMemory(bankNum, address); });
     }
 
     void TearDown() override {}
@@ -42,7 +42,8 @@ public:
     unsigned int ReadRomMemory(unsigned int /*address*/) { return g_memory; }
     unsigned int ReadBankableMemory(BankNum, unsigned int) { return g_memory; }
 
-    BreakpointManager m_breakpointManager;
+    std::shared_ptr<Rdb::DebuggerCallback> m_callbacks = std::make_shared<Rdb::DebuggerCallback>();
+    Rdb::BreakpointManager m_breakpointManager{ std::shared_ptr<Rdb::DebuggerOperations>{}, m_callbacks };
 
     unsigned int m_pc = 0; // TODO: make a gmock interface
     unsigned int g_memory = 0; // TODO: make a gmock interface

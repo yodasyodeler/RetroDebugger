@@ -2,9 +2,11 @@
 
 #include "BreakpointManager.h"
 
+namespace Rdb {
+
 class Debugger {
 public:
-    Debugger();
+    Debugger(std::shared_ptr<DebuggerCallback> callbacks);
     bool CheckBreakpoints(BreakInfo& breakInfo);
 
     bool Run(unsigned int numBreakpointsToSkip = 0);
@@ -23,7 +25,7 @@ public:
     bool DeleteBreakpoints(const std::vector<unsigned int>& list = {});
 
     // RegInfo GetRegInfo(int reg);
-    static AddrInfo GetRomInfo(unsigned int address);
+    AddrInfo GetRomInfo(unsigned int address);
 
     CommandList GetCommandInfoList(size_t address, unsigned int numInstructions);
     CommandList GetCommandInfoList(size_t address, size_t endAddress); // TODO: May make sense to use a strongly typed Address type.
@@ -39,6 +41,9 @@ public:
     void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
 
 private:
+    std::shared_ptr<DebuggerCallback> m_callbacks;
     std::shared_ptr<DebuggerOperations> m_operations;
     BreakpointManager m_breakManager;
 };
+
+}

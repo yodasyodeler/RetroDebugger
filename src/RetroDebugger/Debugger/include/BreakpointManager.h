@@ -1,10 +1,14 @@
 #pragma once
+
+#include "DebuggerCallbacks.h"
 #include "DebuggerCommon.h"
 
 #include <limits>
 #include <map>
 #include <string>
 #include <vector>
+
+namespace Rdb {
 
 static constexpr BreakNum MaxBreakpointNumber = BreakNum{ std::numeric_limits<unsigned int>::max() };
 static constexpr unsigned int MaxAddress = std::numeric_limits<unsigned int>::max();
@@ -19,8 +23,7 @@ class BreakpointManager {
     };
 
 public:
-    BreakpointManager() = default;
-    explicit BreakpointManager(std::shared_ptr<DebuggerOperations> operations);
+    explicit BreakpointManager(std::shared_ptr<DebuggerOperations> operations, std::shared_ptr<DebuggerCallback> callbacks);
 
     bool CheckBreakpoints(BreakInfo& breakInfo);
 
@@ -54,9 +57,12 @@ private:
 
     std::map<BreakNum, BreakInfo> m_breakpoints = {};
     std::shared_ptr<DebuggerOperations> m_operations;
+    std::shared_ptr<DebuggerCallback> m_callbacks;
 
     DebugOperation m_debugOp = DebugOperation::RunOp;
     unsigned int m_instructionsToStep = 0;
 
     BreakNum m_breakPointCounter = BreakNum{ 1 };
 };
+
+}

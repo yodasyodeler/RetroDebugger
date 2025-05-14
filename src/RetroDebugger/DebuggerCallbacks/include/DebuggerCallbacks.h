@@ -2,27 +2,30 @@
 
 #include "RetroDebuggerCallbackDefines.h"
 
-// TODO: Probably should just make this non-static methods
+namespace Rdb {
+
 class DebuggerCallback {
 public:
-    static unsigned int GetPcReg();
-    static unsigned int ReadMemory(unsigned int address);
-    static bool CheckBankableMemoryLocation(BankNum bank, unsigned int address);
-    static unsigned int ReadBankableMemory(BankNum bank, unsigned int address);
-    static RegSet GetRegSet();
+    unsigned int GetPcReg();
+    unsigned int ReadMemory(unsigned int address);
+    bool CheckBankableMemoryLocation(BankNum bank, unsigned int address);
+    unsigned int ReadBankableMemory(BankNum bank, unsigned int address);
+    RegSet GetRegSet();
 
     // Set Callbacks
-    static void SetGetPcRegCallback(Rdb::GetProgramCounterFunc getPcReg_cb);
-    static void SetReadMemoryCallback(Rdb::ReadMemoryFunc readMemory_cb);
-    static void SetCheckBankableMemoryLocationCallback(Rdb::CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
-    static void SetReadBankableMemoryCallback(Rdb::ReadBankableMemoryFunc readBankableMemory_cb);
-    static void SetGetRegSetCallback(Rdb::GetRegSetFunc getRegSet_cb);
+    void SetGetPcRegCallback(Rdb::GetProgramCounterFunc getPcReg_cb);
+    void SetReadMemoryCallback(Rdb::ReadMemoryFunc readMemory_cb);
+    void SetCheckBankableMemoryLocationCallback(Rdb::CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
+    void SetReadBankableMemoryCallback(Rdb::ReadBankableMemoryFunc readBankableMemory_cb);
+    void SetGetRegSetCallback(Rdb::GetRegSetFunc getRegSet_cb);
 
 private:
     // Callback functions
-    static Rdb::GetProgramCounterFunc m_getPcReg_cb;
-    static Rdb::ReadMemoryFunc m_readMemory_cb;
-    static Rdb::CheckBankableMemoryLocationFunc m_CheckBankableMemoryLocation_cb;
-    static Rdb::ReadBankableMemoryFunc m_readBankableMemory_cb;
-    static Rdb::GetRegSetFunc m_getRegSet_cb;
+    Rdb::GetProgramCounterFunc m_getPcReg_cb;
+    Rdb::ReadMemoryFunc m_readMemory_cb;
+    Rdb::CheckBankableMemoryLocationFunc m_CheckBankableMemoryLocation_cb;
+    Rdb::ReadBankableMemoryFunc m_readBankableMemory_cb;
+    Rdb::GetRegSetFunc m_getRegSet_cb;
 };
+
+}

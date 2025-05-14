@@ -14,9 +14,12 @@ std::vector<BreakNum> ToBreakNumList(const std::vector<unsigned int>& list) {
 }
 }
 
+namespace Rdb {
 
-Debugger::Debugger() :
-    m_operations(std::make_shared<DebuggerOperations>()), m_breakManager(m_operations) {}
+Debugger::Debugger(std::shared_ptr<DebuggerCallback> callbacks) :
+    m_callbacks(std::move(callbacks)),
+    m_operations(std::make_shared<DebuggerOperations>(m_callbacks)),
+    m_breakManager(m_operations, m_callbacks) {}
 
 bool Debugger::CheckBreakpoints(BreakInfo& breakInfo) {
     return m_breakManager.CheckBreakpoints(breakInfo);
@@ -74,7 +77,9 @@ BreakList Debugger::GetBreakpointInfoList(const std::vector<unsigned int>& list)
 
 // RegInfo Debugger::GetRegInfo(const int /*reg*/) { return {}; } // TODO: need to redo RegInfo
 
-AddrInfo Debugger::GetRomInfo(const unsigned int address) { return { address, DebuggerCallback::ReadMemory(address) }; }
+AddrInfo Debugger::GetRomInfo(const unsigned int address) {
+    return { address, m_callbacks->ReadMemory(address) };
+}
 
 std::vector<RegisterInfoPtr> Debugger::GetRegisterInfoList() {
     return m_operations->GetRegisters();
@@ -116,4 +121,6 @@ CommandList Debugger::GetCommandInfoList(size_t address, size_t endAddress) {
         operations.emplace(operationAddress, operation);
     }
     return operations;
+}
+
 }

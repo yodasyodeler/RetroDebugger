@@ -2,11 +2,7 @@
 
 #include <limits>
 
-Rdb::GetProgramCounterFunc DebuggerCallback::m_getPcReg_cb; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables) - TODO: look into this more. Not solving now so blocking the warning for now.
-Rdb::ReadMemoryFunc DebuggerCallback::m_readMemory_cb; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables) - TODO: look into this more. Not solving now so blocking the warning for now.
-Rdb::CheckBankableMemoryLocationFunc DebuggerCallback::m_CheckBankableMemoryLocation_cb; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables) - TODO: look into this more. Not solving now so blocking the warning for now.
-Rdb::ReadBankableMemoryFunc DebuggerCallback::m_readBankableMemory_cb; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables) - TODO: look into this more. Not solving now so blocking the warning for now.
-Rdb::GetRegSetFunc DebuggerCallback::m_getRegSet_cb; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables) - TODO: look into this more. Not solving now so blocking the warning for now.
+namespace Rdb {
 
 // Callback wrappers
 unsigned int DebuggerCallback::GetPcReg() {
@@ -63,4 +59,6 @@ void DebuggerCallback::SetReadBankableMemoryCallback(Rdb::ReadBankableMemoryFunc
 
 void DebuggerCallback::SetGetRegSetCallback(Rdb::GetRegSetFunc getRegSet_cb) {
     m_getRegSet_cb = std::move(getRegSet_cb);
+}
+
 }

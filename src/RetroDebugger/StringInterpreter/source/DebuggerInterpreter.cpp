@@ -9,7 +9,10 @@
 #include <numeric>
 #include <sstream>
 
-DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger) :
+namespace Rdb {
+
+DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger, std::shared_ptr<DebuggerCallback> callbacks) :
+    m_callbacks(std::move(callbacks)),
     m_debugger(debugger) {}
 
 std::string DebuggerInterpreter::GetCommandResponse() const {
@@ -81,7 +84,7 @@ bool DebuggerInterpreter::SetBreakpoint(const std::vector<std::string>& words) {
     const auto cmdCount = words.size();
 
     if (cmdCount == 1) {
-        m_debugger->SetBreakpoint(DebuggerCallback::GetPcReg());
+        m_debugger->SetBreakpoint(m_callbacks->GetPcReg());
         return true;
     }
     if (cmdCount == 2) {
@@ -164,7 +167,7 @@ bool DebuggerInterpreter::GetInfo(const std::vector<std::string>& words) {
     }
     else if (words[1] == "line") {
         if (cmdCount == 2) {
-            SetCommandResponse(DebuggerPrintFormat::PrintLineInfo(DebuggerCallback::GetPcReg()));
+            SetCommandResponse(DebuggerPrintFormat::PrintLineInfo(m_callbacks->GetPcReg()));
             return true;
         }
     }
@@ -219,7 +222,7 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
 
     if (cmdCount == 2) {
         unsigned int number{};
-        const auto regSet = DebuggerCallback::GetRegSet();
+        const auto regSet = m_callbacks->GetRegSet();
         auto reg = regSet.find(words[1]);
         if (reg != regSet.end()) {
             SetCommandResponse(DebuggerPrintFormat::PrintRegister(reg->first, reg->second) + "\n");
@@ -248,7 +251,7 @@ bool DebuggerInterpreter::Print(const std::vector<std::string>& words) {
 bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
     m_commandResponse.clear();
     const auto cmdCount = words.size();
-    unsigned int number = DebuggerCallback::GetPcReg();
+    unsigned int number = m_callbacks->GetPcReg();
     unsigned int listSize = m_listSize;
 
     bool isAddressRange = false; // TODO: hack for now. Should rethink this to make it simpler
@@ -271,7 +274,7 @@ bool DebuggerInterpreter::List(const std::vector<std::string>& words) {
 
         auto commands = isAddressRange ? m_debugger->GetCommandInfoList(static_cast<size_t>(number), static_cast<size_t>(listSize)) : m_debugger->GetCommandInfoList(static_cast<size_t>(number), listSize);
 
-        SetCommandResponse(DebuggerPrintFormat::PrintInstructions(commands));
+        SetCommandResponse(DebuggerPrintFormat::PrintInstructions(m_callbacks, commands));
         if (!commands.empty()) {
             auto command = commands.rbegin();
             auto lastAddress = command->first;
@@ -312,4 +315,6 @@ bool DebuggerInterpreter::SetListsize(const unsigned int listsize) {
     m_commandResponse.clear();
     m_listSize = listsize;
     return true;
+}
+
 }

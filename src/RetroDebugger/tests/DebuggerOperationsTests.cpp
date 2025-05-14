@@ -33,8 +33,9 @@ public:
         return m_mockMemory[address];
     };
 
+    std::shared_ptr<Rdb::DebuggerCallback> m_callbacks = std::make_shared<Rdb::DebuggerCallback>();
     std::shared_ptr<DebuggerXmlParser> m_parser = std::make_shared<DebuggerXmlParser>();
-    std::unique_ptr<DebuggerOperations> m_operations = std::make_unique<DebuggerOperations>();
+    std::unique_ptr<Rdb::DebuggerOperations> m_operations = std::make_unique<Rdb::DebuggerOperations>(m_callbacks);
 };
 
 TEST_F(DebuggerOperationsTests, GameboyOperations_ParseFile) {
@@ -83,7 +84,8 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_ExtendedOperationArgumentsMatc
 TEST_F(DebuggerOperationsTests, GameboyOperations_GetOperation) {
     static constexpr auto RetNoCarryOpcode = 0xD0;
     m_mockMemory.push_back(RetNoCarryOpcode);
-    DebuggerCallback::SetReadMemoryCallback(MockReadMemory);
+    m_callbacks->SetReadMemoryCallback(MockReadMemory);
+
     Operation actualOperation;
     const auto sizeOfOperation = m_operations->GetOperation(0, actualOperation);
     EXPECT_EQ(sizeOfOperation, 1U);
@@ -101,7 +103,8 @@ TEST_F(DebuggerOperationsTests, GameboyOperations_GetExtendedOperation) {
     static constexpr auto SraIndirectHlOpcode = 0x2E;
     m_mockMemory.push_back(extendedOpcode);
     m_mockMemory.push_back(SraIndirectHlOpcode);
-    DebuggerCallback::SetReadMemoryCallback(MockReadMemory);
+    m_callbacks->SetReadMemoryCallback(MockReadMemory);
+
     Operation actualOperation;
     const auto sizeOfOperation = m_operations->GetOperation(0, actualOperation);
     EXPECT_EQ(sizeOfOperation, 2U);

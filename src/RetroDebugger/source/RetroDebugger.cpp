@@ -138,25 +138,25 @@ void RetroDebugger::ParseXmlFile(const std::string& filename) {
 
 // Set Callbacks
 void RetroDebugger::SetGetPcRegCallback(GetProgramCounterFunc getPc_cb) {
-    DebuggerCallback::SetGetPcRegCallback(std::move(getPc_cb));
+    m_callbacks->SetGetPcRegCallback(std::move(getPc_cb));
 }
 
 void RetroDebugger::SetReadMemoryCallback(ReadMemoryFunc readMemory_cb) {
-    DebuggerCallback::SetReadMemoryCallback(std::move(readMemory_cb));
+    m_callbacks->SetReadMemoryCallback(std::move(readMemory_cb));
 }
 
 // TODO: I need to think about this callback more. The idea is to add the bank to a break/watch such as Bank 3 address 0x40C0 -> "3:0x40C0"
 void RetroDebugger::SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb) {
-    return DebuggerCallback::SetCheckBankableMemoryLocationCallback(std::move(CheckBankableMemoryLocation_cb));
+    m_callbacks->SetCheckBankableMemoryLocationCallback(std::move(CheckBankableMemoryLocation_cb));
 }
 
 void RetroDebugger::SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb) {
-    DebuggerCallback::SetReadBankableMemoryCallback(std::move(readBankMemory_cb));
+    m_callbacks->SetReadBankableMemoryCallback(std::move(readBankMemory_cb));
 }
 
 
 void RetroDebugger::SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
-    DebuggerCallback::SetGetRegSetCallback(std::move(getRegSet_cb));
+    m_callbacks->SetGetRegSetCallback(std::move(getRegSet_cb));
 }
 
 void RetroDebugger::ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {

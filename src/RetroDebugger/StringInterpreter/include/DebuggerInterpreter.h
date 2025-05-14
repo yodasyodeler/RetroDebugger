@@ -5,9 +5,11 @@
 
 #include "Debugger.h"
 
+namespace Rdb {
+
 class DebuggerInterpreter {
 public:
-    explicit DebuggerInterpreter(Debugger* debugger);
+    explicit DebuggerInterpreter(Debugger* debugger, std::shared_ptr<DebuggerCallback> callbacks);
 
     [[nodiscard]] std::string GetCommandResponse() const;
     void SetCommandResponse(std::string response);
@@ -37,5 +39,8 @@ private:
     unsigned int m_listSize = 10;
     size_t m_listAddress = 0;
     std::string m_commandResponse;
+    std::shared_ptr<DebuggerCallback> m_callbacks;
     Debugger* m_debugger;
 };
+
+}

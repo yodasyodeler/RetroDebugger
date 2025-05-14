@@ -208,7 +208,7 @@ std::string PrintAddressInfo(const AddrInfo& info) {
     return msg.str();
 }
 
-std::string PrintInstructions(const CommandList& commandInfo) {
+std::string PrintInstructions(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, const CommandList& commandInfo) {
     std::string temp;
     for (const auto& info : commandInfo) {
         std::stringstream msg;
@@ -217,8 +217,8 @@ std::string PrintInstructions(const CommandList& commandInfo) {
         // TODO: need to rethink this. Can't assume the memory value that is read from the callback.
         temp += msg.str();
 
-        const auto byte = static_cast<uint8_t>(DebuggerCallback::ReadMemory(static_cast<unsigned int>(info.first) + 1));
-        const auto word = static_cast<uint16_t>((DebuggerCallback::ReadMemory(static_cast<unsigned int>(info.first) + 2U) << 8U) | byte); // TODO: Code smell, this doesn't look like the best way to do this!
+        const auto byte = static_cast<uint8_t>(callbacks->ReadMemory(static_cast<unsigned int>(info.first) + 1));
+        const auto word = static_cast<uint16_t>((callbacks->ReadMemory(static_cast<unsigned int>(info.first) + 2U) << 8U) | byte); // TODO: Code smell, this doesn't look like the best way to do this!
 
         for (const auto& arg : info.second.arguments) {
             if (arg->indirectArg && arg->type != ArgumentType::REG) { temp += "("; }

@@ -1,6 +1,5 @@
-#include "RetroDebuggerCallbackDefines.h"
-
 #include "Debugger.h"
+#include "DebuggerCallbacks.h"
 #include "DebuggerConsole.h"
 #include "DebuggerInterpreter.h"
 
@@ -49,15 +48,15 @@ public:
     void ParseXmlFile(const std::string& filename);
 
     // Callbacks
-    static void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);
+    void SetGetPcRegCallback(GetProgramCounterFunc getPc_cb);
 
-    static void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb);
+    void SetReadMemoryCallback(ReadMemoryFunc readMemory_cb);
 
-    static void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
+    void SetCheckBankableMemoryLocationCallback(CheckBankableMemoryLocationFunc CheckBankableMemoryLocation_cb);
 
-    static void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb);
+    void SetReadBankableMemoryCallback(ReadBankableMemoryFunc readBankMemory_cb);
 
-    static void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
+    void SetGetRegSetCallback(GetRegSetFunc getRegSet_cb);
 
     // Hooks
     void ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
@@ -65,8 +64,9 @@ public:
     void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
 
 private:
-    Debugger m_debugger;
-    DebuggerInterpreter m_interpreter{ &m_debugger };
+    std::shared_ptr<DebuggerCallback> m_callbacks = std::make_shared<DebuggerCallback>();
+    Debugger m_debugger{ m_callbacks };
+    DebuggerInterpreter m_interpreter{ &m_debugger, m_callbacks };
     DebuggerConsole m_console{ &m_interpreter };
 };
 
