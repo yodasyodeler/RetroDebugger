@@ -48,6 +48,7 @@ target_compile_features(RetroDebugger_options INTERFACE cxx_std_${CMAKE_CXX_STAN
 include(dependencies/fmt)
 include(dependencies/NamedType)
 include(dependencies/tinyxml2)
+include(dependencies/magic_enum)
 
 # Adding the src:
 add_subdirectory(src bin)

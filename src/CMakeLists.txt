@@ -32,5 +32,6 @@ target_sources(RetroDebugger PRIVATE source/RetroDebuggerApi.cpp)
 
 # Add Source files and assets
 add_subdirectory(assets)
+add_subdirectory(ConditionInterpreter)
 add_subdirectory(RetroDebugger)
 add_subdirectory(RetroDebuggerCommon)
