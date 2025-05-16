@@ -33,7 +33,7 @@ public:
         return m_mockMemory[address];
     };
 
-    std::shared_ptr<Rdb::DebuggerCallback> m_callbacks = std::make_shared<Rdb::DebuggerCallback>();
+    std::shared_ptr<Rdb::DebuggerCallbacks> m_callbacks = std::make_shared<Rdb::DebuggerCallbacks>();
     std::shared_ptr<DebuggerXmlParser> m_parser = std::make_shared<DebuggerXmlParser>();
     std::unique_ptr<Rdb::DebuggerOperations> m_operations = std::make_unique<Rdb::DebuggerOperations>(m_callbacks);
 };

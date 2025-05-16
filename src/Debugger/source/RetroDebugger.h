@@ -64,7 +64,7 @@ public:
     void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
 
 private:
-    std::shared_ptr<DebuggerCallback> m_callbacks = std::make_shared<DebuggerCallback>();
+    std::shared_ptr<DebuggerCallbacks> m_callbacks = std::make_shared<DebuggerCallbacks>();
     Debugger m_debugger{ m_callbacks };
     DebuggerInterpreter m_interpreter{ &m_debugger, m_callbacks };
     DebuggerConsole m_console{ &m_interpreter };

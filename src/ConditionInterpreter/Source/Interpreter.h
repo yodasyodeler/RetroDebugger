@@ -1,14 +1,16 @@
 #pragma once
 
+#include "IDebuggerCallbacks.h"
 #include "IExpr.h"
-
 #include "Report.h"
 
 #include <functional>
 
+namespace Rdb {
+
 class Interpreter : public IAstVisitor {
 public:
-    Interpreter(ErrorsPtr errors);
+    Interpreter(std::shared_ptr<IDebuggerCallbacks> callbacks, ErrorsPtr errors);
 
     std::string InterpretAsString(const Expr::IExprPtr& expr);
     bool InterpretBoolean(const Expr::IExprPtr& expr);
@@ -35,3 +37,5 @@ private:
     PrinterMethod m_printer;
     ErrorsPtr m_errors;
 };
+
+}

@@ -3,21 +3,22 @@
 #include <memory>
 #include <string>
 
-#include <IExpr.h>
 #include <IDebuggerCallbacks.h>
+#include <IExpr.h>
 
 
 namespace Rdb {
 
 class ConditionInterpreter {
 public:
-    static std::unique_ptr<ConditionInterpreter> CreateCondition(const std::string& conditionString);
+    static std::unique_ptr<ConditionInterpreter> CreateCondition(std::shared_ptr<IDebuggerCallbacks> callbacks, const std::string& conditionString);
 
     bool EvaluateCondition();
 
 private:
-    ConditionInterpreter(Expr::IExprPtr expression);
+    ConditionInterpreter(std::shared_ptr<IDebuggerCallbacks> callbacks, Expr::IExprPtr expression);
 
+    std::shared_ptr<IDebuggerCallbacks> m_callbacks;
     Expr::IExprPtr m_conditionExpression;
 };
 using ConditionPtr = std::unique_ptr<ConditionInterpreter>;

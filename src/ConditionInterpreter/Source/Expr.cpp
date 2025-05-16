@@ -6,7 +6,7 @@ namespace Expr {
 Binary::Binary(IExprPtr left, TokenPtr oper, IExprPtr right) :
     m_left(std::move(left)), m_oper(std::move(oper)), m_right(std::move(right)) {}
 
-VisitorValue Binary::Accept(const IAstVisitor* visitor) const {
+VisitorValue Binary::Accept(const Rdb::IAstVisitor* visitor) const {
     return visitor->VisitBinary(this);
 }
 
@@ -15,7 +15,7 @@ VisitorValue Binary::Accept(const IAstVisitor* visitor) const {
 Grouping::Grouping(IExprPtr expression) :
     m_expression(std::move(expression)) {}
 
-VisitorValue Grouping::Accept(const IAstVisitor* visitor) const {
+VisitorValue Grouping::Accept(const Rdb::IAstVisitor* visitor) const {
     return visitor->VisitGrouping(this);
 }
 
@@ -24,7 +24,7 @@ VisitorValue Grouping::Accept(const IAstVisitor* visitor) const {
 Literal::Literal(LiteralObject value) :
     m_value(std::move(value)) {}
 
-VisitorValue Literal::Accept(const IAstVisitor* visitor) const {
+VisitorValue Literal::Accept(const Rdb::IAstVisitor* visitor) const {
     return visitor->VisitLiteral(this);
 }
 
@@ -33,7 +33,7 @@ VisitorValue Literal::Accept(const IAstVisitor* visitor) const {
 Unary::Unary(TokenPtr oper, IExprPtr right) :
     m_oper(std::move(oper)), m_right(std::move(right)) {}
 
-VisitorValue Unary::Accept(const IAstVisitor* visitor) const {
+VisitorValue Unary::Accept(const Rdb::IAstVisitor* visitor) const {
     return visitor->VisitUnary(this);
 }
 
@@ -43,7 +43,7 @@ Variable::Variable(TokenPtr name) :
     m_name(std::move(name)) {
 }
 
-VisitorValue Variable::Accept(const IAstVisitor* visitor) const {
+VisitorValue Variable::Accept(const Rdb::IAstVisitor* visitor) const {
     return visitor->VisitVariable(this);
 }
 

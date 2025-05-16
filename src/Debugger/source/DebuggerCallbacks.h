@@ -4,7 +4,7 @@
 
 namespace Rdb {
 
-class DebuggerCallback : public IDebuggerCallbacks{
+class DebuggerCallbacks : public IDebuggerCallbacks {
 public:
     unsigned int GetPcReg() override;
     unsigned int ReadMemory(unsigned int address) override;

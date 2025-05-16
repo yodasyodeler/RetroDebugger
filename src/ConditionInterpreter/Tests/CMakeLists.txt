@@ -18,7 +18,8 @@ target_sources(
 
 target_link_libraries(
     ConditionInterpreterLibTests
-    PRIVATE RetroDebugger_options
+    PRIVATE DebuggerLib
+            RetroDebugger_options
             RetroDebugger_warnings
             ConditionInterpreterLib
             fmt::fmt

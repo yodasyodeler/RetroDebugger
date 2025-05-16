@@ -11,8 +11,9 @@ constexpr bool IsZero(const LiteralObject& literal) noexcept {
 }
 }
 
+namespace Rdb {
 
-Interpreter::Interpreter(ErrorsPtr errors) :
+Interpreter::Interpreter(std::shared_ptr<IDebuggerCallbacks> callbacks, ErrorsPtr errors) :
     m_errors(std::move(errors)),
     m_printer([](std::string_view message) { fmt::print("{}", message); }) {}
 
@@ -179,4 +180,6 @@ void Interpreter::CheckNumberOperand(const TokenPtr& oper, const VisitorValue& l
     if (IsDouble(left) && IsDouble(right)) { return; }
 
     throw RuntimeError(oper, "Operands must be a number.");
+}
+
 }

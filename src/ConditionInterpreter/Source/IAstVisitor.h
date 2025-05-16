@@ -12,6 +12,8 @@ struct Unary;
 struct Variable;
 }
 
+namespace Rdb {
+
 class IAstVisitor {
 public:
     virtual ~IAstVisitor() = default;
@@ -22,3 +24,5 @@ public:
     virtual VisitorValue VisitUnary(const Expr::Unary* expr) const = 0;
     virtual VisitorValue VisitVariable(const Expr::Variable* expr) const = 0;
 };
+
+}

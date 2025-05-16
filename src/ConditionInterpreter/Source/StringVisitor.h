@@ -7,7 +7,7 @@
 
 using namespace std::literals::string_literals;
 
-struct StringVisitor : public IAstVisitor
+struct StringVisitor : public Rdb::IAstVisitor
 {
     VisitorValue VisitBinary(const Expr::Binary* expr) const override { return "("s + expr->m_oper->GetLexeme() + " "s + std::get<std::string>(expr->m_left->Accept(this)) + " "s + std::get<std::string>(expr->m_right->Accept(this)) + ")"s; }
     VisitorValue VisitGrouping(const Expr::Grouping* expr) const override { return "(group "s + std::get<std::string>(expr->m_expression->Accept(this)) + ")"s; }

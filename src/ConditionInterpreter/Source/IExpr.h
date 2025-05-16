@@ -6,10 +6,11 @@
 
 namespace Expr {
 
-struct IExpr {
+struct IExpr
+{
     virtual ~IExpr() = default;
 
-    virtual VisitorValue Accept(const IAstVisitor* visitor) const = 0;
+    virtual VisitorValue Accept(const Rdb::IAstVisitor* visitor) const = 0;
 };
 using IExprPtr = std::shared_ptr<IExpr>; // TODO: Can this be a unique_ptr?
 

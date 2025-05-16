@@ -7,7 +7,8 @@
 
 namespace Rdb {
 
-ConditionPtr ConditionInterpreter::CreateCondition(const std::string& conditionString) {
+// Static Public
+ConditionPtr ConditionInterpreter::CreateCondition(std::shared_ptr<IDebuggerCallbacks> callbacks, const std::string& conditionString) {
     auto errors = std::make_shared<Errors>();
     Scanner scanner(errors, conditionString);
     const auto tokens = scanner.ScanTokens();
@@ -15,19 +16,22 @@ ConditionPtr ConditionInterpreter::CreateCondition(const std::string& conditionS
 
     Parser parser(errors, tokens);
     auto expr = parser.Parse();
-    return std::unique_ptr<ConditionInterpreter>(new ConditionInterpreter(expr));
+    return std::unique_ptr<ConditionInterpreter>(new ConditionInterpreter(callbacks, expr));
 }
 
+// Public
 bool ConditionInterpreter::EvaluateCondition() {
     auto errors = std::make_shared<Errors>();
-    Interpreter interpreter(errors);
+    Interpreter interpreter(m_callbacks, errors);
     bool expressionResult = interpreter.InterpretBoolean(m_conditionExpression);
     if (errors->HasError()) { throw std::runtime_error(errors->GetError()); }
 
     return expressionResult;
 }
 
-ConditionInterpreter::ConditionInterpreter(Expr::IExprPtr expression) :
+// Private
+ConditionInterpreter::ConditionInterpreter(std::shared_ptr<IDebuggerCallbacks> callbacks, Expr::IExprPtr expression) :
+    m_callbacks(std::move(callbacks)),
     m_conditionExpression(std::move(expression)) {}
 
 }

@@ -42,7 +42,7 @@ public:
     unsigned int ReadRomMemory(unsigned int /*address*/) { return g_memory; }
     unsigned int ReadBankableMemory(BankNum, unsigned int) { return g_memory; }
 
-    std::shared_ptr<Rdb::DebuggerCallback> m_callbacks = std::make_shared<Rdb::DebuggerCallback>();
+    std::shared_ptr<Rdb::DebuggerCallbacks> m_callbacks = std::make_shared<Rdb::DebuggerCallbacks>();
     Rdb::BreakpointManager m_breakpointManager{ std::shared_ptr<Rdb::DebuggerOperations>{}, m_callbacks };
 
     unsigned int m_pc = 0; // TODO: make a gmock interface

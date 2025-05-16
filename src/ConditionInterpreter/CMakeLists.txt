@@ -7,9 +7,9 @@ target_include_directories(ConditionInterpreterLib PUBLIC "source")
 
 target_link_libraries(
     ConditionInterpreterLib
+    PUBLIC RetroDebuggerInterfaces
     PRIVATE RetroDebugger_options
             RetroDebugger_warnings
-            RetroDebuggerInterfaces
             magic_enum
             fmt::fmt
 )
