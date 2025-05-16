@@ -208,7 +208,7 @@ std::string PrintAddressInfo(const AddrInfo& info) {
     return msg.str();
 }
 
-std::string PrintInstructions(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, const CommandList& commandInfo) {
+std::string PrintInstructions(const std::shared_ptr<Rdb::IDebuggerCallbacks>& callbacks, const CommandList& commandInfo) {
     std::string temp;
     for (const auto& info : commandInfo) {
         std::stringstream msg;

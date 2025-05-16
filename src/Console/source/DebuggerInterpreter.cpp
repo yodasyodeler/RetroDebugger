@@ -2,16 +2,16 @@
 
 #include "DebuggerInterpreter.h"
 
-#include "DebuggerCallbacks.h"
 #include "DebuggerPrintFormat.h"
 #include "DebuggerStringParser.h"
+#include "IDebuggerCallbacks.h"
 
 #include <numeric>
 #include <sstream>
 
 namespace Rdb {
 
-DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger, std::shared_ptr<DebuggerCallback> callbacks) :
+DebuggerInterpreter::DebuggerInterpreter(Debugger* debugger, std::shared_ptr<IDebuggerCallbacks> callbacks) :
     m_callbacks(std::move(callbacks)),
     m_debugger(debugger) {}
 

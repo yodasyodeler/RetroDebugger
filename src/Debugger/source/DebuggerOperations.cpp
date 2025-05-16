@@ -1,7 +1,4 @@
-
 #include "DebuggerOperations.h"
-
-#include "DebuggerCallbacks.h"
 
 #include <algorithm>
 #include <memory>
@@ -9,7 +6,7 @@
 
 namespace Rdb {
 
-Rdb::DebuggerOperations::DebuggerOperations(std::shared_ptr<DebuggerCallback> callbacks) :
+Rdb::DebuggerOperations::DebuggerOperations(std::shared_ptr<IDebuggerCallbacks> callbacks) :
     m_callbacks(std::move(callbacks)) {}
 
 void DebuggerOperations::Reset() {

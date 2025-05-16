@@ -4,7 +4,7 @@
 #include <string>
 
 #include <IExpr.h>
-#include <RetroDebuggerCallbackDefines.h>
+#include <IDebuggerCallbacks.h>
 
 
 namespace Rdb {

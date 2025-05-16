@@ -9,7 +9,7 @@ namespace Rdb {
 
 class DebuggerInterpreter {
 public:
-    explicit DebuggerInterpreter(Debugger* debugger, std::shared_ptr<DebuggerCallback> callbacks);
+    explicit DebuggerInterpreter(Debugger* debugger, std::shared_ptr<IDebuggerCallbacks> callbacks);
 
     [[nodiscard]] std::string GetCommandResponse() const;
     void SetCommandResponse(std::string response);
@@ -39,7 +39,7 @@ private:
     unsigned int m_listSize = 10;
     size_t m_listAddress = 0;
     std::string m_commandResponse;
-    std::shared_ptr<DebuggerCallback> m_callbacks;
+    std::shared_ptr<IDebuggerCallbacks> m_callbacks;
     Debugger* m_debugger;
 };
 

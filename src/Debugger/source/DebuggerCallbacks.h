@@ -1,16 +1,16 @@
 #pragma once
 
-#include "RetroDebuggerCallbackDefines.h"
+#include "IDebuggerCallbacks.h"
 
 namespace Rdb {
 
-class DebuggerCallback {
+class DebuggerCallback : public IDebuggerCallbacks{
 public:
-    unsigned int GetPcReg();
-    unsigned int ReadMemory(unsigned int address);
-    bool CheckBankableMemoryLocation(BankNum bank, unsigned int address);
-    unsigned int ReadBankableMemory(BankNum bank, unsigned int address);
-    RegSet GetRegSet();
+    unsigned int GetPcReg() override;
+    unsigned int ReadMemory(unsigned int address) override;
+    bool CheckBankableMemoryLocation(BankNum bank, unsigned int address) override;
+    unsigned int ReadBankableMemory(BankNum bank, unsigned int address) override;
+    RegSet GetRegSet() override;
 
     // Set Callbacks
     void SetGetPcRegCallback(Rdb::GetProgramCounterFunc getPcReg_cb);

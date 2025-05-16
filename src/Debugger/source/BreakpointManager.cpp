@@ -29,7 +29,7 @@ BreakInfo BreakPoint(BreakNum breakNumber, unsigned int address, BankNum bankNum
     };
 }
 
-BreakInfo WatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+BreakInfo WatchPoint(const std::shared_ptr<Rdb::IDebuggerCallbacks>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
@@ -47,7 +47,7 @@ BreakInfo WatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, Br
     };
 }
 
-BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::IDebuggerCallbacks>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
@@ -65,7 +65,7 @@ BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks
     };
 }
 
-BreakInfo AnyWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
+BreakInfo AnyWatchPoint(const std::shared_ptr<Rdb::IDebuggerCallbacks>& callbacks, BreakNum breakNumber, unsigned int address, BankNum bankNumber = AnyBank) {
     return BreakInfo{
         .address = address,
         .breakpointNumber = breakNumber,
@@ -104,7 +104,7 @@ BreakInfo ContinuePoint() {
 }
 
 // Watch a register
-BreakInfo WatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, const std::string& registerName) {
+BreakInfo WatchPoint(const std::shared_ptr<Rdb::IDebuggerCallbacks>& callbacks, BreakNum breakNumber, const std::string& registerName) {
     const auto regset = callbacks->GetRegSet();
     if (const auto iter = regset.find(registerName);
         iter != regset.end()) {
@@ -129,7 +129,7 @@ BreakInfo WatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, Br
     return ContinuePoint();
 }
 
-BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks, BreakNum breakNumber, const std::string& registerName) {
+BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::IDebuggerCallbacks>& callbacks, BreakNum breakNumber, const std::string& registerName) {
     const auto regset = callbacks->GetRegSet();
     if (const auto iter = regset.find(registerName);
         iter != regset.end()) {
@@ -159,7 +159,7 @@ BreakInfo ReadWatchPoint(const std::shared_ptr<Rdb::DebuggerCallback>& callbacks
 
 namespace Rdb {
 
-BreakpointManager::BreakpointManager(std::shared_ptr<DebuggerOperations> operations, std::shared_ptr<DebuggerCallback> callbacks) :
+BreakpointManager::BreakpointManager(std::shared_ptr<DebuggerOperations> operations, std::shared_ptr<IDebuggerCallbacks> callbacks) :
     m_operations(std::move(operations)),
     m_callbacks(std::move(callbacks)) {}
 

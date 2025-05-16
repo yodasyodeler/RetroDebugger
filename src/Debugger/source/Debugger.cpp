@@ -16,7 +16,7 @@ std::vector<BreakNum> ToBreakNumList(const std::vector<unsigned int>& list) {
 
 namespace Rdb {
 
-Debugger::Debugger(std::shared_ptr<DebuggerCallback> callbacks) :
+Debugger::Debugger(std::shared_ptr<IDebuggerCallbacks> callbacks) :
     m_callbacks(std::move(callbacks)),
     m_operations(std::make_shared<DebuggerOperations>(m_callbacks)),
     m_breakManager(m_operations, m_callbacks) {}

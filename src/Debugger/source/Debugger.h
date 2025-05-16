@@ -6,7 +6,7 @@ namespace Rdb {
 
 class Debugger {
 public:
-    Debugger(std::shared_ptr<DebuggerCallback> callbacks);
+    Debugger(std::shared_ptr<IDebuggerCallbacks> callbacks);
     bool CheckBreakpoints(BreakInfo& breakInfo);
 
     bool Run(unsigned int numBreakpointsToSkip = 0);
@@ -41,7 +41,7 @@ public:
     void WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes);
 
 private:
-    std::shared_ptr<DebuggerCallback> m_callbacks;
+    std::shared_ptr<IDebuggerCallbacks> m_callbacks;
     std::shared_ptr<DebuggerOperations> m_operations;
     BreakpointManager m_breakManager;
 };

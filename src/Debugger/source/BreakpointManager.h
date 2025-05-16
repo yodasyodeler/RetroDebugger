@@ -1,7 +1,7 @@
 #pragma once
 
-#include "DebuggerCallbacks.h"
 #include "DebuggerCommon.h"
+#include "IDebuggerCallbacks.h"
 
 #include <limits>
 #include <map>
@@ -23,7 +23,7 @@ class BreakpointManager {
     };
 
 public:
-    explicit BreakpointManager(std::shared_ptr<DebuggerOperations> operations, std::shared_ptr<DebuggerCallback> callbacks);
+    explicit BreakpointManager(std::shared_ptr<DebuggerOperations> operations, std::shared_ptr<IDebuggerCallbacks> callbacks);
 
     bool CheckBreakpoints(BreakInfo& breakInfo);
 
@@ -57,7 +57,7 @@ private:
 
     std::map<BreakNum, BreakInfo> m_breakpoints = {};
     std::shared_ptr<DebuggerOperations> m_operations;
-    std::shared_ptr<DebuggerCallback> m_callbacks;
+    std::shared_ptr<IDebuggerCallbacks> m_callbacks;
 
     DebugOperation m_debugOp = DebugOperation::RunOp;
     unsigned int m_instructionsToStep = 0;

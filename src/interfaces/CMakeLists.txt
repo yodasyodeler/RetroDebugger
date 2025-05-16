@@ -8,6 +8,7 @@ target_sources(RetroDebuggerInterfaces
         BASE_DIRS
             include
         FILES
+            include/IDebuggerCallbacks.h
             include/RetroDebuggerCallbackDefines.h
             include/RetroDebuggerCommon.h)
 # cmake-format: on
