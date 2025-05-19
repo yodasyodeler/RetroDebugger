@@ -340,3 +340,18 @@ TEST(ParserExpressionTests, Expression_assignment_CausesError) {
     ASSERT_TRUE(errors->HasError());
     EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"("=": Unexpected character.)"));
 }
+
+TEST(ParserExpressionTests, EmptyString_HasError) {
+    std::string testStr = R"()";
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, testStr);
+    const auto tokens = scanner.ScanTokens();
+    ASSERT_FALSE(errors->HasError());
+
+    Parser parser(errors, tokens);
+    parser.Parse();
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Expect expression.)"));
+
+    ASSERT_ANY_THROW(parser.ParseWithThrow());
+}

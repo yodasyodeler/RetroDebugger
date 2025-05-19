@@ -13,7 +13,7 @@ class ConditionInterpreter {
 public:
     static std::unique_ptr<ConditionInterpreter> CreateCondition(std::shared_ptr<IDebuggerCallbacks> callbacks, const std::string& conditionString);
 
-    bool EvaluateCondition();
+    bool EvaluateCondition() const;
 
 private:
     ConditionInterpreter(std::shared_ptr<IDebuggerCallbacks> callbacks, Expr::IExprPtr expression);

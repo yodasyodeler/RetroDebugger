@@ -14,6 +14,7 @@
 class Token {
 public:
     Token(TokenType type, std::string_view lexeme, std::string literal, int offset);
+    explicit Token(TokenType type, std::string_view lexeme, int literal, int offset);
     explicit Token(TokenType type, std::string_view lexeme, double literal, int offset);
     explicit Token(TokenType type, std::string_view lexeme, bool literal, int offset);
     explicit Token(TokenType type, std::string_view lexeme, NilType literal, int offset);

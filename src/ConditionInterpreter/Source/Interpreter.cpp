@@ -7,17 +7,32 @@
 
 namespace {
 constexpr bool IsZero(const LiteralObject& literal) noexcept {
-    return (std::holds_alternative<double>(literal) && std::get<double>(literal) == 0.0) || (std::holds_alternative<int>(literal) && std::get<int>(literal) == 0);
+    auto ZeroValue = NumericValue{ 0.0 };
+    return IsNumeric(literal) && std::get<NumericValue>(literal) == ZeroValue;
+}
+
+constexpr int GetValueAsInt(const LiteralObject& literal) {
+    return std::get<NumericValue>(literal).Get<int>();
+}
+
+constexpr int GetValueAsDouble(const LiteralObject& literal) {
+    return std::get<NumericValue>(literal).Get<double>();
+}
+
+constexpr bool AreNumbers(const VisitorValue& left, const VisitorValue& right) {
+    return IsNumeric(left) && IsNumeric(right);
 }
 }
+
 
 namespace Rdb {
 
 Interpreter::Interpreter(std::shared_ptr<IDebuggerCallbacks> callbacks, ErrorsPtr errors) :
-    m_errors(std::move(errors)),
-    m_printer([](std::string_view message) { fmt::print("{}", message); }) {}
+    m_callbacks(std::move(callbacks)),
+    m_errors(std::move(errors)) {}
 
 std::string Interpreter::InterpretAsString(const Expr::IExprPtr& expr) {
+    if (expr == nullptr) { return {}; } // TODO: should this be a throw.
     try {
         const auto value = EvaluateExpression(expr.get());
 
@@ -30,6 +45,7 @@ std::string Interpreter::InterpretAsString(const Expr::IExprPtr& expr) {
 }
 
 bool Interpreter::InterpretBoolean(const Expr::IExprPtr& expr) {
+    if (expr == nullptr) { return true; } // TODO: should this be true, false, or throw.
     try {
         const auto value = EvaluateExpression(expr.get());
 
@@ -56,24 +72,34 @@ VisitorValue Interpreter::VisitBinary(const Expr::Binary* expr) const {
         case TokenType::COMMA:
             return right;
 
+        case TokenType::BITWISE_OR:
+            CheckNumberOperand(expr->m_oper, left, right);
+            return GetValueAsInt(left) | GetValueAsInt(right);
+        case TokenType::BITWISE_XOR:
+            CheckNumberOperand(expr->m_oper, left, right);
+            return GetValueAsInt(left) ^ GetValueAsInt(right);
+        case TokenType::BITWISE_AND:
+            CheckNumberOperand(expr->m_oper, left, right);
+            return GetValueAsInt(left) & GetValueAsInt(right);
+
         case TokenType::MINUS:
             CheckNumberOperand(expr->m_oper, left, right);
-            return std::get<double>(left) - std::get<double>(right);
+            return std::get<NumericValue>(left) - std::get<NumericValue>(right);
         case TokenType::SLASH:
             CheckNumberOperand(expr->m_oper, left, right);
-            if (auto rightNum = std::get<double>(right)) {
-                return std::get<double>(left) / std::get<double>(right);
+            if (!IsZero(right)) {
+                return std::get<NumericValue>(left) / std::get<NumericValue>(right);
             }
             // Fall threw means divide by zero.
             throw RuntimeError(expr->m_oper, "Divide by zero error.");
 
         case TokenType::STAR:
             CheckNumberOperand(expr->m_oper, left, right);
-            return std::get<double>(left) * std::get<double>(right);
+            return std::get<NumericValue>(left) * std::get<NumericValue>(right);
 
         case TokenType::PLUS: {
             const auto IsUnsupportedType = [](const VisitorValue& value) {
-                return !(IsDouble(value) || IsString(value));
+                return !(IsNumeric(value) || IsString(value));
             };
             if (std::ranges::any_of(std::array<VisitorValue, 2>{ left, right }, IsUnsupportedType)) {
                 throw RuntimeError(expr->m_oper, "Operands must be either numbers or strings.");
@@ -84,25 +110,26 @@ VisitorValue Interpreter::VisitBinary(const Expr::Binary* expr) const {
                 return to_string(left) + to_string(right);
             }
 
-            return std::get<double>(left) + std::get<double>(right);
+            return std::get<NumericValue>(left) + std::get<NumericValue>(right);
         }
         case TokenType::GREATER:
             CheckNumberOperand(expr->m_oper, left, right);
-            return std::get<double>(left) > std::get<double>(right);
+            return std::get<NumericValue>(left) > std::get<NumericValue>(right);
         case TokenType::GREATER_EQUAL:
             CheckNumberOperand(expr->m_oper, left, right);
-            return std::get<double>(left) >= std::get<double>(right);
+            return std::get<NumericValue>(left) >= std::get<NumericValue>(right);
         case TokenType::LESS:
             CheckNumberOperand(expr->m_oper, left, right);
-            return std::get<double>(left) < std::get<double>(right);
+            return std::get<NumericValue>(left) < std::get<NumericValue>(right);
         case TokenType::LESS_EQUAL:
             CheckNumberOperand(expr->m_oper, left, right);
-            return std::get<double>(left) <= std::get<double>(right);
+            return std::get<NumericValue>(left) <= std::get<NumericValue>(right);
 
         case TokenType::BANG_EQUAL:
-            return !IsEqual(left, right);
+            return left != right;
+
         case TokenType::EQUAL_EQUAL:
-            return IsEqual(left, right);
+            return left == right;
     };
 
     return {};
@@ -110,6 +137,20 @@ VisitorValue Interpreter::VisitBinary(const Expr::Binary* expr) const {
 
 VisitorValue Interpreter::VisitGrouping(const Expr::Grouping* expr) const {
     return EvaluateExpression(expr->m_expression.get());
+}
+
+VisitorValue Interpreter::VisitLogical(const Expr::Logical* expr) const {
+    auto left = EvaluateExpression(expr->m_left.get());
+
+    // Logic short-circuit checks
+    if (expr->m_oper->GetType() == TokenType::LOGIC_OR) {
+        if (IsTruthy(left)) { return left; }
+    }
+    else { // LOGIC_AND
+        if (!IsTruthy(left)) { return left; }
+    }
+
+    return EvaluateExpression(expr->m_right.get());
 }
 
 VisitorValue Interpreter::VisitLiteral(const Expr::Literal* expr) const {
@@ -122,19 +163,13 @@ VisitorValue Interpreter::VisitUnary(const Expr::Unary* expr) const {
     switch (expr->m_oper->GetType()) {
         case TokenType::BANG:
             return VisitorValue{ !IsTruthy(right) };
-        case TokenType::MINUS:
-            if (IsInt(right)) {
-                return VisitorValue{ -std::get<int>(right) };
-            }
+        case TokenType::MINUS: {
             CheckNumberOperand(expr->m_oper, right);
-            return VisitorValue{ -std::get<double>(right) };
+            return VisitorValue{ NumericValue(0) - std::get<NumericValue>(right) };
+        }
         case TokenType::STAR:
-            if (IsInt(right)) {
-                return VisitorValue{ -std::get<int>(right) };
-            }
             CheckNumberOperand(expr->m_oper, right);
-            // TODO: ReadMemory callback to get the value
-            return VisitorValue{ static_cast<int>(std::get<double>(right)) };
+            return VisitorValue{ static_cast<int>(m_callbacks->ReadMemory(std::get<NumericValue>(right).Get<int>())) };
     };
 
     // TODO: Should be unreachable
@@ -142,10 +177,15 @@ VisitorValue Interpreter::VisitUnary(const Expr::Unary* expr) const {
 }
 
 VisitorValue Interpreter::VisitVariable(const Expr::Variable* expr) const {
+    auto regset = m_callbacks->GetRegSet();
 
-    // TODO: no longer a variable, but instead a system specific look up value
-
-    return VisitorValue{ 0 };
+    if (const auto& iter = regset.find(expr->m_name->GetLexeme());
+        iter == regset.end()) {
+        throw RuntimeError(expr->m_name, "Not a recognized identifier.");
+    }
+    else {
+        return VisitorValue{ static_cast<int>(iter->second) };
+    }
 }
 
 void Interpreter::SetPrinter(PrinterMethod printMethod) {
@@ -160,24 +200,19 @@ bool Interpreter::IsTruthy(const VisitorValue& literal) const {
     return true;
 }
 
-bool Interpreter::IsEqual(const VisitorValue& left, const VisitorValue& right) const {
-    return left == right;
-}
-
 
 VisitorValue Interpreter::EvaluateExpression(const Expr::IExpr* expr) const {
     return expr->Accept(this);
 }
 
 void Interpreter::CheckNumberOperand(const TokenPtr& oper, const VisitorValue& right) const {
-    if (IsDouble(right)) { return; }
-    if (IsDouble(right)) { return; }
+    if (IsNumeric(right)) { return; }
 
     throw RuntimeError(oper, "Operand must be a number.");
 }
 
 void Interpreter::CheckNumberOperand(const TokenPtr& oper, const VisitorValue& left, const VisitorValue& right) const {
-    if (IsDouble(left) && IsDouble(right)) { return; }
+    if (AreNumbers(left, right)) { return; }
 
     throw RuntimeError(oper, "Operands must be a number.");
 }

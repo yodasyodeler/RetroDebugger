@@ -7,13 +7,23 @@ Parser::Parser(ErrorsPtr errors, TokenList tokens) :
     m_errors(std::move(errors)) {
 }
 
-Expr::IExprPtr Parser::Parse() {
+Expr::IExprPtr Parser::Parse() noexcept {
     try {
         return ParseBooleanExpression();
     }
     catch (const ParseError& /*error*/) {
         SynchronizeAfterError();
         return nullptr;
+    }
+}
+
+Expr::IExprPtr Parser::ParseWithThrow() {
+    try {
+        return ParseBooleanExpression();
+    }
+    catch (const ParseError& error) {
+        SynchronizeAfterError();
+        throw;
     }
 }
 
@@ -50,8 +60,68 @@ Expr::IExprPtr Parser::ParseAssignment() {
 }
 
 Expr::IExprPtr Parser::ParseComma() {
-    auto expr = ParseEquality();
+    auto expr = ParseLogicOr();
     while (MatchTokenType(TokenType::COMMA)) {
+        const auto& oper = PreviousToken();
+        const auto right = ParseLogicOr();
+        expr = std::make_shared<Expr::Binary>(expr, std::make_shared<Token>(oper), right);
+    }
+
+    return expr;
+}
+
+Expr::IExprPtr Parser::ParseLogicOr() {
+    auto expr = ParseLogicAnd();
+
+    while (MatchTokenType(TokenType::LOGIC_OR)) {
+        const auto& oper = PreviousToken();
+        const auto right = ParseLogicAnd();
+        expr = std::make_shared<Expr::Logical>(expr, std::make_shared<Token>(oper), right);
+    }
+
+    return expr;
+}
+
+Expr::IExprPtr Parser::ParseLogicAnd() {
+    auto expr = ParseBitwiseOr();
+
+    while (MatchTokenType(TokenType::LOGIC_AND)) {
+        const auto& oper = PreviousToken();
+        const auto right = ParseBitwiseOr();
+        expr = std::make_shared<Expr::Logical>(expr, std::make_shared<Token>(oper), right);
+    }
+
+    return expr;
+}
+
+Expr::IExprPtr Parser::ParseBitwiseOr() {
+    auto expr = ParseBitwiseXor();
+
+    while (MatchTokenType(TokenType::BITWISE_OR)) {
+        const auto& oper = PreviousToken();
+        const auto right = ParseBitwiseXor();
+        expr = std::make_shared<Expr::Binary>(expr, std::make_shared<Token>(oper), right);
+    }
+
+    return expr;
+}
+
+Expr::IExprPtr Parser::ParseBitwiseXor() {
+    auto expr = ParseBitwiseAnd();
+
+    while (MatchTokenType(TokenType::BITWISE_XOR)) {
+        const auto& oper = PreviousToken();
+        const auto right = ParseBitwiseAnd();
+        expr = std::make_shared<Expr::Binary>(expr, std::make_shared<Token>(oper), right);
+    }
+
+    return expr;
+}
+
+Expr::IExprPtr Parser::ParseBitwiseAnd() {
+    auto expr = ParseEquality();
+
+    while (MatchTokenType(TokenType::BITWISE_AND)) {
         const auto& oper = PreviousToken();
         const auto right = ParseEquality();
         expr = std::make_shared<Expr::Binary>(expr, std::make_shared<Token>(oper), right);
@@ -105,14 +175,9 @@ Expr::IExprPtr Parser::ParseFactor() {
 }
 
 Expr::IExprPtr Parser::ParseUnary() {
-    if (MatchTokenType({ TokenType::MINUS, TokenType::BANG })) {
+    if (MatchTokenType({ TokenType::MINUS, TokenType::BANG, TokenType::STAR })) {
         Token oper = PreviousToken();
         auto right = ParseUnary();
-        return std::make_shared<Expr::Unary>(std::make_shared<Token>(oper), right);
-    }
-    else if (MatchTokenType({ TokenType::STAR })) { // Pointer notation
-        Token oper = PreviousToken();
-        auto right = ParsePrimary();
         return std::make_shared<Expr::Unary>(std::make_shared<Token>(oper), right);
     }
     return ParsePrimary();

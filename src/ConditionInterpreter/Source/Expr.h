@@ -33,6 +33,16 @@ struct Literal : public IExpr
     LiteralObject m_value;
 };
 
+struct Logical : public IExpr
+{
+    Logical(IExprPtr left, TokenPtr oper, IExprPtr right);
+    VisitorValue Accept(const Rdb::IAstVisitor* visitor) const override;
+
+    IExprPtr m_left;
+    TokenPtr m_oper;
+    IExprPtr m_right;
+};
+
 struct Unary : public IExpr
 {
     Unary(TokenPtr oper, IExprPtr right);

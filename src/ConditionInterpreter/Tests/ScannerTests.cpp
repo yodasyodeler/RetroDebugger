@@ -211,3 +211,29 @@ TEST(ScannerTests, Scan_Identifier_LeadingNumberDoesntGetIncluded) {
     EXPECT_EQ(tokens[1].GetType(), TokenType::IDENTIFIER);
     EXPECT_EQ(tokens[1].GetLexeme(), "_dest123"sv);
 }
+
+TEST(ScannerTests, LogicOperators_AndOr) {
+    static constexpr auto source = R"(true && false || true)";
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 6);
+
+    EXPECT_EQ(tokens[1].GetType(), TokenType::LOGIC_AND);
+    EXPECT_EQ(tokens[3].GetType(), TokenType::LOGIC_OR);
+}
+
+TEST(ScannerTests, BitWiseOperators_AndOr) {
+    static constexpr auto source = R"(3 & 5 | 1000)";
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 6);
+
+    EXPECT_EQ(tokens[1].GetType(), TokenType::BITWISE_AND);
+    EXPECT_EQ(tokens[3].GetType(), TokenType::BITWISE_OR);
+}

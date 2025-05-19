@@ -350,3 +350,14 @@ TEST(InterpreterExpressionTests, DISABLED_Unary_Minus_NotANumber_ReportsError) {
     ASSERT_TRUE(errors->HasRuntimeError());
     EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Operand must be a number.)"));
 }
+
+TEST(InterpreterExpressionTests, NullptrExpr_HappyPath) {
+    std::string testStr = R"()";
+    const auto [statements, errors, callbacks] = ScanAndParse(testStr);
+    ASSERT_TRUE(errors->HasError());
+    errors->ClearError();
+
+    Interpreter interpreter(callbacks, errors);
+    ASSERT_TRUE(interpreter.InterpretAsString(nullptr).empty());
+    ASSERT_TRUE(interpreter.InterpretBoolean(nullptr));
+}

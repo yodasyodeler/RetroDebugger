@@ -18,6 +18,9 @@ enum class TokenType {
     SEMICOLON,
     SLASH,
     STAR,
+    BITWISE_AND, // &
+    BITWISE_OR, // |
+    BITWISE_XOR, // ^
 
     // One or two character tokens.
     BANG,
@@ -28,6 +31,8 @@ enum class TokenType {
     GREATER_EQUAL,
     LESS,
     LESS_EQUAL,
+    LOGIC_AND, // &&
+    LOGIC_OR, // ||
 
     // Literals.
     IDENTIFIER,

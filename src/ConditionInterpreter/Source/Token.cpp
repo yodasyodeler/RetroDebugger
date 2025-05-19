@@ -21,18 +21,20 @@ std::string to_string(const LiteralObject& literal) {
         if constexpr (std::is_same_v<LiteralType, bool>) {
             return arg ? "true" : "false";
         }
-        else if constexpr (std::is_same_v<LiteralType, double>) {
-            // If the double is identical as a double lets print it as one.
-            double interPtr = {};
-            if (bool isInteger = !std::modf(arg, &interPtr)) {
-                return std::to_string(static_cast<int>(arg));
+        else if constexpr (std::is_same_v<LiteralType, NumericValue>) {
+            if (arg.IsDouble()) {
+                double interPtr = {};
+                double value = arg.Get<double>();
+                if (bool isInteger = !std::modf(value, &interPtr)) {
+                    return std::to_string(static_cast<int>(value));
+                }
+                else {
+                    return std::to_string(value);
+                }
             }
             else {
-                return std::to_string(arg);
+                return std::to_string(arg.Get<int>());
             }
-        }
-        else if constexpr (std::is_same_v<LiteralType, int>) {
-            return std::to_string(arg);
         }
         else if constexpr (std::is_same_v<LiteralType, std::string>) {
             return arg;
@@ -54,8 +56,13 @@ std::string to_string(const LiteralObject& literal) {
 Token::Token(TokenType type, std::string_view lexeme, std::string literal, int offset) :
     m_type(type), m_lexeme(lexeme), m_literal(literal), m_offset(offset) {
 }
+
+Token::Token(TokenType type, std::string_view lexeme, int literal, int offset) :
+    m_type(type), m_lexeme(lexeme), m_literal(NumericValue{ literal }), m_offset(offset) {
+}
+
 Token::Token(TokenType type, std::string_view lexeme, double literal, int offset) :
-    m_type(type), m_lexeme(lexeme), m_literal(literal), m_offset(offset) {
+    m_type(type), m_lexeme(lexeme), m_literal(NumericValue{ literal }), m_offset(offset) {
 }
 
 Token::Token(TokenType type, std::string_view lexeme, bool literal, int offset) :
@@ -93,9 +100,9 @@ bool Token::GetLiteralBool() const {
 }
 
 double Token::GetLiteralDouble() const {
-    if (!IsDouble(m_literal)) { throw std::runtime_error("Must be a 'double' type."); }
+    if (!IsNumeric(m_literal)) { throw std::runtime_error("Must be a 'Numeric' type."); }
 
-    return std::get<double>(m_literal);
+    return std::get<NumericValue>(m_literal).Get<double>();
 }
 
 std::string Token::GetLiteralString() const {

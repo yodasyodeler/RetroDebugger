@@ -15,12 +15,12 @@ ConditionPtr ConditionInterpreter::CreateCondition(std::shared_ptr<IDebuggerCall
     if (errors->HasError()) { throw std::runtime_error(errors->GetError()); }
 
     Parser parser(errors, tokens);
-    auto expr = parser.Parse();
+    auto expr = parser.ParseWithThrow();
     return std::unique_ptr<ConditionInterpreter>(new ConditionInterpreter(callbacks, expr));
 }
 
 // Public
-bool ConditionInterpreter::EvaluateCondition() {
+bool ConditionInterpreter::EvaluateCondition() const {
     auto errors = std::make_shared<Errors>();
     Interpreter interpreter(m_callbacks, errors);
     bool expressionResult = interpreter.InterpretBoolean(m_conditionExpression);

@@ -24,6 +24,7 @@ target_sources(
             "Source/IExpr.h"
             "Source/Interpreter.cpp"
             "Source/Interpreter.h"
+            "Source/NumericType.h"
             "Source/Parser.cpp"
             "Source/Parser.h"
             "Source/Report.cpp"

@@ -2,8 +2,8 @@
 
 #include "Token.h"
 
-#include "Report.h"
 #include "Expr.h"
+#include "Report.h"
 
 #include <stdexcept>
 
@@ -17,7 +17,9 @@ class Parser {
 public:
     Parser(ErrorsPtr errors, TokenList tokens);
 
-    Expr::IExprPtr Parse();
+    Expr::IExprPtr Parse() noexcept;
+
+    Expr::IExprPtr ParseWithThrow();
 
     bool IsDone();
 
@@ -25,6 +27,11 @@ private:
     Expr::IExprPtr ParseBooleanExpression();
     Expr::IExprPtr ParseAssignment();
     Expr::IExprPtr ParseComma();
+    Expr::IExprPtr ParseLogicOr();
+    Expr::IExprPtr ParseLogicAnd();
+    Expr::IExprPtr ParseBitwiseOr();
+    Expr::IExprPtr ParseBitwiseXor();
+    Expr::IExprPtr ParseBitwiseAnd();
     Expr::IExprPtr ParseEquality();
     Expr::IExprPtr ParseComparison();
     Expr::IExprPtr ParseTerm();

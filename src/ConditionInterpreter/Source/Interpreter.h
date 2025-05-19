@@ -17,6 +17,7 @@ public:
 
     VisitorValue VisitBinary(const Expr::Binary* expr) const override;
     VisitorValue VisitGrouping(const Expr::Grouping* expr) const override;
+    VisitorValue VisitLogical(const Expr::Logical* expr) const override;
     VisitorValue VisitLiteral(const Expr::Literal* expr) const override;
     VisitorValue VisitUnary(const Expr::Unary* expr) const override;
     VisitorValue VisitVariable(const Expr::Variable* expr) const override;
@@ -27,15 +28,16 @@ public:
 
 private:
     bool IsTruthy(const VisitorValue& literal) const;
-    bool IsEqual(const VisitorValue& left, const VisitorValue& right) const;
+    // bool IsEqual(const VisitorValue& left, const VisitorValue& right) const;
     VisitorValue EvaluateExpression(const Expr::IExpr* expr) const;
 
     // Error checking
     void CheckNumberOperand(const TokenPtr& oper, const VisitorValue& right) const;
     void CheckNumberOperand(const TokenPtr& oper, const VisitorValue& left, const VisitorValue& right) const;
 
-    PrinterMethod m_printer;
+    std::shared_ptr<IDebuggerCallbacks> m_callbacks;
     ErrorsPtr m_errors;
+    PrinterMethod m_printer;
 };
 
 }

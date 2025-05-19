@@ -104,6 +104,8 @@ void Scanner::ScanToken(Cursor& cursor) {
         case '*':
             m_tokenList.emplace_back(CreateCharToken(TokenType::STAR));
             break;
+        case '^':
+            m_tokenList.emplace_back(CreateCharToken(TokenType::BITWISE_XOR));
 
         // One/Two char Tokens
         case '!':
@@ -122,6 +124,12 @@ void Scanner::ScanToken(Cursor& cursor) {
             break;
         case '>':
             m_tokenList.emplace_back(CreateCharToken(MatchChar('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER));
+            break;
+        case '&':
+            m_tokenList.emplace_back(CreateCharToken(MatchChar('&') ? TokenType::LOGIC_AND : TokenType::BITWISE_AND));
+            break;
+        case '|':
+            m_tokenList.emplace_back(CreateCharToken(MatchChar('|') ? TokenType::LOGIC_OR : TokenType::BITWISE_OR));
             break;
 
         // One or many char Token
