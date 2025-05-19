@@ -110,6 +110,25 @@ TEST_F(BreakpointManagerTests, CheckBreakpoints_HitBreakpoint) {
     EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
 }
 
+TEST_F(BreakpointManagerTests, CheckBreakpoints_Condition) {
+    BreakInfo breakInfo;
+    static constexpr auto address = 0x100;
+    m_pc = address;
+    g_memory = 0;
+    auto breakNum = m_breakpointManager.SetBreakpoint(address);
+    m_breakpointManager.SetCondition(breakNum, "*(100) == 5");
+
+    EXPECT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    g_memory = 5;
+    EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    // Is reentrant
+    g_memory = 6;
+    EXPECT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+    g_memory = 5;
+    EXPECT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
 TEST_F(BreakpointManagerTests, CheckBreakpoints_DisableReEnableBreakpoint) {
     static constexpr auto address1 = 0x100;
 

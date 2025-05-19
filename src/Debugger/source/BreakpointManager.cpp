@@ -1,7 +1,11 @@
 #include "BreakpointManager.h"
+
+#include "ConditionInterpreter.h"
 #include "DebuggerCallbacks.h"
+#include "DebuggerError.h"
 #include "DebuggerOperations.h"
 
+#include <fmt/core.h>
 #include <limits>
 
 namespace {
@@ -199,6 +203,14 @@ BreakNum BreakpointManager::SetBreakpoint(const BankNum bank, const unsigned int
     return breakpoint.breakpointNumber;
 }
 
+void BreakpointManager::SetCondition(BreakNum breakNum, const std::string& condition) {
+    auto iter = m_breakpoints.find(breakNum);
+    if (iter == m_breakpoints.end()) {
+        throw Rdb::DebuggerError(fmt::format("{}", static_cast<unsigned int>(breakNum)));
+    }
+    iter->second.condition = Rdb::ConditionInterpreter::CreateCondition(m_callbacks, condition);
+}
+
 BreakNum BreakpointManager::SetWatchpoint(const unsigned int address, BankNum bankNum) {
     const BreakInfo breakpoint = WatchPoint(m_callbacks, m_breakPointCounter++, address, bankNum);
     m_breakpoints.emplace(breakpoint.breakpointNumber, breakpoint);
@@ -301,18 +313,22 @@ BreakInfo BreakpointManager::CheckBreakInfo() {
             if (breakInfo.type == BreakType::Breakpoint && (breakInfo.bankNumber == AnyBank && breakInfo.address == m_callbacks->GetPcReg()) || // NON-Bank Breakpoint
                 (breakInfo.bankNumber != AnyBank && m_callbacks->CheckBankableMemoryLocation(breakInfo.bankNumber, breakInfo.address))) { // Bank Breakpoint
 
-                ++breakInfo.timesHit;
-                return breakInfo;
+                if (breakInfo.condition == nullptr || breakInfo.condition->EvaluateCondition()) {
+                    ++breakInfo.timesHit;
+                    return breakInfo;
+                }
             }
             if (breakInfo.type == BreakType::Watchpoint || breakInfo.type == BreakType::ReadWatchpoint || breakInfo.type == BreakType::AnyWatchpoint) {
                 const auto currentWatchValue = breakInfo.bankNumber == AnyBank ? m_callbacks->ReadMemory(breakInfo.address) : m_callbacks->ReadBankableMemory(breakInfo.bankNumber, breakInfo.address);
 
                 if (breakInfo.externalHit || (breakInfo.type != BreakType::ReadWatchpoint && breakInfo.currentWatchValue != currentWatchValue)) {
-                    breakInfo.oldWatchValue = breakInfo.currentWatchValue;
-                    breakInfo.currentWatchValue = currentWatchValue;
-                    ++breakInfo.timesHit;
-                    breakInfo.externalHit = false; // Clear the external hit
-                    return breakInfo;
+                    if (breakInfo.condition == nullptr || breakInfo.condition->EvaluateCondition()) {
+                        breakInfo.oldWatchValue = breakInfo.currentWatchValue;
+                        breakInfo.currentWatchValue = currentWatchValue;
+                        ++breakInfo.timesHit;
+                        breakInfo.externalHit = false; // Clear the external hit
+                        return breakInfo;
+                    }
                 }
             }
         }

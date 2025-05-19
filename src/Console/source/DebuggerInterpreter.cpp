@@ -6,8 +6,12 @@
 #include "DebuggerStringParser.h"
 #include "IDebuggerCallbacks.h"
 
+#include <fmt/ranges.h>
+
+#include <algorithm>
 #include <numeric>
 #include <sstream>
+
 
 namespace Rdb {
 
@@ -87,19 +91,41 @@ bool DebuggerInterpreter::SetBreakpoint(const std::vector<std::string>& words) {
         m_debugger->SetBreakpoint(m_callbacks->GetPcReg());
         return true;
     }
-    if (cmdCount == 2) {
+    if (cmdCount == 2 || (cmdCount >= 3 && words[2] == "if")) {
         unsigned int bankNumber{};
-        unsigned int breakNumber{};
-        if (DebuggerStringParser::ParseNumber(words[1], breakNumber)) {
-            m_debugger->SetBreakpoint(breakNumber);
-            return true;
+        unsigned int breakNumbers{};
+        BreakNum breakNum = Rdb::MaxBreakpointNumber;
+        if (DebuggerStringParser::ParseNumber(words[1], breakNumbers)) {
+            breakNum = m_debugger->SetBreakpoint(breakNumbers);
         }
-        else if (DebuggerStringParser::ParseNumberPair(words[1], bankNumber, breakNumber, ":")) {
-            m_debugger->SetBreakpoint(bankNumber, breakNumber);
-            return true;
+        else if (DebuggerStringParser::ParseNumberPair(words[1], bankNumber, breakNumbers, ":")) {
+            breakNum = m_debugger->SetBreakpoint(bankNumber, breakNumbers);
         }
+        else {
+            return false;
+        }
+
+        if (cmdCount >= 3) {
+            const std::string condition = fmt::format("{}", fmt::join(words.begin() + 3, words.end(), " "));
+            m_debugger->SetCondition(breakNum, condition);
+        }
+        return true;
     }
     return false;
+}
+
+void DebuggerInterpreter::SetCondition(const std::vector<std::string>& words) {
+    m_commandResponse.clear();
+    const auto cmdCount = words.size();
+    std::vector<unsigned int> numbers;
+
+    if (cmdCount >= 2 && DebuggerStringParser::ParseList(words[1], numbers)) {
+        const std::string condition = (cmdCount == 2) ? "" : fmt::format("{}", fmt::join(words.begin() + 2, words.end(), " "));
+
+        for (const auto& number : numbers) {
+            m_debugger->SetCondition(BreakNum{ number }, condition);
+        }
+    }
 }
 
 bool DebuggerInterpreter::EnableBreak(const std::vector<std::string>& words) {

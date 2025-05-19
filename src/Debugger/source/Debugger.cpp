@@ -47,6 +47,10 @@ BreakNum Debugger::SetBreakpoint(unsigned int bank, const unsigned int address) 
     return m_breakManager.SetBreakpoint(BankNum{ bank }, address);
 }
 
+void Debugger::SetCondition(BreakNum breakNum, const std::string& condition) {
+    m_breakManager.SetCondition(breakNum, condition);
+}
+
 BreakNum Debugger::SetWatchpoint(const unsigned int address, BankNum bankNumber) {
     return m_breakManager.SetWatchpoint(address, bankNumber);
 }

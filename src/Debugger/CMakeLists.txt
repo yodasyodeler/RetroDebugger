@@ -8,6 +8,7 @@ target_include_directories(DebuggerLib PUBLIC "source")
 target_link_libraries(
     DebuggerLib
     PUBLIC ConsoleLib
+           ConditionInterpreterLib
            DebuggerInterfaces
            RetroDebuggerInterfaces
            XmlParserLib

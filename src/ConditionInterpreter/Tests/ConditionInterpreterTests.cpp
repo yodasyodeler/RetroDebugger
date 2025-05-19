@@ -21,8 +21,8 @@ public:
     unsigned int g_memory = 0; // TODO: make a gmock interface
 };
 
-TEST_F(ConditionInterpreterTests, EmptyCondition_Throws) {
-    ASSERT_ANY_THROW(Rdb::ConditionInterpreter::CreateCondition(m_callbacks, ""));
+TEST_F(ConditionInterpreterTests, EmptyCondition_ReturnsNullptr) {
+    ASSERT_EQ(Rdb::ConditionInterpreter::CreateCondition(m_callbacks, ""), nullptr);
 }
 
 TEST_F(ConditionInterpreterTests, SimpleConditions_StaticValues_HappyPath) {

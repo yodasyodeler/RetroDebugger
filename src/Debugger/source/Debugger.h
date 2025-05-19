@@ -16,6 +16,8 @@ public:
     BreakNum SetBreakpoint(unsigned int address);
     BreakNum SetBreakpoint(unsigned int bank, unsigned int address);
 
+    void SetCondition(BreakNum breakNum, const std::string& condition);
+
     BreakNum SetWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
     BreakNum SetReadWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
     BreakNum SetAnyWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);

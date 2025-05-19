@@ -44,6 +44,10 @@ bool SetBreakpoint(unsigned int address) {
     return m_debugger.SetBreakpoint(address);
 }
 
+void SetCondition(unsigned int breakNum, const std::string& condition) {
+    m_debugger.SetCondition(BreakNum{ breakNum }, condition);
+}
+
 bool SetWatchpoint(unsigned int address) {
     return m_debugger.SetWatchpoint(address);
 }

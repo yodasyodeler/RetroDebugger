@@ -1,5 +1,6 @@
 #include "DebuggerPrintFormat.h"
 
+#include "ConditionInterpreter.h"
 #include "DebuggerCallbacks.h"
 
 #include <NamedType/named_type.hpp>
@@ -86,6 +87,9 @@ static constexpr std::string_view generalHelp =
     "\n"
     "(b)reak -- set a breakpoint at current instruction\n"
     "(b)reak <address> -- set breakpoint at address\n"
+    "(b)reak <address> if <condition_expression> -- set breakpoint at address as well sets a condition for that breakpoint\n"
+    "condition <number> -- removes breakpoint condition from the specified breakpoint\n"
+    "condition <number> <condition_expression> -- Adds a breakpoint condition to the specified breakpoint\n"
     "enable <number>-- enable breakpoint number\n"
     "enable <number-number>-- enable breakpoint number range\n"
     "disable <number>-- disable breakpoint number\n"
@@ -170,7 +174,9 @@ std::string PrintBreakInfo(const BreakList& breakInfo) {
             (info.second.isEnabled ? "y" : "n"),
             info.second.address,
             what);
-
+        if (info.second.condition != nullptr) {
+            breakInfoStr += fmt::format("{: <8}stop only if {}\n", std::string(), info.second.condition->GetAsString());
+        }
         if (info.second.timesHit != 0U) {
             breakInfoStr += fmt::format("{} already hit {} times\n", BreakTypeToString.at(info.second.type), info.second.timesHit);
         }

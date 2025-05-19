@@ -304,4 +304,37 @@ TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Commandline_SetAnyWatchpoi
     ASSERT_EQ(expectedOutput, output.str()); // Doing one full check.
 }
 
+TEST_F(RetroDebuggerIntegrationTests, IntegrationTest_Commandline_SetBreakpointWithCondition_GetBreakpointInfo_ReadModifyWrite) {
+
+    // Has a condition in 'info'
+    //(rdb) b 0x100 if 5 == *1000
+    //(rdb) info break
+    {
+        std::stringstream input;
+        input << "b 0x100 if 5 == *1000\ninfo break"; // Not ending with '/n' so GetLine will return immediately on last command
+        Rdb::ParseXmlFile(std::string(RetroDebuggerTests::Assets::GameboyOperationsDebuggerXml));
+        auto output = TestCommandPrompt(input);
+
+        auto expectedOutput = std::string(MessageWhenEnteringDebugLoop) + ConsolePrompt + // No return, in command prompt it would come from the input.
+                              "Num     Type           Disp Enb Address            What\n"
+                              "1       Breakpoint     Keep y   0x0000000000000100 \n"
+                              "        stop only if 5 == *1000\n";
+        ASSERT_EQ(expectedOutput, output.str()); // Doing one full check.
+    }
+
+    // Remove the condition
+    //(rdb) condition 1
+    //(rdb) info break
+    {
+        std::stringstream input;
+        input << "condition 1\ninfo break"; // Not ending with '/n' so GetLine will return immediately on last command
+        auto output = TestCommandPrompt(input);
+
+        auto expectedOutput = std::string(MessageWhenEnteringDebugLoop) + ConsolePrompt + // No return, in command prompt it would come from the input.
+                              "Num     Type           Disp Enb Address            What\n"
+                              "1       Breakpoint     Keep y   0x0000000000000100 \n";
+        ASSERT_EQ(expectedOutput, output.str()); // Doing one full check.
+    }
+}
+
 }

@@ -51,6 +51,16 @@ bool DebuggerConsole::ParseCommand(std::vector<std::string>& words) { // NOLINT 
     else if ((cmd == "c") || (cmd == "continue")) {
         if (m_interpreter->Continue(words)) { return true; }
     }
+    else if (cmd == "condition") {
+        try {
+            m_interpreter->SetCondition(words);
+            return false;
+        }
+        catch (const std::runtime_error& e) {
+            m_interpreter->SetCommandResponse(fmt::format("Condition error: {}", e.what()));
+            return false;
+        }
+    }
     else if ((cmd == "s") || (cmd == "step")) {
         if (m_interpreter->Step(words)) { return true; }
     }

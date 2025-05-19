@@ -25,6 +25,8 @@ public:
 
     bool SetBreakpoint(unsigned int address);
 
+    void SetCondition(BreakNum breakNum, const std::string& condition);
+
     bool SetWatchpoint(unsigned int address);
 
     bool SetReadWatchpoint(unsigned int address);

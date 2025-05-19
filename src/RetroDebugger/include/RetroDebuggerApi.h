@@ -33,6 +33,8 @@ RDB_EXPORT bool RunTillJump();
 
 RDB_EXPORT bool SetBreakpoint(unsigned int address);
 
+RDB_EXPORT void SetCondition(unsigned int breakNum, const std::string& condition);
+
 RDB_EXPORT bool SetWatchpoint(unsigned int address);
 
 RDB_EXPORT bool SetReadWatchpoint(unsigned int address);

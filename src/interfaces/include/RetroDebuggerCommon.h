@@ -14,6 +14,10 @@ enum class BankNum : unsigned int;
 
 static constexpr BankNum AnyBank = BankNum{ std::numeric_limits<unsigned int>::max() };
 
+// forward decl
+namespace Rdb {
+class ConditionInterpreter;
+}
 
 enum class BreakType : unsigned int {
     Invalid = static_cast<unsigned int>(-1),
@@ -45,6 +49,7 @@ struct BreakInfo
     bool isEnabled = false;
     bool externalHit = false;
     std::string regName = {};
+    std::shared_ptr<Rdb::ConditionInterpreter> condition;
 };
 using BreakList = std::map<BreakNum, BreakInfo>;
 

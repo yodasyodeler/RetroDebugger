@@ -74,6 +74,10 @@ bool RetroDebugger::SetBreakpoint(unsigned int address) {
     return m_debugger.SetBreakpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
+void RetroDebugger::SetCondition(BreakNum breakNum, const std::string& condition) {
+    m_debugger.SetCondition(breakNum, condition);
+}
+
 bool RetroDebugger::SetWatchpoint(unsigned int address) {
     return m_debugger.SetWatchpoint(address) != std::numeric_limits<BreakNum>::max();
 }

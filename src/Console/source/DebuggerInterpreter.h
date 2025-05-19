@@ -20,6 +20,7 @@ public:
     bool Step(const std::vector<std::string>& words);
     bool Finish(const std::vector<std::string>& words);
     bool SetBreakpoint(const std::vector<std::string>& words);
+    void SetCondition(const std::vector<std::string>& words);
     bool EnableBreak(const std::vector<std::string>& words);
     bool DisableBreak(const std::vector<std::string>& words);
     bool DeleteBreakpoints(const std::vector<std::string>& words);
