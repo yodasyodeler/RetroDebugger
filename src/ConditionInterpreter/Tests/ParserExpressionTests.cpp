@@ -11,6 +11,7 @@
 
 using namespace std::string_view_literals;
 using namespace std::string_literals;
+using namespace Rdb;
 
 
 TEST(ParserExpressionTests, Equality_AllTypes_AllLiteralTypes_HappyPath) {

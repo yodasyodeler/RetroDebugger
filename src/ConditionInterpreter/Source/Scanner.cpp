@@ -2,10 +2,12 @@
 
 #include "Report.h"
 
+#include <algorithm>
 #include <map>
 
 using namespace std::string_view_literals;
 
+namespace {
 // TODO: this may be a good candidate for a constexpr map
 static const std::map<std::string_view, TokenType> KeywordMap = {
     /*{ "and"sv, TokenType::AND },
@@ -27,18 +29,52 @@ static const std::map<std::string_view, TokenType> KeywordMap = {
 };
 
 // std library methods are not constexpr, most likely not an issue though.
-static constexpr bool IsAlpha(char character) {
-    return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || character == '_');
+static constexpr bool IsLetter(char character) {
+    return ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z'));
 }
 
-static constexpr bool IsDigit(char character) {
+static constexpr bool IsAlpha(char character) {
+    return (IsLetter(character) || character == '_');
+}
+
+static constexpr bool IsNumeric(char character) {
     return character >= '0' && character <= '9';
 }
 
-static constexpr bool IsAlphaNumeric(char character) {
-    return IsAlpha(character) || IsDigit(character);
+static constexpr bool IsNumberValid(char character) {
+    constexpr auto digitSeperator = '\'';
+    return IsNumeric(character) || IsLetter(character) || character == digitSeperator;
 }
 
+static constexpr bool IsAlphaNumeric(char character) {
+    return IsAlpha(character) || IsNumeric(character);
+}
+
+enum NumericBase {
+    Binary = 2,
+    Octal = 8,
+    Decimal = 10,
+    Hex = 16,
+};
+
+std::string to_string(NumericBase numericBase) {
+    switch (numericBase) {
+        case NumericBase::Binary:
+            return "Binary";
+        case NumericBase::Octal:
+            return "Octal";
+        case NumericBase::Decimal:
+            return "Decimal";
+        case NumericBase::Hex:
+            return "Hex";
+    }
+
+    return fmt::format("Base-{}", static_cast<int>(numericBase));
+}
+
+}
+
+namespace Rdb {
 
 Scanner::Scanner(ErrorsPtr errors, std::string_view source) :
     m_source(source),
@@ -106,6 +142,7 @@ void Scanner::ScanToken(Cursor& cursor) {
             break;
         case '^':
             m_tokenList.emplace_back(CreateCharToken(TokenType::BITWISE_XOR));
+            break;
 
         // One/Two char Tokens
         case '!':
@@ -189,19 +226,92 @@ void Scanner::ScanToken(Cursor& cursor) {
 }
 
 void Scanner::ScanNumericLiteral(Cursor& cursor) {
-    const auto scanNum = [&]() { while (!IsAtEnd(cursor) && IsDigit(Peek(cursor))) { Pop(cursor); } };
+    const auto scanNumber = [&]() { while (!IsAtEnd(cursor) && IsNumberValid(Peek(cursor))) { Pop(cursor); } };
+    const auto stripNumberSeperator = [&]() {
+        std::string numberStr = std::string(m_source.data() + cursor.start, cursor.current - cursor.start);
+        const auto invalidRepeatedNumberSeperator = numberStr.find("''");
+        if (invalidRepeatedNumberSeperator != std::string::npos) {
+            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), "Adjacent digit separators");
+            return std::string{};
+        }
+        if (numberStr.back() == '\'') {
+            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), "Unexpected character.");
+            return std::string{};
+        }
 
-    scanNum();
-    // TODO: floating point may not work as expected with different floating point standards.
-    if (Peek(cursor) == '.' && IsDigit(PeekAhead(cursor))) {
-        Pop(cursor);
-        scanNum(); // decimal
+        const auto numberSeperators = std::ranges::remove(numberStr, '\'');
+        numberStr.erase(numberSeperators.begin(), numberSeperators.end());
+
+        return numberStr;
+    };
+    auto AddNumberToken = [this, &cursor](auto number) {
+        m_tokenList.emplace_back(TokenType::NUMBER,
+            std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start),
+            number,
+            cursor.current);
+    };
+
+
+    // Check for base
+    auto expectedBase = NumericBase::Decimal;
+    if (m_source[cursor.start] == '0') {
+        // Hex
+        if (const auto value = Peek(cursor);
+            value == 'x' || value == 'X') {
+            Pop(cursor);
+            expectedBase = NumericBase::Hex;
+        }
+
+        // Binary
+        else if (value == 'b' || value == 'B') {
+            Pop(cursor);
+            expectedBase = NumericBase::Binary;
+        }
+        // Octal
+        else {
+            expectedBase = NumericBase::Octal;
+        }
     }
 
-    m_tokenList.emplace_back(TokenType::NUMBER,
-        std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start),
-        std::stod(std::string(m_source.data() + cursor.start, cursor.current - cursor.start)),
-        cursor.current);
+
+    scanNumber();
+    // TODO: floating point may not work as expected with different floating point standards.
+    if (Peek(cursor) == '.' && IsNumeric(PeekAhead(cursor))) {
+        Pop(cursor);
+        const auto scanDecimal = [&]() { while (!IsAtEnd(cursor) && IsNumeric(Peek(cursor))) { Pop(cursor); } };
+        scanDecimal(); // decimal
+
+        try {
+            auto number = std::stod(stripNumberSeperator(), nullptr);
+            AddNumberToken(number);
+        }
+        catch (...) {
+            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), "Invalid floating-point number");
+        }
+    }
+    else {
+        try {
+            if (auto numberStr = stripNumberSeperator();
+                !numberStr.empty()) {
+
+                size_t pos{};
+                // stoi doesn't recognize '0b' prefix.
+                if (expectedBase == NumericBase::Binary) {
+                    pos += 2;
+                    numberStr = std::string(numberStr.begin() + 2, numberStr.end());
+                }
+                AddNumberToken(std::stoi(numberStr, &pos, static_cast<int>(expectedBase)));
+
+                // Error if we stopped sooner than expected
+                if (pos != numberStr.size()) {
+                    m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), fmt::format("Invalid {} number", to_string(expectedBase)));
+                }
+            }
+        }
+        catch (...) {
+            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), fmt::format("Invalid {} number", to_string(expectedBase)));
+        }
+    }
 }
 
 void Scanner::ScanIdentifier(Cursor& cursor) {
@@ -247,4 +357,5 @@ char Scanner::PeekAhead(Cursor cursor) {
 
 char Scanner::Pop(Cursor& cursor) {
     return m_source[cursor.current++];
+}
 }

@@ -6,6 +6,8 @@
 #include <string_view>
 #include <vector>
 
+namespace Rdb {
+
 class Scanner {
 public:
     Scanner(ErrorsPtr errors, std::string_view source);
@@ -13,8 +15,7 @@ public:
     TokenList ScanTokens();
 
 private:
-    struct Cursor
-    {
+    struct Cursor {
         int current = 0;
         int start = 0;
         int line = 1; // Line number is not 0 indexed
@@ -36,3 +37,5 @@ private:
 
     ErrorsPtr m_errors;
 };
+
+}

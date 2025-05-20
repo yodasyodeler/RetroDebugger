@@ -1,37 +1,6 @@
 #include "DebuggerStringParser.h"
 
-namespace DebuggerStringParser {
-std::vector<std::string> ParseBuffer(const std::string& buffer) {
-    std::vector<size_t> wordPos = {};
-    size_t pos = 0;
-    while (pos != std::string::npos) {
-        // Find position of each word
-        pos = buffer.find_first_not_of(' ', pos); // Add first none whitespace character
-        wordPos.emplace_back(pos);
-
-        if (pos != std::string::npos) {
-            pos = buffer.find(' ', pos);
-            wordPos.emplace_back(pos);
-        }
-    }
-
-    // Parse each word
-    std::vector<std::string> words;
-    size_t count = 0;
-    const auto spaceCount = wordPos.size() - 1; // Don't count the starting pos of the first word
-    while (count < spaceCount) {
-        const auto startPos = wordPos[count++];
-        const auto lastPos = wordPos[count++];
-        words.emplace_back(buffer.substr(startPos, lastPos - startPos));
-    }
-
-    if (words.empty()) {
-        words.emplace_back("");
-    }
-
-    return words;
-}
-
+namespace Rdb {
 // TODO: expand this, be nice to handle list such as "1,3-6,-4" = vector of <1,3,5,6>. Negatives are not supported at the moment, should they be?
 bool ParseList(const std::string& word, std::vector<unsigned int>& num) {
     size_t start_pos = 0;
@@ -156,8 +125,8 @@ std::tuple<bool, unsigned int, unsigned int> ParseNumberPair(const std::string& 
     }
     else {
         if (separatorPos == 0 || (separatorPos + separatorStr.size()) == word.size()) { return { false, {}, {} }; } // If no number is before or after the Separator
-        if (std::tie(isNumber, number1) = DebuggerStringParser::ParseNumber(word.substr(0, separatorPos)); !isNumber) { return { false, {}, {} }; }
-        if (std::tie(isNumber, number2) = DebuggerStringParser::ParseNumber(word.substr(separatorPos + separatorStr.size())); !isNumber) { return { false, {}, {} }; }
+        if (std::tie(isNumber, number1) = Rdb::ParseNumber(word.substr(0, separatorPos)); !isNumber) { return { false, {}, {} }; }
+        if (std::tie(isNumber, number2) = Rdb::ParseNumber(word.substr(separatorPos + separatorStr.size())); !isNumber) { return { false, {}, {} }; }
 
         return { true, number1, number2 };
     }

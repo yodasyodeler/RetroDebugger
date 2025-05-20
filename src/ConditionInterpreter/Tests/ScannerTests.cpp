@@ -1,7 +1,9 @@
-#include "gtest/gtest.h"
+#include "Scanner.h"
 
 #include "Report.h"
-#include "Scanner.h"
+
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #include <array>
 #include <stdexcept>
@@ -11,6 +13,7 @@
     Error case: Unexpected second character
 */
 using namespace std::string_view_literals;
+using namespace Rdb;
 
 [[nodiscard]] consteval std::string_view RemoveQuotes(std::string_view str) {
     if (str.front() != '"') { throw std::invalid_argument(R"(Doesn't start with '"')"); }
@@ -98,8 +101,90 @@ TEST(ScannerTests, Scan_Operators) {
     }
 }
 
-TEST(ScannerTests, Scan_NumericLiterals_LeadingZero) {
+TEST(ScannerTests, Scan_NumericLiterals_Octal) {
     static constexpr auto source = "0123"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 2);
+
+    EXPECT_EQ(tokens[0].GetType(), TokenType::NUMBER);
+    EXPECT_EQ(tokens[0].GetLexeme(), source);
+    EXPECT_EQ(tokens[0].GetLiteralDouble(), 83.0); // Octal value
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_InvalidOctal_CausesError) {
+    static constexpr auto source = "0181"sv; // 8 is not allowed in octal
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Invalid Octal number)"));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_Hex) {
+    static constexpr auto source = "0x10"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 2);
+
+    EXPECT_EQ(tokens[0].GetType(), TokenType::NUMBER);
+    EXPECT_EQ(tokens[0].GetLexeme(), source);
+    EXPECT_EQ(tokens[0].GetLiteralInt(), 16); // Hex value
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_InvalidHex_CausesError) {
+    static constexpr auto source = "0x1G1"sv; // G is not allowed in hex
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Invalid Hex number)"));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_Binary) {
+    static constexpr auto source = "0b100"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 2);
+
+    EXPECT_EQ(tokens[0].GetType(), TokenType::NUMBER);
+    EXPECT_EQ(tokens[0].GetLexeme(), source);
+    EXPECT_EQ(tokens[0].GetLiteralInt(), 4); // Hex value
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_InvalidBinary_CausesError) {
+    static constexpr auto source = "0b121"sv; // 2 is not allowed in binary
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Invalid Binary number)"));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_InvalidDecimal_CausesError) {
+    static constexpr auto source = "1A1"sv; // A is not allowed in hex
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Invalid Decimal number)"));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_NumberSeperators_SeperatorsAreRemoved) {
+    static constexpr auto source = "1'2'3"sv;
     auto errors = std::make_shared<Errors>();
     Scanner scanner(errors, source);
     const auto tokens = scanner.ScanTokens();
@@ -112,8 +197,28 @@ TEST(ScannerTests, Scan_NumericLiterals_LeadingZero) {
     EXPECT_EQ(tokens[0].GetLiteralDouble(), 123.0);
 }
 
+TEST(ScannerTests, Scan_NumericLiterals_NumberSeperators_DoubleSeperatorsError) {
+    static constexpr auto source = "12''3"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Adjacent digit separators)"));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_NumberSeperators_BadUseOfSeperator_Error) {
+    static constexpr auto source = "123'"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_TRUE(errors->HasError());
+    EXPECT_THAT(errors->GetError(), testing::HasSubstr(R"(Unexpected character)"));
+}
+
 TEST(ScannerTests, Scan_NumericLiterals_LeadingPeriod) {
-    static constexpr auto source = ".0123"sv;
+    static constexpr auto source = ".123"sv;
     auto errors = std::make_shared<Errors>();
     Scanner scanner(errors, source);
     const auto tokens = scanner.ScanTokens();
@@ -128,8 +233,8 @@ TEST(ScannerTests, Scan_NumericLiterals_LeadingPeriod) {
     EXPECT_EQ(tokens[1].GetLiteralDouble(), 123.0);
 }
 
-TEST(ScannerTests, Scan_NumericLiterals_LeadingZeroAndTrailingPeriod) {
-    static constexpr auto source = "0123."sv;
+TEST(ScannerTests, Scan_NumericLiterals_TrailingPeriod) {
+    static constexpr auto source = "123."sv;
     auto errors = std::make_shared<Errors>();
     Scanner scanner(errors, source);
     const auto tokens = scanner.ScanTokens();
@@ -226,14 +331,15 @@ TEST(ScannerTests, LogicOperators_AndOr) {
 }
 
 TEST(ScannerTests, BitWiseOperators_AndOr) {
-    static constexpr auto source = R"(3 & 5 | 1000)";
+    static constexpr auto source = R"(3 & 5 | 1000 ^ 20)";
     auto errors = std::make_shared<Errors>();
     Scanner scanner(errors, source);
     const auto tokens = scanner.ScanTokens();
 
     ASSERT_FALSE(errors->HasError());
-    ASSERT_EQ(tokens.size(), 6);
+    ASSERT_EQ(tokens.size(), 8);
 
     EXPECT_EQ(tokens[1].GetType(), TokenType::BITWISE_AND);
     EXPECT_EQ(tokens[3].GetType(), TokenType::BITWISE_OR);
+    EXPECT_EQ(tokens[5].GetType(), TokenType::BITWISE_XOR);
 }

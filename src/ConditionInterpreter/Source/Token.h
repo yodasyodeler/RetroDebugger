@@ -31,6 +31,7 @@ public:
     bool IsLiteralNil() const noexcept; // Won't throw
     bool GetLiteralBool() const;
     double GetLiteralDouble() const;
+    int GetLiteralInt() const;
     std::string GetLiteralString() const;
 
 private:

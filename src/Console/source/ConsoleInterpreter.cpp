@@ -43,13 +43,13 @@ std::tuple<bool, BankNum, unsigned int> ParseAddress(std::string_view word) {
     auto wordStr = std::string(word);
 
     // <address>
-    if (const auto [isNumber, address] = DebuggerStringParser::ParseNumber(wordStr);
+    if (const auto [isNumber, address] = Rdb::ParseNumber(wordStr);
         isNumber) {
         return { isNumber, AnyBank, address };
     }
 
     // <bank>:<address>
-    if (const auto [isNumber, bank, address] = DebuggerStringParser::ParseNumberPair(wordStr, ":");
+    if (const auto [isNumber, bank, address] = Rdb::ParseNumberPair(wordStr, ":");
         isNumber) {
         return { isNumber, BankNum{ bank }, address };
     }
@@ -195,7 +195,7 @@ bool ConsoleInterpreter::ContinueCommand(std::string_view command) {
     }
 
     // continue <number>
-    if (const auto [isNumber, number] = DebuggerStringParser::ParseNumber(std::string(word));
+    if (const auto [isNumber, number] = Rdb::ParseNumber(std::string(word));
         isNumber && sentence.empty()) {
         m_debugger->Run(number);
         m_settings.listNext = false;
@@ -217,7 +217,7 @@ bool ConsoleInterpreter::StepCommand(std::string_view command) {
     }
 
     // Step <number>
-    if (const auto [isNumber, number] = DebuggerStringParser::ParseNumber(std::string(word));
+    if (const auto [isNumber, number] = Rdb::ParseNumber(std::string(word));
         isNumber && sentence.empty()) {
         m_debugger->RunInstructions(number);
         m_settings.listNext = false;
@@ -277,7 +277,7 @@ bool ConsoleInterpreter::ConditionCommand(std::string_view command) {
 
     // condition <break_number>
     // condition <break_number> <condition_expression>
-    if (const auto [isNumber, number] = DebuggerStringParser::ParseNumber(std::string(word));
+    if (const auto [isNumber, number] = Rdb::ParseNumber(std::string(word));
         isNumber) {
         m_debugger->SetCondition(BreakNum{ number }, std::string{ sentence });
         return true;
@@ -290,7 +290,7 @@ bool ConsoleInterpreter::EnableBreakCommand(std::string_view command) {
     const auto [word, sentence] = SplitFirstWord(command);
 
     // enable <break_list>
-    if (const auto [areNumbers, numbers] = DebuggerStringParser::ParseList(std::string(word));
+    if (const auto [areNumbers, numbers] = Rdb::ParseList(std::string(word));
         areNumbers && sentence.empty()) {
         m_debugger->EnableBreakpoints(numbers);
         return true;
@@ -303,7 +303,7 @@ bool ConsoleInterpreter::DisableBreakCommand(std::string_view command) {
     const auto [word, sentence] = SplitFirstWord(command);
 
     // disable <break_list>
-    if (const auto [areNumbers, numbers] = DebuggerStringParser::ParseList(std::string(word));
+    if (const auto [areNumbers, numbers] = Rdb::ParseList(std::string(word));
         areNumbers && sentence.empty()) {
         m_debugger->DisableBreakpoints(numbers);
         return true;
@@ -322,7 +322,7 @@ bool ConsoleInterpreter::DeleteBreakCommand(std::string_view command) {
     }
 
     // delete <break_list>
-    if (const auto [areNumbers, numbers] = DebuggerStringParser::ParseList(std::string(word));
+    if (const auto [areNumbers, numbers] = Rdb::ParseList(std::string(word));
         areNumbers && sentence.empty()) {
         m_debugger->DeleteBreakpoints(numbers);
         return true;
@@ -347,7 +347,7 @@ bool ConsoleInterpreter::InfoCommand(std::string_view command) {
         }
 
         // info (break | breakpoint | watchpoint) <break_list>
-        if (const auto [areNumbers, numbers] = DebuggerStringParser::ParseList(std::string(numWord));
+        if (const auto [areNumbers, numbers] = Rdb::ParseList(std::string(numWord));
             areNumbers && restOfSentence.empty()) {
             auto info = m_debugger->GetBreakpointInfoList(numbers);
             if (!info.empty()) {
@@ -437,7 +437,7 @@ bool ConsoleInterpreter::PrintCommand(std::string_view command) {
         }
 
         // print <address>
-        if (const auto [isNumber, number] = DebuggerStringParser::ParseNumber(std::string(word));
+        if (const auto [isNumber, number] = Rdb::ParseNumber(std::string(word));
             isNumber) {
             const auto info = m_debugger->GetRomInfo(number);
             SetCommandResponse(DebuggerPrintFormat::PrintAddressInfo(info));
@@ -481,7 +481,7 @@ bool ConsoleInterpreter::ListCommand(std::string_view command) {
     }
 
     // list <address>
-    if (const auto [isNumber, address] = DebuggerStringParser::ParseNumber(std::string(word));
+    if (const auto [isNumber, address] = Rdb::ParseNumber(std::string(word));
         isNumber && sentence.empty()) {
         auto commands = m_debugger->GetCommandInfoList(address, static_cast<unsigned int>(m_settings.listSize));
         SetCommandResponse(DebuggerPrintFormat::PrintInstructions(m_callbacks, commands));
@@ -491,7 +491,7 @@ bool ConsoleInterpreter::ListCommand(std::string_view command) {
     }
 
     // list <address-address>
-    if (const auto [isNumber, address1, address2] = DebuggerStringParser::ParseNumberPair(std::string(word), "-");
+    if (const auto [isNumber, address1, address2] = Rdb::ParseNumberPair(std::string(word), "-");
         isNumber && sentence.empty()) {
         if (address1 > address2) {
             m_settings.listNext = false;
@@ -517,7 +517,7 @@ bool ConsoleInterpreter::SetCommand(std::string_view command) {
     if (word == "listsize") {
         const auto [listSize, extraWords] = SplitFirstWord(sentence);
 
-        if (const auto [isNumber, number] = DebuggerStringParser::ParseNumber(std::string(listSize));
+        if (const auto [isNumber, number] = Rdb::ParseNumber(std::string(listSize));
             isNumber && extraWords.empty()) {
             m_settings.listSize = number;
         }

@@ -8,8 +8,7 @@ using namespace std::literals::string_literals;
 
 
 template<class AnyType>
-struct always_false : std::false_type
-{};
+struct always_false : std::false_type {};
 
 template<class AnyType>
 constexpr bool always_false_v = always_false<AnyType>::value;
@@ -103,6 +102,12 @@ double Token::GetLiteralDouble() const {
     if (!IsNumeric(m_literal)) { throw std::runtime_error("Must be a 'Numeric' type."); }
 
     return std::get<NumericValue>(m_literal).Get<double>();
+}
+
+int Token::GetLiteralInt() const {
+    if (!IsNumeric(m_literal)) { throw std::runtime_error("Must be a 'Numeric' type."); }
+
+    return std::get<NumericValue>(m_literal).Get<int>();
 }
 
 std::string Token::GetLiteralString() const {
