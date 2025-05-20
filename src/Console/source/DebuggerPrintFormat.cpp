@@ -130,7 +130,7 @@ std::string PrintHelpHelp() {
     return "TODO: write help for help command\n Help commands are WIP.\n";
 }
 
-std::string PrintCommandHelp(const std::string& /*command*/) { return "TODO: write help\n"; }
+std::string PrintCommandHelp(std::string_view command) { return "TODO: write help\n"; }
 
 std::string PrintRegHelp() { return "TODO: write help\n"; }
 

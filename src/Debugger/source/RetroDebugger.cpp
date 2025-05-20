@@ -34,7 +34,7 @@ std::string RetroDebugger::GetCommandPrompt() noexcept {
 }
 
 std::string RetroDebugger::GetCommandResponse() const {
-    return m_console.GetResponse();
+    return m_console.GetCommandResponse();
 }
 
 int RetroDebugger::ProcessCommandString(const std::string& message) {
@@ -46,78 +46,78 @@ bool RetroDebugger::CheckBreakpoints(BreakInfo* breakInfo) {
     BreakInfo info = {};
     BreakInfo& infoRef = (breakInfo == nullptr) ? info : *breakInfo;
 
-    const auto hitBreakpoint = m_debugger.CheckBreakpoints(infoRef);
+    const auto hitBreakpoint = m_debugger->CheckBreakpoints(infoRef);
     if (hitBreakpoint) {
         if (infoRef.type == BreakType::Breakpoint) {
-            m_interpreter.SetCommandResponse(DebuggerPrintFormat::PrintBreakpointHit(infoRef));
+            m_console.SetCommandResponse(DebuggerPrintFormat::PrintBreakpointHit(infoRef));
         }
         else if (infoRef.type == BreakType::Watchpoint) {
-            m_interpreter.SetCommandResponse(DebuggerPrintFormat::PrintWatchpointHit(infoRef));
+            m_console.SetCommandResponse(DebuggerPrintFormat::PrintWatchpointHit(infoRef));
         }
     }
     return hitBreakpoint;
 }
 
 bool RetroDebugger::Run(const unsigned int numBreakpointsToSkip) {
-    return m_debugger.Run(numBreakpointsToSkip);
+    return m_debugger->Run(numBreakpointsToSkip);
 }
 
 bool RetroDebugger::RunInstructions(const unsigned int numBreakToPass) {
-    return m_debugger.RunInstructions(numBreakToPass);
+    return m_debugger->RunInstructions(numBreakToPass);
 }
 
 bool RetroDebugger::RunTillJump() {
-    return m_debugger.RunTillJump();
+    return m_debugger->RunTillJump();
 }
 
 bool RetroDebugger::SetBreakpoint(unsigned int address) {
-    return m_debugger.SetBreakpoint(address) != std::numeric_limits<BreakNum>::max();
+    return m_debugger->SetBreakpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
 void RetroDebugger::SetCondition(BreakNum breakNum, const std::string& condition) {
-    m_debugger.SetCondition(breakNum, condition);
+    m_debugger->SetCondition(breakNum, condition);
 }
 
 bool RetroDebugger::SetWatchpoint(unsigned int address) {
-    return m_debugger.SetWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+    return m_debugger->SetWatchpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
 bool RetroDebugger::SetReadWatchpoint(unsigned int address) {
-    return m_debugger.SetReadWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+    return m_debugger->SetReadWatchpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
 bool RetroDebugger::SetAnyWatchpoint(unsigned int address) {
-    return m_debugger.SetAnyWatchpoint(address) != std::numeric_limits<BreakNum>::max();
+    return m_debugger->SetAnyWatchpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
 bool RetroDebugger::EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
 
-    return m_debugger.EnableBreakpoints(CreateRange(breakRange0, breakRange1));
+    return m_debugger->EnableBreakpoints(CreateRange(breakRange0, breakRange1));
 }
 
 bool RetroDebugger::DisableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
 
-    return m_debugger.DisableBreakpoints(CreateRange(breakRange0, breakRange1));
+    return m_debugger->DisableBreakpoints(CreateRange(breakRange0, breakRange1));
 }
 
 bool RetroDebugger::DeleteBreakpoints() {
-    return m_debugger.DeleteBreakpoints({});
+    return m_debugger->DeleteBreakpoints({});
 }
 
 bool RetroDebugger::DeleteBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
 
-    return m_debugger.DeleteBreakpoints(CreateRange(breakRange0, breakRange1));
+    return m_debugger->DeleteBreakpoints(CreateRange(breakRange0, breakRange1));
 }
 
 BreakList RetroDebugger::GetBreakpointInfo() {
-    return m_debugger.GetBreakpointInfoList({});
+    return m_debugger->GetBreakpointInfoList({});
 }
 
 BreakInfo RetroDebugger::GetBreakpointInfo(const unsigned int breakPointNum) {
-    auto breakInfo = m_debugger.GetBreakpointInfoList({ breakPointNum });
+    auto breakInfo = m_debugger->GetBreakpointInfoList({ breakPointNum });
 
     static constexpr auto maxUInt = std::numeric_limits<unsigned int>::max();
     const BreakInfo invalidBreakpoint = { maxUInt, BreakNum{ maxUInt }, BankNum{ maxUInt }, maxUInt, 0, 0, BreakType::Invalid, BreakDisposition::Disable, false };
@@ -126,7 +126,7 @@ BreakInfo RetroDebugger::GetBreakpointInfo(const unsigned int breakPointNum) {
 
 bool RetroDebugger::GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo) {
     if (registerInfo != nullptr) {
-        *registerInfo = m_debugger.GetRegisterInfoList();
+        *registerInfo = m_debugger->GetRegisterInfoList();
         return true;
     }
 
@@ -134,10 +134,10 @@ bool RetroDebugger::GetRegisterInfo(std::vector<RegisterInfoPtr>* registerInfo) 
 }
 
 void RetroDebugger::ParseXmlFile(const std::string& filename) {
-    m_debugger.ResetOperations();
+    m_debugger->ResetOperations();
     DebuggerXmlParser xmlParser;
     xmlParser.ParseFile(filename);
-    m_debugger.SetOperations(xmlParser.GetOperations());
+    m_debugger->SetOperations(xmlParser.GetOperations());
 }
 
 // Set Callbacks
@@ -164,11 +164,11 @@ void RetroDebugger::SetGetRegSetCallback(GetRegSetFunc getRegSet_cb) {
 }
 
 void RetroDebugger::ReadMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
-    m_debugger.ReadMemoryHook(bankNum, address, bytes);
+    m_debugger->ReadMemoryHook(bankNum, address, bytes);
 }
 
 void RetroDebugger::WriteMemoryHook(BankNum bankNum, unsigned int address, const std::vector<std::byte>& bytes) {
-    m_debugger.ReadMemoryHook(bankNum, address, bytes);
+    m_debugger->ReadMemoryHook(bankNum, address, bytes);
 }
 
 }

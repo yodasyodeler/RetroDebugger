@@ -1,7 +1,6 @@
+#include "ConsoleInterpreter.h"
 #include "Debugger.h"
 #include "DebuggerCallbacks.h"
-#include "DebuggerConsole.h"
-#include "DebuggerInterpreter.h"
 
 namespace Rdb {
 
@@ -67,9 +66,8 @@ public:
 
 private:
     std::shared_ptr<DebuggerCallbacks> m_callbacks = std::make_shared<DebuggerCallbacks>();
-    Debugger m_debugger{ m_callbacks };
-    DebuggerInterpreter m_interpreter{ &m_debugger, m_callbacks };
-    DebuggerConsole m_console{ &m_interpreter };
+    std::shared_ptr<Debugger> m_debugger = std::make_shared<Debugger>(m_callbacks);
+    ConsoleInterpreter m_console{ m_debugger, m_callbacks };
 };
 
 }

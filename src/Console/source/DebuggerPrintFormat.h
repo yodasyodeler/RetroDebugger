@@ -11,7 +11,7 @@ namespace DebuggerPrintFormat {
 // Help print
 std::string PrintGeneralHelp();
 
-std::string PrintCommandHelp(const std::string& command);
+std::string PrintCommandHelp(std::string_view command);
 std::string PrintRegHelp();
 std::string PrintPpuHelp();
 std::string PrintApuHelp();

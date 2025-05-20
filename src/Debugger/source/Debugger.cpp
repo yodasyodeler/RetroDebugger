@@ -42,7 +42,7 @@ BreakNum Debugger::SetBreakpoint(const unsigned int address) {
     return m_breakManager.SetBreakpoint(address);
 }
 
-BreakNum Debugger::SetBreakpoint(unsigned int bank, const unsigned int address) {
+BreakNum Debugger::SetBreakpoint(BankNum bank, const unsigned int address) {
     // TODO: should the address be checked?
     return m_breakManager.SetBreakpoint(BankNum{ bank }, address);
 }

@@ -14,7 +14,7 @@ public:
     bool RunTillJump();
 
     BreakNum SetBreakpoint(unsigned int address);
-    BreakNum SetBreakpoint(unsigned int bank, unsigned int address);
+    BreakNum SetBreakpoint(BankNum bank, unsigned int address);
 
     void SetCondition(BreakNum breakNum, const std::string& condition);
 

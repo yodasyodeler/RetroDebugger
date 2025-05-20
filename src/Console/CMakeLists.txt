@@ -3,10 +3,8 @@ add_library(ConsoleLib STATIC)
 target_sources(
     ConsoleLib
     PRIVATE pch.h
-            source/DebuggerConsole.cpp
-            source/DebuggerConsole.h
-            source/DebuggerInterpreter.cpp
-            source/DebuggerInterpreter.h
+            source/ConsoleInterpreter.h
+            source/ConsoleInterpreter.cpp
             source/DebuggerPrintFormat.cpp
             source/DebuggerPrintFormat.h
             source/DebuggerStringParser.cpp
