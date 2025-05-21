@@ -1,6 +1,8 @@
 #include "BreakpointManager.h"
 #include "DebuggerCallbacks.h"
 
+#include "MockDebuggerCallbacks.h"
+
 #include <gtest/gtest.h>
 
 #include <algorithm>
@@ -27,13 +29,14 @@ BreakNum operator++(BreakNum& breakNum, int) {
 
 namespace DebuggerTests {
 
+using namespace testing;
 
 class BreakpointManagerTests : public ::testing::Test {
 public:
     void SetUp() override {
-        m_callbacks->SetGetPcRegCallback([this]() { return GetPcRegMock(); });
-        m_callbacks->SetReadMemoryCallback([this](unsigned int address) { return ReadRomMemory(address); });
-        m_callbacks->SetReadBankableMemoryCallback([this](BankNum bankNum, unsigned int address) { return ReadBankableMemory(bankNum, address); });
+        ON_CALL(*m_callbacks, GetPcReg).WillByDefault([this]() { return GetPcRegMock(); });
+        ON_CALL(*m_callbacks, ReadMemory).WillByDefault([this](unsigned int address) { return ReadRomMemory(address); });
+        ON_CALL(*m_callbacks, ReadBankableMemory).WillByDefault([this](BankNum bankNum, unsigned int address) { return ReadBankableMemory(bankNum, address); });
     }
 
     void TearDown() override {}
@@ -42,7 +45,7 @@ public:
     unsigned int ReadRomMemory(unsigned int /*address*/) { return g_memory; }
     unsigned int ReadBankableMemory(BankNum, unsigned int) { return g_memory; }
 
-    std::shared_ptr<Rdb::DebuggerCallbacks> m_callbacks = std::make_shared<Rdb::DebuggerCallbacks>();
+    std::shared_ptr<Rdb::MockDebuggerCallbacks> m_callbacks = std::make_shared<Rdb::MockDebuggerCallbacks>();
     Rdb::BreakpointManager m_breakpointManager{ std::shared_ptr<Rdb::DebuggerOperations>{}, m_callbacks };
 
     unsigned int m_pc = 0; // TODO: make a gmock interface
@@ -559,6 +562,21 @@ TEST_F(BreakpointManagerTests, AnyWatchpoint_bugFix_WatchpointAddressIsWithInHit
     m_breakpointManager.ReadMemoryHook(AnyBank, 101u, { expectedValue });
     ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
 }
+
+TEST_F(BreakpointManagerTests, Watchpoints_register_HappyPath) {
+    static constexpr std::string_view registerA = "RegisterA";
+    RegSet regSet = { { std::string(registerA), 5 } };
+    EXPECT_CALL(*m_callbacks, GetRegSet).Times(2).WillRepeatedly(Return(regSet));
+
+    m_breakpointManager.SetWatchpoint(std::string(registerA));
+    BreakInfo breakInfo{};
+    ASSERT_FALSE(m_breakpointManager.CheckBreakpoints(breakInfo));
+
+    regSet[std::string(registerA)] = 6;
+    EXPECT_CALL(*m_callbacks, GetRegSet).Times(1).WillRepeatedly(Return(regSet));
+    ASSERT_TRUE(m_breakpointManager.CheckBreakpoints(breakInfo));
+}
+
 
 // TEST_F(BreakpointManagerTests, Debugger_ListDiffrentListSizesOfBootRom) {
 //     const auto expectedSize = 5;

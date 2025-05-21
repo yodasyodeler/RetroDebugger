@@ -140,9 +140,10 @@ bool ConsoleInterpreter::AdvanceDebugger(const std::string& command) {
             return false;
         }
     }
-    catch (const std::runtime_error&) {
-        // TODO: maybe print some more info on the error here.
-        // fall through
+    catch (const std::runtime_error& e) {
+        // Command specific error
+        SetCommandResponse(fmt::format("Error: {}", e.what()));
+        return false;
     }
 
     SetCommandResponse(fmt::format("Invalid arg, \"help {}\" for info on command and args\n", word));
@@ -376,11 +377,10 @@ bool ConsoleInterpreter::WatchCommand(std::string_view command) {
         return m_debugger->SetWatchpoint(address, bankNum) != std::numeric_limits<BreakNum>::max();
     }
 
-    // TODO:
     // watch <register>
-    /*if (!word.empty() && sentence.empty()) {
+    if (!word.empty() && sentence.empty()) {
         return m_debugger->SetWatchpoint(std::string(word)) != std::numeric_limits<BreakNum>::max();
-    }*/
+    }
 
     return false;
 }
@@ -395,7 +395,7 @@ bool ConsoleInterpreter::RwatchCommand(std::string_view command) {
         return m_debugger->SetReadWatchpoint(address, bankNum) != std::numeric_limits<BreakNum>::max();
     }
 
-    // TODO:
+    // Unsure if worth supporting, would require some sort of feedback from emulator on every read.
     // watch <register>
     /*if (!word.empty() && sentence.empty()) {
         return m_debugger->SetReadWatchpoint(std::string(word)) != std::numeric_limits<BreakNum>::max();
@@ -415,7 +415,7 @@ bool ConsoleInterpreter::AwatchCommand(std::string_view command) {
         return true;
     }
 
-    // TODO:
+    // Unsure if worth supporting, would require some sort of feedback from emulator on every read.
     // watch <register>
     /*if (!word.empty() && sentence.empty()) {
         return m_debugger->SetAnyWatchpoint(std::string(word)) != std::numeric_limits<BreakNum>::max();

@@ -3,9 +3,13 @@
 #include "BreakpointManager.h"
 #include "MockDebuggerCallbacks.h"
 
+#include <fmt/core.h>
+
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+
+using namespace testing;
 
 class ConditionInterpreterTests : public ::testing::Test {
 public:
@@ -55,4 +59,31 @@ TEST_F(ConditionInterpreterTests, SimpleConditions_StaticValues_HappyPath) {
         const auto condition = Rdb::ConditionInterpreter::CreateCondition(m_callbacks, "0");
         EXPECT_FALSE(condition->EvaluateCondition());
     }
+}
+
+TEST_F(ConditionInterpreterTests, SimpleConditions_CheckRegisterValue_HappyPath) {
+    static constexpr std::string_view registerA = "RegisterA";
+    static constexpr auto testValue = 5;
+    RegSet regSet = { { std::string(registerA), 0 } };
+    EXPECT_CALL(*m_callbacks, GetRegSet).Times(1).WillRepeatedly(Return(regSet));
+
+    const auto condition = Rdb::ConditionInterpreter::CreateCondition(m_callbacks, fmt::format("{} == 5", registerA));
+    EXPECT_FALSE(condition->EvaluateCondition());
+
+    regSet[std::string(registerA)] = testValue;
+    EXPECT_CALL(*m_callbacks, GetRegSet).Times(1).WillRepeatedly(Return(regSet));
+    EXPECT_TRUE(condition->EvaluateCondition());
+}
+
+
+TEST_F(ConditionInterpreterTests, SimpleConditions_CheckAddress_HappyPath) {
+    auto testMemory = 0;
+    EXPECT_CALL(*m_callbacks, ReadMemory(0x100)).Times(1).WillRepeatedly(Return(testMemory));
+
+    const auto condition = Rdb::ConditionInterpreter::CreateCondition(m_callbacks, "*0x100 == 5");
+    EXPECT_FALSE(condition->EvaluateCondition());
+
+    testMemory = 5;
+    EXPECT_CALL(*m_callbacks, ReadMemory(0x100)).Times(1).WillRepeatedly(Return(testMemory));
+    EXPECT_TRUE(condition->EvaluateCondition());
 }

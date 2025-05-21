@@ -60,6 +60,10 @@ bool SetAnyWatchpoint(unsigned int address) {
     return m_debugger.SetAnyWatchpoint(address);
 }
 
+bool SetWatchpoint(const std::string& name) {
+    return m_debugger.SetWatchpoint(name);
+}
+
 bool EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     return m_debugger.EnableBreakpoints(breakRange0, breakRange1);
 }

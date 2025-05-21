@@ -90,6 +90,10 @@ bool RetroDebugger::SetAnyWatchpoint(unsigned int address) {
     return m_debugger->SetAnyWatchpoint(address) != std::numeric_limits<BreakNum>::max();
 }
 
+bool RetroDebugger::SetWatchpoint(const std::string& name) {
+    return m_debugger->SetWatchpoint(name) != std::numeric_limits<BreakNum>::max();
+}
+
 bool RetroDebugger::EnableBreakpoints(const unsigned int breakRange0, const unsigned int breakRange1) {
     if (breakRange0 > breakRange1) { return false; }
 

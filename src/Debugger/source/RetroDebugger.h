@@ -32,6 +32,8 @@ public:
 
     bool SetAnyWatchpoint(unsigned int address);
 
+    bool SetWatchpoint(const std::string& name);
+
     bool EnableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
     bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);

@@ -63,6 +63,18 @@ BreakNum Debugger::SetAnyWatchpoint(unsigned int address, BankNum bankNumber) {
     return m_breakManager.SetAnyWatchpoint(address, bankNumber);
 }
 
+BreakNum Debugger::SetWatchpoint(const std::string& name) {
+    return m_breakManager.SetWatchpoint(name);
+}
+
+// BreakNum Debugger::SetReadWatchpoint(const std::string& name) {
+//     return m_breakManager.SetReadWatchpoint(name);
+// }
+//
+// BreakNum Debugger::SetAnyWatchpoint(const std::string& name) {
+//     return m_breakManager.SetAnyWatchpoint(name);
+// }
+
 bool Debugger::EnableBreakpoints(const std::vector<unsigned int>& list) {
     return m_breakManager.EnableBreakpoints(ToBreakNumList(list));
 }

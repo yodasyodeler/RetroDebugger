@@ -101,9 +101,10 @@ static constexpr std::string_view generalHelp =
     "(i)nfo breakpoints -- list breakpoints\n"
     "(i)nfo line -- prints the current line number and its associated address\n"
     "\n"
-    "(w)atch <reg> -- break on next instruction that writes to the specified reg and its value changes\n"
-    "rwatch <reg> -- break on next instruction that reads from the specified reg and its value changes\n"
-    "awatch <reg> -- break on next instruction that either reads from or writes to the specified reg and its value changes\n"
+    "(w)atch <reg> -- break when register value changes. Note: not a true watch as writing same value won't trigger this watchpoint.\n"
+    // Do we want to watch reads of registers? Would require a feedback from emulator and would likely not have value.
+    /*"rwatch <reg> -- break on next instruction that reads from the specified reg and its value changes\n"
+    "awatch <reg> -- break on next instruction that either reads from or writes to the specified reg and its value changes\n"*/
     "(w)atch <address> -- break on next instruction that writes to the specified address and its value changes\n"
     "rwatch <address> -- break on next instruction that reads from the specified address and its value changes\n"
     "awatch <address> -- break on next instruction that either reads from or writes to the specified address and its value changes\n"

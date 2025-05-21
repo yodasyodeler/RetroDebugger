@@ -18,6 +18,7 @@ target_sources(
 target_link_libraries(
     RetroDebuggerTests
     PRIVATE DebuggerLib
+            RdbMocks
             GTest::gtest
             GTest::gtest_main
             GTest::gmock

@@ -41,6 +41,8 @@ RDB_EXPORT bool SetReadWatchpoint(unsigned int address);
 
 RDB_EXPORT bool SetAnyWatchpoint(unsigned int address);
 
+RDB_EXPORT bool SetWatchpoint(const std::string& name);
+
 RDB_EXPORT bool EnableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);
 
 RDB_EXPORT bool DisableBreakpoints(unsigned int breakRange0, unsigned int breakRange1);

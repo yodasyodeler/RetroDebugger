@@ -7,11 +7,9 @@ include(CTest)
 enable_testing()
 add_executable(ConditionInterpreterLibTests)
 
-target_include_directories(ConditionInterpreterLibTests PRIVATE ${CMAKE_CURRENT_LIST_DIR} include)
 target_sources(
     ConditionInterpreterLibTests
-    PRIVATE include/MockDebuggerCallbacks.h
-            ConditionInterpreterTests.cpp
+    PRIVATE ConditionInterpreterTests.cpp
             ExprTests.cpp
             ParserExpressionTests.cpp
             InterpreterExpressionTests.cpp
@@ -21,6 +19,7 @@ target_sources(
 target_link_libraries(
     ConditionInterpreterLibTests
     PRIVATE DebuggerLib
+            RdbMocks
             RetroDebugger_options
             RetroDebugger_warnings
             ConditionInterpreterLib

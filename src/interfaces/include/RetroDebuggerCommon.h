@@ -34,27 +34,25 @@ enum class BreakDisposition {
     Disable,
 };
 
-struct BreakInfo
-{
-    unsigned int address{};
-    BreakNum breakpointNumber{};
-    BankNum bankNumber{};
+struct BreakInfo {
+    unsigned int address = std::numeric_limits<unsigned int>::max();
+    BreakNum breakpointNumber = BreakNum{ std::numeric_limits<unsigned int>::max() };
+    BankNum bankNumber = AnyBank;
     // unsigned int ignoreCount{}; //TODO: unimplemented
     // unsigned int enableCount; //TODO: unimplemented
     unsigned int timesHit{};
     unsigned int oldWatchValue{};
     unsigned int currentWatchValue{};
     BreakType type = BreakType::Invalid;
-    BreakDisposition disp = BreakDisposition::Disable; // TODO: no way to use, is implemented though
-    bool isEnabled = false;
+    BreakDisposition disp = BreakDisposition::Keep; // TODO: no way to use, is implemented though
+    bool isEnabled = true;
     bool externalHit = false;
     std::string regName = {};
     std::shared_ptr<Rdb::ConditionInterpreter> condition;
 };
 using BreakList = std::map<BreakNum, BreakInfo>;
 
-struct RegisterInfo
-{
+struct RegisterInfo {
     std::string name;
 };
 using RegisterInfoPtr = std::shared_ptr<RegisterInfo>;

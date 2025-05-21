@@ -22,6 +22,11 @@ public:
     BreakNum SetReadWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
     BreakNum SetAnyWatchpoint(unsigned int address, BankNum bankNumber = AnyBank);
 
+    BreakNum SetWatchpoint(const std::string& name);
+    // Do we want to watch reads of registers? Would require a feedback from emulator and would likely not have value.
+    /*BreakNum SetReadWatchpoint(const std::string& name);
+    BreakNum SetAnyWatchpoint(const std::string& name);*/
+
     bool EnableBreakpoints(const std::vector<unsigned int>& list);
     bool DisableBreakpoints(const std::vector<unsigned int>& list);
     bool DeleteBreakpoints(const std::vector<unsigned int>& list = {});
