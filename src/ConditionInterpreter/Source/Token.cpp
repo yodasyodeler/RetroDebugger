@@ -35,6 +35,9 @@ std::string to_string(const LiteralObject& literal) {
                 return std::to_string(arg.Get<int>());
             }
         }
+        else if constexpr (std::is_same_v<LiteralType, std::pair<NumericValue, NumericValue>>) {
+            return fmt::format("{}:{}", arg.first.Get<int>(), arg.second.Get<int>());
+        }
         else if constexpr (std::is_same_v<LiteralType, std::string>) {
             return arg;
         }
@@ -58,6 +61,10 @@ Token::Token(TokenType type, std::string_view lexeme, std::string literal, int o
 
 Token::Token(TokenType type, std::string_view lexeme, int literal, int offset) :
     m_type(type), m_lexeme(lexeme), m_literal(NumericValue{ literal }), m_offset(offset) {
+}
+
+Token::Token(TokenType type, std::string_view lexeme, std::pair<int, int> literal, int offset) :
+    m_type(type), m_lexeme(lexeme), m_literal(std::pair{ NumericValue{ literal.first }, NumericValue{ literal.second } }), m_offset(offset) {
 }
 
 Token::Token(TokenType type, std::string_view lexeme, double literal, int offset) :
@@ -104,10 +111,18 @@ double Token::GetLiteralDouble() const {
     return std::get<NumericValue>(m_literal).Get<double>();
 }
 
+
 int Token::GetLiteralInt() const {
     if (!IsNumeric(m_literal)) { throw std::runtime_error("Must be a 'Numeric' type."); }
 
     return std::get<NumericValue>(m_literal).Get<int>();
+}
+
+std::pair<int, int> Token::GetLiteralBankNumber() const {
+    if (!IsNumericPair(m_literal)) { throw std::runtime_error("Must be a 'NumericPair' type."); }
+
+    const auto numPair = std::get<std::pair<NumericValue, NumericValue>>(m_literal);
+    return { numPair.first.Get<int>(), numPair.second.Get<int>() };
 }
 
 std::string Token::GetLiteralString() const {

@@ -227,15 +227,15 @@ void Scanner::ScanToken(Cursor& cursor) {
 
 void Scanner::ScanNumericLiteral(Cursor& cursor) {
     const auto scanNumber = [&]() { while (!IsAtEnd(cursor) && IsNumberValid(Peek(cursor))) { Pop(cursor); } };
-    const auto stripNumberSeperator = [&]() {
-        std::string numberStr = std::string(m_source.data() + cursor.start, cursor.current - cursor.start);
+    const auto stripNumberSeperator = [&](size_t cursorStart) {
+        std::string numberStr = std::string(m_source.data() + cursorStart, cursor.current - cursorStart);
         const auto invalidRepeatedNumberSeperator = numberStr.find("''");
         if (invalidRepeatedNumberSeperator != std::string::npos) {
-            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), "Adjacent digit separators");
+            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursorStart, cursor.current - cursorStart), "Adjacent digit separators");
             return std::string{};
         }
-        if (numberStr.back() == '\'') {
-            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), "Unexpected character.");
+        if (!numberStr.empty() && numberStr.back() == '\'') {
+            m_errors->Report(cursor.line, std::string_view(m_source.data() + cursorStart, cursor.current - cursorStart), "Unexpected character.");
             return std::string{};
         }
 
@@ -282,7 +282,7 @@ void Scanner::ScanNumericLiteral(Cursor& cursor) {
         scanDecimal(); // decimal
 
         try {
-            auto number = std::stod(stripNumberSeperator(), nullptr);
+            auto number = std::stod(stripNumberSeperator(cursor.start), nullptr);
             AddNumberToken(number);
         }
         catch (...) {
@@ -291,21 +291,46 @@ void Scanner::ScanNumericLiteral(Cursor& cursor) {
     }
     else {
         try {
-            if (auto numberStr = stripNumberSeperator();
-                !numberStr.empty()) {
+            const auto getNumber = [&](size_t cursorStart) {
+                if (auto numberStr = stripNumberSeperator(cursorStart);
+                    !numberStr.empty()) {
 
-                size_t pos{};
-                // stoi doesn't recognize '0b' prefix.
-                if (expectedBase == NumericBase::Binary) {
-                    pos += 2;
-                    numberStr = std::string(numberStr.begin() + 2, numberStr.end());
-                }
-                AddNumberToken(std::stoi(numberStr, &pos, static_cast<int>(expectedBase)));
+                    size_t pos{};
+                    // stoi doesn't recognize '0b' prefix.
+                    if (expectedBase == NumericBase::Binary) {
+                        pos += 2;
+                        numberStr = std::string(numberStr.begin() + 2, numberStr.end());
+                    }
+                    const auto number = std::stoi(numberStr, &pos, static_cast<int>(expectedBase));
 
-                // Error if we stopped sooner than expected
-                if (pos != numberStr.size()) {
-                    m_errors->Report(cursor.line, std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start), fmt::format("Invalid {} number", to_string(expectedBase)));
+                    // Error if we stopped sooner than expected
+                    if (pos != numberStr.size()) {
+                        m_errors->Report(cursor.line, std::string_view(m_source.data() + cursorStart, cursor.current - cursorStart), fmt::format("Invalid {} number", to_string(expectedBase)));
+                    }
+                    return std::pair{ false, number };
                 }
+                return std::pair{ true, 0 };
+            };
+            const auto [hasError, number] = getNumber(cursor.start);
+            if (hasError) { return; }
+
+            // Bank Notation
+            if (Peek(cursor) == ':' && IsNumeric(PeekAhead(cursor))) {
+                Pop(cursor);
+                const auto cursorStart = cursor.current;
+                scanNumber();
+
+                const auto [hasError, number2] = getNumber(cursorStart);
+                if (hasError) { return; }
+
+                m_tokenList.emplace_back(TokenType::BANK_NUMBER,
+                    std::string_view(m_source.data() + cursor.start, cursor.current - cursor.start),
+                    std::pair{ number, number2 },
+                    cursor.current);
+            }
+            // Single number
+            else {
+                AddNumberToken(number);
             }
         }
         catch (...) {

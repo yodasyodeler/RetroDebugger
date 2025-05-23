@@ -197,6 +197,54 @@ TEST(ScannerTests, Scan_NumericLiterals_NumberSeperators_SeperatorsAreRemoved) {
     EXPECT_EQ(tokens[0].GetLiteralDouble(), 123.0);
 }
 
+TEST(ScannerTests, Scan_NumericLiterals_BankNotation_) {
+    static constexpr auto source = "1:3"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 2);
+
+    EXPECT_EQ(tokens[0].GetType(), TokenType::BANK_NUMBER);
+    EXPECT_EQ(tokens[0].GetLexeme(), source);
+    EXPECT_EQ(tokens[0].GetLiteralBankNumber(), (std::pair{ 1, 3 }));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_BankNotationDoubleColon_NotASingleNumber) {
+    static constexpr auto source = "1::3"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 5);
+    EXPECT_EQ(tokens[1].GetType(), TokenType::COLON);
+    EXPECT_EQ(tokens[2].GetType(), TokenType::COLON);
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_BankNotationPrefix_NotASingleNumber) {
+    static constexpr auto source = ":3"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 3);
+    EXPECT_EQ(tokens[0].GetType(), TokenType::COLON);
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_BankNotationSuffix_NotASingleNumber) {
+    static constexpr auto source = "3:"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 3);
+    EXPECT_EQ(tokens[1].GetType(), TokenType::COLON);
+}
+
 TEST(ScannerTests, Scan_NumericLiterals_NumberSeperators_DoubleSeperatorsError) {
     static constexpr auto source = "12''3"sv;
     auto errors = std::make_shared<Errors>();

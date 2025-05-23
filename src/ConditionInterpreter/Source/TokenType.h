@@ -38,6 +38,7 @@ enum class TokenType {
     IDENTIFIER,
     // STRING,
     NUMBER,
+    BANK_NUMBER,
 
     // Keywords.
     // AND,
