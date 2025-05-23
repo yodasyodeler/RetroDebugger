@@ -129,6 +129,24 @@ TEST(ParserExpressionTests, Chapter6Challenge_TernaryOperator_withCommaOperator_
     ASSERT_EQ(expectedStr, std::get<std::string>(visitReturn));
 }
 
+TEST(ParserExpressionTests, BankNotationNumber_HappyPath) {
+    std::string expectedStr = "(== 100 (* (group 5:20)))";
+    std::string testStr = R"(100 == *(5:20))";
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, testStr);
+    const auto tokens = scanner.ScanTokens();
+    ASSERT_FALSE(errors->HasError());
+
+    Parser parser(errors, tokens);
+    const auto expr = parser.Parse();
+    EXPECT_TRUE(parser.IsDone());
+
+    StringVisitor visitor;
+    const auto visitReturn = expr->Accept(&visitor);
+
+    ASSERT_EQ(expectedStr, std::get<std::string>(visitReturn));
+}
+
 // Syntax Error Handling
 
 TEST(ParserExpressionTests, Chapter6Challenge_Assignment_Ternary_NoLeftOperand_ExpectThrow) {

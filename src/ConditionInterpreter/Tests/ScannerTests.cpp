@@ -197,7 +197,7 @@ TEST(ScannerTests, Scan_NumericLiterals_NumberSeperators_SeperatorsAreRemoved) {
     EXPECT_EQ(tokens[0].GetLiteralDouble(), 123.0);
 }
 
-TEST(ScannerTests, Scan_NumericLiterals_BankNotation_) {
+TEST(ScannerTests, Scan_NumericLiterals_BankNotation_HappyPath) {
     static constexpr auto source = "1:3"sv;
     auto errors = std::make_shared<Errors>();
     Scanner scanner(errors, source);
@@ -209,6 +209,34 @@ TEST(ScannerTests, Scan_NumericLiterals_BankNotation_) {
     EXPECT_EQ(tokens[0].GetType(), TokenType::BANK_NUMBER);
     EXPECT_EQ(tokens[0].GetLexeme(), source);
     EXPECT_EQ(tokens[0].GetLiteralBankNumber(), (std::pair{ 1, 3 }));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_BankNotation_Hex_HappyPath) {
+    static constexpr auto source = "0x5:0xA"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 2);
+
+    EXPECT_EQ(tokens[0].GetType(), TokenType::BANK_NUMBER);
+    EXPECT_EQ(tokens[0].GetLexeme(), source);
+    EXPECT_EQ(tokens[0].GetLiteralBankNumber(), (std::pair{ 5, 10 }));
+}
+
+TEST(ScannerTests, Scan_NumericLiterals_BankNotation_Binary_HappyPath) {
+    static constexpr auto source = "0b101:0b1010"sv;
+    auto errors = std::make_shared<Errors>();
+    Scanner scanner(errors, source);
+    const auto tokens = scanner.ScanTokens();
+
+    ASSERT_FALSE(errors->HasError());
+    ASSERT_EQ(tokens.size(), 2);
+
+    EXPECT_EQ(tokens[0].GetType(), TokenType::BANK_NUMBER);
+    EXPECT_EQ(tokens[0].GetLexeme(), source);
+    EXPECT_EQ(tokens[0].GetLiteralBankNumber(), (std::pair{ 5, 10 }));
 }
 
 TEST(ScannerTests, Scan_NumericLiterals_BankNotationDoubleColon_NotASingleNumber) {

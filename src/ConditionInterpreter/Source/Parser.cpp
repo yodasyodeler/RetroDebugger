@@ -193,7 +193,7 @@ Expr::IExprPtr Parser::ParsePrimary() {
         return std::make_shared<Expr::Variable>(std::make_shared<Token>(PreviousToken()));
     }
 
-    if (MatchTokenType({ TokenType::NUMBER })) {
+    if (MatchTokenType({ TokenType::NUMBER }) || MatchTokenType({ TokenType::BANK_NUMBER })) {
         return std::make_shared<Expr::Literal>(PreviousToken().GetLiteral());
     }
 

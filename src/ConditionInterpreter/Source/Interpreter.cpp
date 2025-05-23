@@ -168,6 +168,10 @@ VisitorValue Interpreter::VisitUnary(const Expr::Unary* expr) const {
             return VisitorValue{ NumericValue(0) - std::get<NumericValue>(right) };
         }
         case TokenType::STAR:
+            if (IsNumericPair(right)) {
+                const auto numberPair = std::get<std::pair<NumericValue, NumericValue>>(right);
+                return VisitorValue{ static_cast<int>(m_callbacks->ReadBankableMemory(BankNum{ static_cast<unsigned int>(numberPair.first.Get<int>()) }, numberPair.second.Get<int>())) };
+            }
             CheckNumberOperand(expr->m_oper, right);
             return VisitorValue{ static_cast<int>(m_callbacks->ReadMemory(std::get<NumericValue>(right).Get<int>())) };
     };

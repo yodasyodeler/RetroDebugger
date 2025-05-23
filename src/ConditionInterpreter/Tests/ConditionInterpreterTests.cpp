@@ -87,3 +87,15 @@ TEST_F(ConditionInterpreterTests, SimpleConditions_CheckAddress_HappyPath) {
     EXPECT_CALL(*m_callbacks, ReadMemory(0x100)).Times(1).WillRepeatedly(Return(testMemory));
     EXPECT_TRUE(condition->EvaluateCondition());
 }
+
+TEST_F(ConditionInterpreterTests, SimpleConditions_CheckBankAddress_HappyPath) {
+    auto testMemory = 0;
+    EXPECT_CALL(*m_callbacks, ReadBankableMemory(BankNum{ 1u }, 100)).Times(1).WillRepeatedly(Return(testMemory));
+
+    const auto condition = Rdb::ConditionInterpreter::CreateCondition(m_callbacks, "*(1:100) == 5");
+    EXPECT_FALSE(condition->EvaluateCondition());
+
+    testMemory = 5;
+    EXPECT_CALL(*m_callbacks, ReadBankableMemory(BankNum{ 1u }, 100)).Times(1).WillRepeatedly(Return(testMemory));
+    EXPECT_TRUE(condition->EvaluateCondition());
+}
